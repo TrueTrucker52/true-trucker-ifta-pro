@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-truck.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -54,7 +57,12 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up">
-            <Button variant="hero" size="lg" className="text-lg px-8 py-4 h-14">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="text-lg px-8 py-4 h-14"
+              onClick={() => navigate('/auth')}
+            >
               Start 7-Day Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

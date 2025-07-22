@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Star, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Pricing = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="pricing" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -77,7 +80,12 @@ const Pricing = () => {
 
               {/* CTA Button */}
               <div className="space-y-4 pt-6">
-                <Button variant="hero" size="lg" className="w-full">
+                <Button 
+                  variant="hero" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => navigate('/auth')}
+                >
                   <Zap className="mr-2 h-5 w-5" />
                   Start Your Free Trial
                 </Button>
