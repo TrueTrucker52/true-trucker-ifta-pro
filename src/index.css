@@ -8,29 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* TrueTrucker IFTA Pro - Warm & Professional Color System */
+    --background: 220 15% 97%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Deep highway blue - trustworthy and professional */
+    --primary: 215 85% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 75% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Warm sunset orange - inviting and energetic */
+    --secondary: 25 95% 55%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 10% 95%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Lighter blue for highlights */
+    --accent: 215 75% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success colors for positive actions */
+    --success: 150 60% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Gradients for hero sections and call-to-actions */
+    --gradient-primary: linear-gradient(135deg, hsl(215 85% 25%), hsl(215 75% 45%));
+    --gradient-sunset: linear-gradient(135deg, hsl(25 95% 55%), hsl(35 90% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(215 85% 25%) 0%, hsl(215 75% 35%) 50%, hsl(25 95% 55%) 100%);
+
+    /* Shadows with warm undertones */
+    --shadow-elegant: 0 10px 30px -10px hsl(215 85% 25% / 0.3);
+    --shadow-warm: 0 8px 25px -8px hsl(25 95% 55% / 0.2);
+    --shadow-glow: 0 0 40px hsl(215 75% 45% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
