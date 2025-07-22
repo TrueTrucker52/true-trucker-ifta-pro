@@ -47,6 +47,60 @@ export type Database = {
         }
         Relationships: []
       }
+      receipts: {
+        Row: {
+          created_at: string
+          fuel_tax: number | null
+          gallons: number | null
+          id: string
+          location: string | null
+          price_per_gallon: number | null
+          raw_ocr_text: string | null
+          receipt_date: string
+          receipt_image_url: string | null
+          receipt_time: string | null
+          state_code: string | null
+          total_amount: number | null
+          updated_at: string
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          created_at?: string
+          fuel_tax?: number | null
+          gallons?: number | null
+          id?: string
+          location?: string | null
+          price_per_gallon?: number | null
+          raw_ocr_text?: string | null
+          receipt_date: string
+          receipt_image_url?: string | null
+          receipt_time?: string | null
+          state_code?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id: string
+          vendor?: string | null
+        }
+        Update: {
+          created_at?: string
+          fuel_tax?: number | null
+          gallons?: number | null
+          id?: string
+          location?: string | null
+          price_per_gallon?: number | null
+          raw_ocr_text?: string | null
+          receipt_date?: string
+          receipt_image_url?: string | null
+          receipt_time?: string | null
+          state_code?: string | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

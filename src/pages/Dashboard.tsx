@@ -213,7 +213,13 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => handleFeatureClick('Scan Receipts')}
+                onClick={() => {
+                  if (subscriptionStatus === 'trial') {
+                    handleFeatureClick('Scan Receipts');
+                  } else {
+                    navigate('/scan-receipt');
+                  }
+                }}
                 disabled={subscriptionStatus === 'trial'}
               >
                 {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
