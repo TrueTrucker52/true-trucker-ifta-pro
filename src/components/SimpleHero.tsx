@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, ArrowRight } from "lucide-react";
+import { TruckAnimation } from "./TruckAnimation";
+import { AnimatedStatistics } from "./AnimatedStatistics";
+import heroTruck from "@/assets/hero-truck.jpg";
 
 const SimpleHero = () => {
   const navigate = useNavigate();
@@ -8,8 +11,30 @@ const SimpleHero = () => {
   console.log('SimpleHero rendering...');
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-background">
-      <div className="container mx-auto px-4 py-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${heroTruck})`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+        
+        {/* Animated Floating Elements */}
+        <div className="absolute top-20 left-10 animate-bounce">
+          <div className="w-4 h-4 bg-primary/30 rounded-full" />
+        </div>
+        <div className="absolute top-40 right-20 animate-pulse">
+          <div className="w-6 h-6 bg-secondary/40 rounded-full" />
+        </div>
+        <div className="absolute bottom-40 left-20 animate-bounce delay-1000">
+          <div className="w-3 h-3 bg-accent/50 rounded-full" />
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-muted rounded-full mb-8">
             <CheckCircle className="h-4 w-4 mr-2" />
@@ -39,7 +64,7 @@ const SimpleHero = () => {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Button 
               size="lg" 
               className="text-lg px-8 py-4 h-14"
@@ -56,6 +81,23 @@ const SimpleHero = () => {
             >
               Watch Demo
             </Button>
+          </div>
+
+          {/* 3D Truck Animation */}
+          <div className="mb-12">
+            <TruckAnimation />
+          </div>
+
+          {/* Statistics */}
+          <AnimatedStatistics />
+        </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="animate-bounce">
+          <div className="w-6 h-10 border-2 border-primary/50 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-primary rounded-full animate-pulse mt-2" />
           </div>
         </div>
       </div>
