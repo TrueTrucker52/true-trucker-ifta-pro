@@ -37,11 +37,11 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/auth')}>
+            <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>
               Sign In
             </Button>
-            <Button variant="hero" size="lg" onClick={() => navigate('/auth')}>
-              Start Free Trial
+            <Button variant="hero" size="lg" onClick={() => navigate('/auth?mode=signup')}>
+              Sign Up
             </Button>
           </div>
 
@@ -68,11 +68,11 @@ const Header = () => {
                 Contact
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" className="justify-start" onClick={() => navigate('/auth')}>
+                <Button variant="ghost" className="justify-start" onClick={() => navigate('/auth?mode=signin')}>
                   Sign In
                 </Button>
-                <Button variant="hero" onClick={() => navigate('/auth')}>
-                  Start Free Trial
+                <Button variant="hero" onClick={() => navigate('/auth?mode=signup')}>
+                  Sign Up
                 </Button>
               </div>
             </nav>
