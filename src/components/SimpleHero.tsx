@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, ArrowRight } from "lucide-react";
-import { TruckAnimation } from "./TruckAnimation";
+import { CheckCircle, ArrowRight, Truck } from "lucide-react";
+import { motion } from "framer-motion";
 import { AnimatedStatistics } from "./AnimatedStatistics";
 import heroTruck from "@/assets/hero-truck.jpg";
 
@@ -83,9 +83,43 @@ const SimpleHero = () => {
             </Button>
           </div>
 
-          {/* 3D Truck Animation */}
-          <div className="mb-12">
-            <TruckAnimation />
+          {/* Animated 2D Truck */}
+          <div className="mb-12 flex justify-center">
+            <motion.div
+              className="relative p-8 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl"
+              animate={{ 
+                scale: [1, 1.05, 1],
+                rotateY: [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <motion.div
+                animate={{ 
+                  x: [0, 20, -20, 0],
+                  rotate: [0, 2, -2, 0]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Truck className="h-24 w-24 text-primary" />
+              </motion.div>
+              
+              {/* Animated road lines */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent">
+                <motion.div
+                  className="h-full w-8 bg-primary"
+                  animate={{ x: [-32, 300] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+            </motion.div>
           </div>
 
           {/* Statistics */}
