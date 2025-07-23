@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Truck, Play, Video } from 'lucide-react';
 import IFTADemo from '@/components/IFTADemo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import demoThumbnail from '@/assets/demo-video-thumbnail.jpg';
 
 const Demo = () => {
   const navigate = useNavigate();
@@ -48,24 +49,51 @@ const Demo = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="relative aspect-video bg-muted">
-                {/* Video Player */}
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
-                  <div className="text-center">
-                    <div className="bg-primary/10 border-2 border-primary/20 rounded-full p-6 mb-4 inline-block hover:bg-primary/20 transition-colors cursor-pointer group">
-                      <Play className="h-12 w-12 text-primary group-hover:scale-110 transition-transform" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      Complete App Walkthrough
-                    </h3>
-                    <p className="text-muted-foreground max-w-md">
-                      See how easy it is to track mileage, scan receipts, and generate IFTA reports
-                    </p>
-                    {/* Video would be embedded here */}
-                    <div className="mt-4 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-full inline-block">
-                      📹 Demo video coming soon - placeholder for now
-                    </div>
+              <div className="relative aspect-video bg-muted overflow-hidden">
+                {/* Video Thumbnail */}
+                <img 
+                  src={demoThumbnail} 
+                  alt="TrueTrucker IFTA Pro Demo Video"
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group">
+                  <div className="bg-white/10 backdrop-blur border-2 border-white/30 rounded-full p-8 group-hover:scale-110 transition-transform">
+                    <Play className="h-16 w-16 text-white fill-white" />
                   </div>
+                </div>
+                
+                {/* Video Info Overlay */}
+                <div className="absolute bottom-4 left-4 text-white">
+                  <div className="bg-black/50 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
+                    ▶ 3:45 - Complete Walkthrough
+                  </div>
+                </div>
+              </div>
+              
+              {/* Video Description */}
+              <div className="p-6 bg-muted/30">
+                <h4 className="font-semibold text-foreground mb-2">What you'll see in this demo:</h4>
+                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                  <div className="space-y-1">
+                    <div>• Dashboard overview and key metrics</div>
+                    <div>• Adding and managing vehicles</div>
+                    <div>• Recording trip mileage</div>
+                    <div>• Receipt scanning with OCR</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div>• Fuel tax calculations by state</div>
+                    <div>• Generating IFTA quarterly reports</div>
+                    <div>• Fleet management features</div>
+                    <div>• Mobile app functionality</div>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                  <p className="text-sm text-primary font-medium">
+                    💡 To record your own demo video: Use screen recording software to capture the interactive demo below, 
+                    showing each tab and feature with voice narration explaining the benefits.
+                  </p>
                 </div>
               </div>
             </CardContent>
