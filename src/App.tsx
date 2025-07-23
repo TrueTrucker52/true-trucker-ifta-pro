@@ -12,6 +12,7 @@ import Demo from "./pages/Demo";
 import IFTAReports from "./pages/IFTAReports";
 import MileageTracker from "./pages/MileageTracker";
 import ReceiptScan from "./pages/ReceiptScan";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,11 @@ const App = () => (
             <Route path="/scan-receipt" element={
               <ProtectedRoute>
                 <ReceiptScan />
+              </ProtectedRoute>
+            } />
+            <Route path="/invoices" element={
+              <ProtectedRoute>
+                <Invoices />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

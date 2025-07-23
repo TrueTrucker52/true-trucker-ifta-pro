@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, LogOut, MapPin, Receipt, Calculator, FileText, Users, Settings, Lock, Crown, CreditCard } from 'lucide-react';
+import { Truck, LogOut, MapPin, Receipt, Calculator, FileText, Users, Settings, Lock, Crown, CreditCard, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -324,6 +324,37 @@ const Dashboard = () => {
               >
                 {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 Manage Fleet
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-500/10 p-2 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-blue-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Invoice Management</CardTitle>
+                  <CardDescription>Create and send customer invoices</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  if (!isPaid) {
+                    handleFeatureClick('Invoice Management');
+                  } else {
+                    navigate('/invoices');
+                  }
+                }}
+                disabled={!isPaid}
+              >
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
+                Manage Invoices
               </Button>
             </CardContent>
           </Card>

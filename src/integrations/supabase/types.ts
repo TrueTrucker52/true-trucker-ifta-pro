@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          customer_email: string
+          customer_name: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          status: string
+          stripe_invoice_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          customer_email: string
+          customer_name?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_email?: string
+          customer_name?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
