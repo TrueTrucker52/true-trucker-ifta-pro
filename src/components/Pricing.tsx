@@ -11,9 +11,12 @@ const Pricing = () => {
   const { subscription_tier, createCheckout } = useSubscription();
 
   const handlePlanClick = (plan: string) => {
+    console.log('🎯 Plan clicked:', plan, 'User authenticated:', !!user);
     if (!user) {
+      console.log('🔄 Redirecting to auth - no user');
       navigate('/auth');
     } else {
+      console.log('💳 Creating checkout for authenticated user');
       createCheckout(plan);
     }
   };

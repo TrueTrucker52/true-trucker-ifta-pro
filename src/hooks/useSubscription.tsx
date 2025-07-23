@@ -60,7 +60,9 @@ export const useSubscription = () => {
   };
 
   const createCheckout = async (plan: string) => {
+    console.log('🚀 Creating checkout for plan:', plan);
     if (!user || !session) {
+      console.log('❌ No user or session for checkout');
       toast({
         title: "Authentication Required",
         description: "Please sign in to subscribe",
@@ -70,6 +72,7 @@ export const useSubscription = () => {
     }
 
     try {
+      console.log('📡 Invoking create-checkout function with plan:', plan);
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { plan },
         headers: {
@@ -77,13 +80,21 @@ export const useSubscription = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Checkout error:', error);
+        throw error;
+      }
 
+      console.log('✅ Checkout response:', data);
       if (data.url) {
+        console.log('🔗 Opening checkout URL:', data.url);
         window.open(data.url, '_blank');
+      } else {
+        console.error('❌ No checkout URL received');
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('💥 Error creating checkout:', error);
       toast({
         title: "Error",
         description: "Failed to create checkout session. Please try again.",

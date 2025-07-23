@@ -107,7 +107,10 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => navigate('/#pricing')}
+                  onClick={() => {
+                    console.log('🔄 Dashboard Upgrade button clicked - navigating to pricing');
+                    navigate('/#pricing');
+                  }}
                 >
                   Upgrade Now
                 </Button>
