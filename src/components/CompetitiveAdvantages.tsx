@@ -252,7 +252,15 @@ export const CompetitiveAdvantages = () => {
                   size="lg" 
                   variant="outline"
                   className="border-white text-white hover:bg-white/10"
-                  onClick={() => navigate('/#pricing')}
+                  onClick={() => {
+                    console.log('🛒 Competitive Advantages Order Now button clicked - scrolling to pricing');
+                    const pricingElement = document.getElementById('pricing');
+                    if (pricingElement) {
+                      pricingElement.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      navigate('/#pricing');
+                    }
+                  }}
                 >
                   Order Now
                 </Button>

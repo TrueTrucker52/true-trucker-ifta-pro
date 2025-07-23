@@ -81,7 +81,15 @@ const SimpleHero = () => {
               variant="premium"
               size="lg" 
               className="text-lg px-8 py-4 h-14"
-              onClick={() => navigate('/#pricing')}
+              onClick={() => {
+                console.log('🛒 Order Now button clicked - scrolling to pricing');
+                const pricingElement = document.getElementById('pricing');
+                if (pricingElement) {
+                  pricingElement.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  navigate('/#pricing');
+                }
+              }}
             >
               Order Now
             </Button>
