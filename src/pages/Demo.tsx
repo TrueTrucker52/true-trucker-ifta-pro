@@ -27,8 +27,8 @@ const Demo = () => {
                 <p className="text-sm text-muted-foreground">Interactive Demo Experience</p>
               </div>
             </div>
-            <Button onClick={() => navigate('/auth')}>
-              Start Free Trial
+            <Button onClick={() => navigate('/#pricing')}>
+              Order Now
             </Button>
           </div>
         </div>
@@ -112,8 +112,8 @@ const Demo = () => {
               Start your free trial today and experience the difference.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" onClick={() => navigate('/auth')}>
-                Start Free Trial
+              <Button size="lg" onClick={() => navigate('/#pricing')}>
+                Order Now
               </Button>
               <Button variant="outline" size="lg" onClick={() => navigate('/')}>
                 Learn More

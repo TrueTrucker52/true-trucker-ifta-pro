@@ -81,7 +81,7 @@ const SimpleHero = () => {
               variant="premium"
               size="lg" 
               className="text-lg px-8 py-4 h-14"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/#pricing')}
             >
               Order Now
             </Button>

@@ -286,7 +286,7 @@ const Features = () => {
                 size="lg" 
                 variant="premium"
                 className="text-lg px-8 py-4 h-14"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/#pricing')}
               >
                 Order Now
               </Button>
@@ -294,7 +294,7 @@ const Features = () => {
                 size="lg" 
                 variant="outline"
                 className="text-lg px-8 py-4 h-14 border-white text-white hover:bg-white/10"
-                onClick={() => navigate('#pricing')}
+                onClick={() => navigate('/#pricing')}
               >
                 View Pricing
               </Button>
