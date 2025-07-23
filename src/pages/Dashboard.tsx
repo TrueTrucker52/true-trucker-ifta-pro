@@ -107,7 +107,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => navigate('/#pricing')}
+                  onClick={() => navigate('/auth')}
                 >
                   Upgrade Now
                 </Button>
