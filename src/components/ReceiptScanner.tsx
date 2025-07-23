@@ -139,7 +139,7 @@ export const ReceiptScanner = () => {
       
       const sanitizedText = sanitizeOcrText(text);
       setOcrText(sanitizedText);
-      extractReceiptData(sanitizedText);
+      await extractReceiptData(sanitizedText);
       
       toast({
         title: "Receipt Scanned",
@@ -157,46 +157,65 @@ export const ReceiptScanner = () => {
     }
   };
 
-  const extractReceiptData = (text: string) => {
+  const extractReceiptData = async (text: string) => {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
     
-    // Simple pattern matching for common receipt fields
+    // Basic pattern matching for initial extraction
     const datePattern = /(\d{1,2}\/\d{1,2}\/\d{2,4}|\d{1,2}-\d{1,2}-\d{2,4})/;
     const timePattern = /(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)/i;
     const gallonPattern = /(\d+\.?\d*)\s*(?:gal|gallon|gallons)/i;
     const pricePattern = /\$?(\d+\.\d{2,3})\/gal/i;
     const totalPattern = /(?:total|amount).*?\$?(\d+\.\d{2})/i;
     
-    let extractedData: Partial<ReceiptData> = {};
+    let basicExtractedData: Partial<ReceiptData> = {};
     
     lines.forEach(line => {
       const dateMatch = line.match(datePattern);
-      if (dateMatch && !extractedData.date) {
-        extractedData.date = dateMatch[1];
+      if (dateMatch && !basicExtractedData.date) {
+        basicExtractedData.date = dateMatch[1];
       }
       
       const timeMatch = line.match(timePattern);
-      if (timeMatch && !extractedData.time) {
-        extractedData.time = timeMatch[1];
+      if (timeMatch && !basicExtractedData.time) {
+        basicExtractedData.time = timeMatch[1];
       }
       
       const gallonMatch = line.match(gallonPattern);
-      if (gallonMatch && !extractedData.gallons) {
-        extractedData.gallons = gallonMatch[1];
+      if (gallonMatch && !basicExtractedData.gallons) {
+        basicExtractedData.gallons = gallonMatch[1];
       }
       
       const priceMatch = line.match(pricePattern);
-      if (priceMatch && !extractedData.pricePerGallon) {
-        extractedData.pricePerGallon = priceMatch[1];
+      if (priceMatch && !basicExtractedData.pricePerGallon) {
+        basicExtractedData.pricePerGallon = priceMatch[1];
       }
       
       const totalMatch = line.match(totalPattern);
-      if (totalMatch && !extractedData.totalAmount) {
-        extractedData.totalAmount = totalMatch[1];
+      if (totalMatch && !basicExtractedData.totalAmount) {
+        basicExtractedData.totalAmount = totalMatch[1];
       }
     });
     
-    setReceiptData(prev => ({ ...prev, ...extractedData }));
+    // Use AI to enhance the extraction
+    try {
+      const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
+        body: {
+          ocrText: text,
+          extractedData: basicExtractedData
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.enhancedData) {
+        setReceiptData(prev => ({ ...prev, ...data.enhancedData }));
+      } else {
+        setReceiptData(prev => ({ ...prev, ...basicExtractedData }));
+      }
+    } catch (error) {
+      console.error('AI enhancement failed, using basic extraction:', error);
+      setReceiptData(prev => ({ ...prev, ...basicExtractedData }));
+    }
   };
 
   const saveReceipt = async () => {
