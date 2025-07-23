@@ -30,7 +30,7 @@ const Header = () => {
             <a href="#pricing" className="text-foreground hover:text-primary transition-colors">
               Pricing
             </a>
-            <a href="#contact" className="text-foreground hover:text-primary transition-colors">
+            <a href="mailto:support@true-trucker-ifta-pro.com" className="text-foreground hover:text-primary transition-colors">
               Contact
             </a>
           </nav>
@@ -64,7 +64,7 @@ const Header = () => {
               <a href="#pricing" className="text-foreground hover:text-primary transition-colors">
                 Pricing
               </a>
-              <a href="#contact" className="text-foreground hover:text-primary transition-colors">
+              <a href="mailto:support@true-trucker-ifta-pro.com" className="text-foreground hover:text-primary transition-colors">
                 Contact
               </a>
               <div className="flex flex-col space-y-2 pt-4">
