@@ -188,7 +188,13 @@ const Dashboard = () => {
             <CardContent>
               <Button 
                 className="w-full" 
-                onClick={() => handleFeatureClick('Track Miles')}
+                onClick={() => {
+                  if (subscriptionStatus === 'trial') {
+                    handleFeatureClick('Track Miles');
+                  } else {
+                    navigate('/mileage-tracker');
+                  }
+                }}
                 disabled={subscriptionStatus === 'trial'}
               >
                 {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
@@ -244,7 +250,13 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => handleFeatureClick('IFTA Calculator')}
+                onClick={() => {
+                  if (subscriptionStatus === 'trial') {
+                    handleFeatureClick('IFTA Calculator');
+                  } else {
+                    navigate('/ifta-reports');
+                  }
+                }}
                 disabled={subscriptionStatus === 'trial'}
               >
                 {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}

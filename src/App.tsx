@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Demo from "./pages/Demo";
+import IFTAReports from "./pages/IFTAReports";
+import MileageTracker from "./pages/MileageTracker";
 import ReceiptScan from "./pages/ReceiptScan";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +30,16 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/ifta-reports" element={
+              <ProtectedRoute>
+                <IFTAReports />
+              </ProtectedRoute>
+            } />
+            <Route path="/mileage-tracker" element={
+              <ProtectedRoute>
+                <MileageTracker />
               </ProtectedRoute>
             } />
             <Route path="/scan-receipt" element={
