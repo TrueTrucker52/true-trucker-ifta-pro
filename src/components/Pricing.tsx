@@ -20,23 +20,16 @@ const Pricing = () => {
           </p>
         </div>
 
-        {/* Pricing Card */}
-        <div className="max-w-lg mx-auto">
-          <Card className="border-2 border-primary/20 shadow-xl relative overflow-hidden">
-            {/* Popular Badge */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="bg-gradient-sunset px-6 py-2 rounded-full flex items-center space-x-2">
-                <Star className="h-4 w-4 text-white" />
-                <span className="text-white font-semibold text-sm">Most Popular</span>
-              </div>
-            </div>
-
-            <CardHeader className="text-center pt-12 pb-6">
-              <CardTitle className="text-2xl font-bold text-foreground mb-2">
-                TrueTrucker IFTA Pro
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Small Fleet Plan */}
+          <Card className="border-2 border-border shadow-lg relative overflow-hidden">
+            <CardHeader className="text-center pt-8 pb-6">
+              <CardTitle className="text-xl font-bold text-foreground mb-2">
+                Small Fleet
               </CardTitle>
               <CardDescription className="text-muted-foreground mb-6">
-                Everything you need for IFTA compliance
+                Perfect for owner-operators and small fleets
               </CardDescription>
               
               {/* Pricing */}
@@ -47,11 +40,11 @@ const Pricing = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <span className="text-5xl font-bold text-foreground">$25</span>
+                  <span className="text-4xl font-bold text-foreground">$20</span>
                   <span className="text-muted-foreground ml-2">/month</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Cancel anytime. No setup fees.
+                  1-3 trucks • Cancel anytime
                 </p>
               </div>
             </CardHeader>
@@ -60,20 +53,93 @@ const Pricing = () => {
               {/* Features List */}
               <div className="space-y-4">
                 {[
-                  "Unlimited mileage tracking",
+                  "Up to 3 trucks/trailers",
+                  "Unlimited mileage tracking", 
                   "All 48 states + Canadian provinces",
                   "Receipt scanning & OCR",
                   "Quarterly return generation",
                   "Real-time fuel tax calculations",
                   "Mobile & desktop access",
                   "Secure cloud backup",
-                  "Expert support included",
-                  "Audit-ready reports",
-                  "Fleet management tools"
+                  "Email support",
+                  "Basic audit reports"
                 ].map((feature, index) => (
                   <div key={index} className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
-                    <span className="text-foreground">{feature}</span>
+                    <span className="text-foreground text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <div className="space-y-4 pt-6">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => navigate('/auth')}
+                >
+                  Start Free Trial
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Medium Fleet Plan - Most Popular */}
+          <Card className="border-2 border-primary/20 shadow-xl relative overflow-hidden">
+            {/* Popular Badge */}
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-gradient-sunset px-6 py-2 rounded-full flex items-center space-x-2">
+                <Star className="h-4 w-4 text-white" />
+                <span className="text-white font-semibold text-sm">Most Popular</span>
+              </div>
+            </div>
+
+            <CardHeader className="text-center pt-12 pb-6">
+              <CardTitle className="text-xl font-bold text-foreground mb-2">
+                Medium Fleet
+              </CardTitle>
+              <CardDescription className="text-muted-foreground mb-6">
+                Ideal for growing trucking operations
+              </CardDescription>
+              
+              {/* Pricing */}
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="bg-success/10 text-success px-4 py-2 rounded-full inline-block mb-4">
+                    <span className="font-semibold">7-Day FREE Trial</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-foreground">$40</span>
+                  <span className="text-muted-foreground ml-2">/month</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  4-7 trucks • Cancel anytime
+                </p>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Features List */}
+              <div className="space-y-4">
+                {[
+                  "Up to 7 trucks/trailers",
+                  "Unlimited mileage tracking",
+                  "All 48 states + Canadian provinces", 
+                  "Advanced receipt scanning & OCR",
+                  "Automated quarterly returns",
+                  "Real-time fuel tax calculations",
+                  "Mobile & desktop access",
+                  "Secure cloud backup",
+                  "Priority email & phone support",
+                  "Advanced fleet management",
+                  "Driver assignment tracking",
+                  "Comprehensive audit reports"
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+                    <span className="text-foreground text-sm">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -93,16 +159,83 @@ const Pricing = () => {
                   No credit card required for trial
                 </p>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Money Back Guarantee */}
-              <div className="bg-muted/50 p-4 rounded-lg text-center">
+          {/* Large Fleet Plan */}
+          <Card className="border-2 border-border shadow-lg relative overflow-hidden">
+            <CardHeader className="text-center pt-8 pb-6">
+              <CardTitle className="text-xl font-bold text-foreground mb-2">
+                Large Fleet
+              </CardTitle>
+              <CardDescription className="text-muted-foreground mb-6">
+                Enterprise solution for established fleets
+              </CardDescription>
+              
+              {/* Pricing */}
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="bg-success/10 text-success px-4 py-2 rounded-full inline-block mb-4">
+                    <span className="font-semibold">7-Day FREE Trial</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-foreground">$75</span>
+                  <span className="text-muted-foreground ml-2">/month</span>
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  <strong>30-Day Money-Back Guarantee</strong><br />
-                  Not satisfied? Get a full refund, no questions asked.
+                  8-12 trucks • Cancel anytime
                 </p>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Features List */}
+              <div className="space-y-4">
+                {[
+                  "Up to 12 trucks/trailers",
+                  "Unlimited mileage tracking",
+                  "All 48 states + Canadian provinces",
+                  "AI-powered receipt processing",
+                  "Automated quarterly & annual returns",
+                  "Real-time multi-state tax calculations",
+                  "Mobile & desktop access",
+                  "Enterprise cloud backup",
+                  "Dedicated account manager",
+                  "Advanced fleet analytics",
+                  "Multi-driver management",
+                  "Custom compliance reports",
+                  "API access for integrations",
+                  "Priority audit assistance"
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+                    <span className="text-foreground text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <div className="space-y-4 pt-6">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => navigate('/auth')}
+                >
+                  Start Free Trial
+                </Button>
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Money Back Guarantee */}
+        <div className="mt-12 max-w-2xl mx-auto bg-muted/50 p-6 rounded-lg text-center">
+          <p className="text-muted-foreground">
+            <strong className="text-foreground">30-Day Money-Back Guarantee</strong><br />
+            Not satisfied? Get a full refund, no questions asked. All plans include free setup and migration assistance.
+          </p>
         </div>
 
         {/* FAQ Section */}
