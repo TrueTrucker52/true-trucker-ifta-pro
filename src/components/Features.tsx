@@ -13,6 +13,10 @@ import {
   Users,
   Award
 } from "lucide-react";
+import { motion } from "framer-motion";
+import { RouteVisualization } from "./RouteVisualization";
+import { ReceiptScanAnimation } from "./ReceiptScanAnimation";
+import { InteractiveStateMap } from "./InteractiveStateMap";
 
 const Features = () => {
   const features = [
@@ -82,7 +86,13 @@ const Features = () => {
     <section id="features" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             Everything You Need for
             <span className="block text-primary">IFTA Success</span>
@@ -90,46 +100,170 @@ const Features = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Built specifically for professional truckers who need reliable, accurate, and easy-to-use IFTA management.
           </p>
-        </div>
+        </motion.div>
+
+        {/* Route Visualization Demo */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-foreground mb-2">Interactive Route Planning</h3>
+            <p className="text-muted-foreground">Visualize your routes and track mileage across IFTA states</p>
+          </div>
+          <RouteVisualization />
+        </motion.div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {features.map((feature, index) => (
-            <Card 
-              key={index} 
-              className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg group"
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.02, y: -5 }}
             >
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <div className="bg-gradient-primary p-3 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="h-6 w-6 text-white" />
+              <Card 
+                className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg group h-full"
+              >
+                <CardHeader>
+                  <div className="flex items-center space-x-4">
+                    <motion.div 
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="bg-gradient-primary p-3 rounded-lg"
+                    >
+                      <feature.icon className="h-6 w-6 text-white" />
+                    </motion.div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {feature.title}
+                      </CardTitle>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg font-semibold text-foreground">
-                      {feature.title}
-                    </CardTitle>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-muted-foreground">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-muted-foreground">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
+        {/* Receipt Scanning Demo */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 className="text-3xl font-bold text-foreground mb-4">Smart Receipt Processing</h3>
+              <p className="text-muted-foreground mb-6 text-lg">
+                Upload receipts and watch our AI extract fuel purchase data automatically. 
+                No more manual data entry - just scan and go!
+              </p>
+              <div className="space-y-3">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  viewport={{ once: true }}
+                  className="flex items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-2 h-2 bg-primary rounded-full mr-3"
+                  />
+                  <span className="text-foreground">Automatic OCR text recognition</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  viewport={{ once: true }}
+                  className="flex items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                    className="w-2 h-2 bg-primary rounded-full mr-3"
+                  />
+                  <span className="text-foreground">Smart data extraction</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  viewport={{ once: true }}
+                  className="flex items-center"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                    className="w-2 h-2 bg-primary rounded-full mr-3"
+                  />
+                  <span className="text-foreground">Instant IFTA calculations</span>
+                </motion.div>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <ReceiptScanAnimation />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Interactive State Map */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <InteractiveStateMap />
+        </motion.div>
+
         {/* Call to Action */}
-        <div className="text-center mt-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
           <div className="bg-gradient-primary p-8 rounded-2xl text-white">
-            <h3 className="text-2xl font-bold mb-4">Ready to Simplify Your IFTA?</h3>
-            <p className="text-white/90 mb-6 max-w-2xl mx-auto">
+            <motion.h3 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="text-2xl font-bold mb-4"
+            >
+              Ready to Simplify Your IFTA?
+            </motion.h3>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="text-white/90 mb-6 max-w-2xl mx-auto"
+            >
               Join thousands of truckers who've already made the switch to TrueTrucker IFTA Pro. 
               Start your free trial today and see the difference.
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
