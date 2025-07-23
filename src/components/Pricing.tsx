@@ -62,11 +62,6 @@ const Pricing = () => {
               {/* Pricing */}
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="bg-success/10 text-success px-4 py-2 rounded-full inline-block mb-4">
-                    <span className="font-semibold">7-Day FREE Trial</span>
-                  </div>
-                </div>
-                <div className="text-center">
                   <span className="text-4xl font-bold text-foreground">$20</span>
                   <span className="text-muted-foreground ml-2">/month</span>
                 </div>
@@ -107,7 +102,7 @@ const Pricing = () => {
                 onClick={() => handlePlanClick('small')}
                 disabled={subscription_tier === 'small'}
               >
-                {subscription_tier === 'small' ? 'Current Plan' : 'Start Free Trial'}
+                {subscription_tier === 'small' ? 'Current Plan' : 'Subscribe Now'}
               </Button>
               </div>
             </CardContent>
@@ -144,11 +139,6 @@ const Pricing = () => {
               
               {/* Pricing */}
               <div className="space-y-4">
-                <div className="text-center">
-                  <div className="bg-success/10 text-success px-4 py-2 rounded-full inline-block mb-4">
-                    <span className="font-semibold">7-Day FREE Trial</span>
-                  </div>
-                </div>
                 <div className="text-center">
                   <span className="text-4xl font-bold text-foreground">$40</span>
                   <span className="text-muted-foreground ml-2">/month</span>
@@ -197,13 +187,10 @@ const Pricing = () => {
                   ) : (
                     <>
                       <Zap className="mr-2 h-5 w-5" />
-                      Start Your Free Trial
+                      Subscribe Now
                     </>
                   )}
                 </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  No credit card required for trial
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -232,11 +219,6 @@ const Pricing = () => {
               
               {/* Pricing */}
               <div className="space-y-4">
-                <div className="text-center">
-                  <div className="bg-success/10 text-success px-4 py-2 rounded-full inline-block mb-4">
-                    <span className="font-semibold">7-Day FREE Trial</span>
-                  </div>
-                </div>
                 <div className="text-center">
                   <span className="text-4xl font-bold text-foreground">$75</span>
                   <span className="text-muted-foreground ml-2">/month</span>
@@ -282,7 +264,7 @@ const Pricing = () => {
                   onClick={() => handlePlanClick('large')}
                   disabled={subscription_tier === 'large'}
                 >
-                  {subscription_tier === 'large' ? 'Current Plan' : 'Start Free Trial'}
+                  {subscription_tier === 'large' ? 'Current Plan' : 'Subscribe Now'}
                 </Button>
               </div>
             </CardContent>
@@ -305,8 +287,8 @@ const Pricing = () => {
           <div className="space-y-6">
             {[
               {
-                question: "What happens after my free trial?",
-                answer: "After 7 days, you'll be automatically charged based on your selected plan: Small Fleet ($20/month), Medium Fleet ($40/month), or Large Fleet ($75/month). You can cancel anytime during or after the trial with no penalty."
+                question: "How does billing work?",
+                answer: "You'll be charged monthly based on your selected plan: Small Fleet ($20/month), Medium Fleet ($40/month), or Large Fleet ($75/month). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",
