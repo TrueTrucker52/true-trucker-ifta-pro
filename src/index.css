@@ -18,20 +18,20 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    /* Primary: Deep highway blue - trustworthy and professional */
-    --primary: 215 85% 25%;
+    /* Primary: Vibrant highway blue - trustworthy and professional */
+    --primary: 215 100% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 75% 45%;
+    --primary-glow: 215 85% 65%;
 
-    /* Secondary: Warm sunset orange - inviting and energetic */
-    --secondary: 25 95% 55%;
+    /* Secondary: Bold sunset orange - inviting and energetic */
+    --secondary: 25 100% 65%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 10% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 220 15% 92%;
+    --muted-foreground: 215 25% 35%;
 
-    /* Accent: Lighter blue for highlights */
-    --accent: 215 75% 45%;
+    /* Accent: Electric blue for highlights */
+    --accent: 200 100% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 55%;
@@ -42,9 +42,9 @@ All colors MUST be HSL.
     --success-foreground: 0 0% 100%;
 
     /* Gradients for hero sections and call-to-actions */
-    --gradient-primary: linear-gradient(135deg, hsl(215 85% 25%), hsl(215 75% 45%));
-    --gradient-sunset: linear-gradient(135deg, hsl(25 95% 55%), hsl(35 90% 60%));
-    --gradient-hero: linear-gradient(135deg, hsl(215 85% 25%) 0%, hsl(215 75% 35%) 50%, hsl(25 95% 55%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(215 100% 45%), hsl(215 85% 65%));
+    --gradient-sunset: linear-gradient(135deg, hsl(25 100% 65%), hsl(35 95% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(215 100% 45%) 0%, hsl(200 100% 55%) 50%, hsl(25 100% 65%) 100%);
 
     /* Shadows with warm undertones */
     --shadow-elegant: 0 10px 30px -10px hsl(215 85% 25% / 0.3);
