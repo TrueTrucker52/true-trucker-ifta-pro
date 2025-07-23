@@ -303,7 +303,7 @@ const Pricing = () => {
             {[
               {
                 question: "What happens after my free trial?",
-                answer: "After 7 days, you'll be automatically charged $25/month. You can cancel anytime during or after the trial with no penalty."
+                answer: "After 7 days, you'll be automatically charged based on your selected plan: Small Fleet ($20/month), Medium Fleet ($40/month), or Large Fleet ($75/month). You can cancel anytime during or after the trial with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",
