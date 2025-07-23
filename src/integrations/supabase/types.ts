@@ -101,6 +101,93 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_logs: {
+        Row: {
+          created_at: string
+          date: string
+          end_location: string
+          id: string
+          miles: number
+          notes: string | null
+          purpose: string
+          start_location: string
+          updated_at: string
+          user_id: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_location: string
+          id?: string
+          miles: number
+          notes?: string | null
+          purpose: string
+          start_location: string
+          updated_at?: string
+          user_id: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_location?: string
+          id?: string
+          miles?: number
+          notes?: string | null
+          purpose?: string
+          start_location?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          fuel_type: string | null
+          id: string
+          license_plate: string | null
+          make: string | null
+          model: string | null
+          updated_at: string
+          user_id: string
+          vehicle_name: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_name: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_name?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -46,7 +46,8 @@ const MileageTracker = () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
+      // Using type assertion temporarily until Supabase types are regenerated
+      const { data, error } = await (supabase as any)
         .from('trip_logs')
         .select('*')
         .eq('user_id', user.id)
@@ -75,7 +76,8 @@ const MileageTracker = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      // Using type assertion temporarily until Supabase types are regenerated
+      const { error } = await (supabase as any)
         .from('trip_logs')
         .insert({
           user_id: user.id,
