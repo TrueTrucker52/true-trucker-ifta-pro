@@ -168,7 +168,7 @@ const Pricing = () => {
                   "Real-time fuel tax calculations",
                   "Mobile & desktop access",
                   "Secure cloud backup",
-                  "Priority email & phone support",
+                  "Priority email support",
                   "Advanced fleet management",
                   "Driver assignment tracking",
                   "Comprehensive audit reports"

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Truck, Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
+import { Truck, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,7 +13,6 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
@@ -28,7 +27,7 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !phone) {
+    if (!email || !password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -38,7 +37,7 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const { error } = await signUp(email, password, phone);
+    const { error } = await signUp(email, password);
     
     if (error) {
       toast({
@@ -165,21 +164,6 @@ const Auth = () => {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-phone">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input
-                        id="signup-phone"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
                         className="pl-10"
                         required
                       />

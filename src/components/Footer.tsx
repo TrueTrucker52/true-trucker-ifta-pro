@@ -1,4 +1,4 @@
-import { Truck, Mail, Phone, MapPin } from "lucide-react";
+import { Truck, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -49,11 +49,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4" />
-                <span className="text-primary-foreground/80">support@truetrucker.com</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4" />
-                <span className="text-primary-foreground/80">1-800-TRUCKER</span>
+                <span className="text-primary-foreground/80">support@true-trucker-ifta-pro.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4" />

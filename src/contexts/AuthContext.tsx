@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   profile: any;
-  signUp: (email: string, password: string, phone?: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, phone?: string) => {
+  const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -58,17 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailRedirectTo: redirectUrl
       }
     });
-
-    // If signup successful and phone provided, update profile
-    if (!error && phone) {
-      setTimeout(async () => {
-        try {
-          await supabase.from('profiles').update({ phone }).eq('email', email);
-        } catch (profileError) {
-          console.error('Error updating profile with phone:', profileError);
-        }
-      }, 1000);
-    }
 
     return { error };
   };
