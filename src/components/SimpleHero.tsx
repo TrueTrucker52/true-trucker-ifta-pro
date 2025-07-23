@@ -12,25 +12,28 @@ const SimpleHero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background */}
+      {/* Hero Truck Background */}
       <div className="absolute inset-0 z-0">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
           style={{
             backgroundImage: `url(${heroTruck})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/60 to-background/85" />
         
         {/* Animated Floating Elements */}
         <div className="absolute top-20 left-10 animate-bounce">
-          <div className="w-4 h-4 bg-primary/30 rounded-full" />
+          <div className="w-4 h-4 bg-primary/40 rounded-full blur-sm" />
         </div>
         <div className="absolute top-40 right-20 animate-pulse">
-          <div className="w-6 h-6 bg-secondary/40 rounded-full" />
+          <div className="w-6 h-6 bg-secondary/50 rounded-full blur-sm" />
         </div>
         <div className="absolute bottom-40 left-20 animate-bounce delay-1000">
-          <div className="w-3 h-3 bg-accent/50 rounded-full" />
+          <div className="w-3 h-3 bg-accent/60 rounded-full blur-sm" />
+        </div>
+        <div className="absolute top-60 right-40 animate-pulse delay-500">
+          <div className="w-5 h-5 bg-primary/30 rounded-full blur-sm" />
         </div>
       </div>
 
