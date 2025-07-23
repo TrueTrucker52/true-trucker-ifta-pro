@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { securityMonitor } from '@/lib/securityMonitoring';
 
 interface AuthContextType {
   user: User | null;
@@ -63,10 +64,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    // Check rate limiting
+    if (securityMonitor.checkRateLimit(`auth_${email}`, 5, 15 * 60 * 1000)) {
+      const error = new Error('Too many failed attempts. Please try again later.');
+      return { error };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    // Log authentication failures for security monitoring
+    if (error) {
+      securityMonitor.logAuthFailure(email, error.message, navigator.userAgent);
+    }
+
     return { error };
   };
 

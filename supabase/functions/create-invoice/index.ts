@@ -3,7 +3,7 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://tlvngzfoxpjdltbpmzaz.supabase.co",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -41,13 +41,31 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { customer_email, customer_name, amount, description, due_date } = await req.json();
+    const requestData = await req.json();
+    const { customer_email, customer_name, amount, description, due_date } = requestData;
     
+    // Input validation and sanitization
     if (!customer_email || !amount) {
       throw new Error("customer_email and amount are required");
     }
+    
+    if (typeof customer_email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer_email)) {
+      throw new Error("Invalid email format");
+    }
+    
+    if (typeof amount !== 'number' || amount <= 0 || amount > 100000000) {
+      throw new Error("Invalid amount");
+    }
+    
+    if (customer_name && (typeof customer_name !== 'string' || customer_name.length > 100)) {
+      throw new Error("Invalid customer name");
+    }
+    
+    if (description && (typeof description !== 'string' || description.length > 500)) {
+      throw new Error("Invalid description");
+    }
 
-    logStep("Request data validated", { customer_email, amount, description });
+    logStep("Request data validated", { customer_email, amount: amount, description: description?.substring(0, 50) });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
@@ -132,9 +150,17 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-invoice", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    logStep("ERROR in create-invoice", { error: error instanceof Error ? error.name : 'UnknownError' });
+    
+    // Don't expose internal error details in production
+    const publicError = errorMessage.includes('Authentication') || 
+                       errorMessage.includes('required') || 
+                       errorMessage.includes('Invalid') 
+                       ? errorMessage 
+                       : 'Invoice creation failed. Please try again.';
+    
+    return new Response(JSON.stringify({ error: publicError }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

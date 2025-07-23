@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Plus, Eye, DollarSign, Calendar, Mail, User } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { invoiceSchema, sanitizeInput } from '@/lib/validation';
 
 interface Invoice {
   id: string;
@@ -74,23 +75,34 @@ const InvoiceManager = () => {
   };
 
   const createInvoice = async () => {
-    if (!user || !formData.customer_email || !formData.amount) {
-      toast({
-        title: "Validation Error", 
-        description: "Customer email and amount are required",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!user) return;
 
     try {
+      // Validate and sanitize input data
+      const validationResult = invoiceSchema.safeParse({
+        customerEmail: formData.customer_email,
+        customerName: formData.customer_name,
+        amount: parseFloat(formData.amount),
+        description: formData.description,
+        dueDate: formData.due_date
+      });
+
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: validationResult.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+
       setCreating(true);
       const { data, error } = await supabase.functions.invoke('create-invoice', {
         body: {
-          customer_email: formData.customer_email,
-          customer_name: formData.customer_name || null,
+          customer_email: sanitizeInput(formData.customer_email),
+          customer_name: formData.customer_name ? sanitizeInput(formData.customer_name) : null,
           amount: Math.round(parseFloat(formData.amount) * 100), // Convert to cents
-          description: formData.description || null,
+          description: formData.description ? sanitizeInput(formData.description) : null,
           due_date: formData.due_date || null,
         },
       });

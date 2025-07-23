@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import Tesseract from 'tesseract.js';
+import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
+import { validateFileUpload } from '@/lib/securityMonitoring';
 
 interface ReceiptData {
   date: string;
@@ -97,6 +99,17 @@ export const ReceiptScanner = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file before processing
+      const validation = validateFileUpload(file);
+      if (!validation.valid) {
+        toast({
+          title: "File Validation Failed",
+          description: validation.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = e.target?.result as string;
@@ -124,8 +137,9 @@ export const ReceiptScanner = () => {
         }
       );
       
-      setOcrText(text);
-      extractReceiptData(text);
+      const sanitizedText = sanitizeOcrText(text);
+      setOcrText(sanitizedText);
+      extractReceiptData(sanitizedText);
       
       toast({
         title: "Receipt Scanned",
@@ -195,6 +209,27 @@ export const ReceiptScanner = () => {
       return;
     }
 
+    // Validate receipt data
+    const validationResult = receiptSchema.safeParse({
+      receiptDate: receiptData.date || new Date().toISOString().split('T')[0],
+      vendor: receiptData.vendor,
+      location: receiptData.location,
+      totalAmount: receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : undefined,
+      gallons: receiptData.gallons ? parseFloat(receiptData.gallons) : undefined,
+      pricePerGallon: receiptData.pricePerGallon ? parseFloat(receiptData.pricePerGallon) : undefined,
+      stateCode: receiptData.stateCode,
+      rawOcrText: ocrText
+    });
+
+    if (!validationResult.success) {
+      toast({
+        title: "Validation Error",
+        description: validationResult.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     
     try {
@@ -214,22 +249,22 @@ export const ReceiptScanner = () => {
         imageUrl = fileName;
       }
       
-      // Save receipt data to database
+      // Save receipt data to database with sanitized inputs
       const { error } = await supabase
         .from('receipts')
         .insert({
           user_id: user.id,
           receipt_date: receiptData.date || new Date().toISOString().split('T')[0],
           receipt_time: receiptData.time || null,
-          location: receiptData.location || null,
-          vendor: receiptData.vendor || null,
+          location: receiptData.location ? sanitizeInput(receiptData.location) : null,
+          vendor: receiptData.vendor ? sanitizeInput(receiptData.vendor) : null,
           gallons: receiptData.gallons ? parseFloat(receiptData.gallons) : null,
           price_per_gallon: receiptData.pricePerGallon ? parseFloat(receiptData.pricePerGallon) : null,
           total_amount: receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : null,
           fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
-          state_code: receiptData.stateCode || null,
+          state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
           receipt_image_url: imageUrl,
-          raw_ocr_text: ocrText
+          raw_ocr_text: sanitizeOcrText(ocrText)
         });
       
       if (error) throw error;
