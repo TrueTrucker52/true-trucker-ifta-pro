@@ -277,10 +277,18 @@ const Features = () => {
                 size="lg" 
                 variant="secondary"
                 className="text-lg px-8 py-4 h-14 bg-white text-primary hover:bg-white/90"
+                onClick={() => navigate('/demo')}
+              >
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="premium"
+                className="text-lg px-8 py-4 h-14"
                 onClick={() => navigate('/auth')}
               >
-                Subscribe Now - Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
+                Order Now
               </Button>
               <Button 
                 size="lg" 

@@ -69,12 +69,21 @@ const SimpleHero = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Button 
+              variant="hero"
+              size="lg" 
+              className="text-lg px-8 py-4 h-14"
+              onClick={() => navigate('/demo')}
+            >
+              Start Free Trial
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              variant="premium"
               size="lg" 
               className="text-lg px-8 py-4 h-14"
               onClick={() => navigate('/auth')}
             >
-              Subscribe Now - Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Order Now
             </Button>
             <Button 
               variant="outline" 

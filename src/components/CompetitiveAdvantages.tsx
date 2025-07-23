@@ -238,15 +238,25 @@ export const CompetitiveAdvantages = () => {
               <p className="text-white/90 mb-4">
                 Join the thousands of truckers who've already made the switch to smarter IFTA management.
               </p>
-              <Button 
-                size="lg" 
-                variant="secondary"
-                className="bg-white text-primary hover:bg-white/90"
-                onClick={() => navigate('/auth')}
-              >
-                Subscribe Now - Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button 
+                  size="lg" 
+                  variant="secondary"
+                  className="bg-white text-primary hover:bg-white/90"
+                  onClick={() => navigate('/demo')}
+                >
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-white text-white hover:bg-white/10"
+                  onClick={() => navigate('/auth')}
+                >
+                  Order Now
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
