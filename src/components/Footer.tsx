@@ -27,8 +27,8 @@ const Footer = () => {
             <ul className="space-y-2 text-primary-foreground/80">
               <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
               <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Mobile App</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Desktop App</a></li>
+              <li><a href="https://apps.apple.com/search?term=trucking%20apps" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Mobile App</a></li>
+              <li><a href="/dashboard" className="hover:text-white transition-colors">Desktop App</a></li>
             </ul>
           </div>
 
@@ -36,10 +36,10 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Support</h4>
             <ul className="space-y-2 text-primary-foreground/80">
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">IFTA Guide</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="https://docs.google.com/document/d/help-center" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">IFTA Guide</a></li>
+              <li><a href="https://www.reddit.com/r/Truckers/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Community</a></li>
+              <li><a href="mailto:support@true-trucker-ifta-pro.com" className="hover:text-white transition-colors">Contact Us</a></li>
             </ul>
           </div>
 
@@ -49,7 +49,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4" />
-                <span className="text-primary-foreground/80">support@true-trucker-ifta-pro.com</span>
+                <a href="mailto:support@true-trucker-ifta-pro.com" className="text-primary-foreground/80 hover:text-white transition-colors">support@true-trucker-ifta-pro.com</a>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4" />
@@ -65,9 +65,9 @@ const Footer = () => {
             © 2024 TrueTrucker IFTA Pro. All rights reserved.
           </p>
           <div className="flex space-x-6 text-primary-foreground/60 text-sm mt-4 md:mt-0">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">IFTA Compliance</a>
+            <a href="https://www.privacypolicygenerator.info/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="https://www.termsofservicegenerator.net/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">IFTA Compliance</a>
           </div>
         </div>
       </div>
