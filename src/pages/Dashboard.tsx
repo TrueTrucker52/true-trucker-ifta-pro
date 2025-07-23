@@ -107,10 +107,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    // Direct navigation to pricing/checkout
-                    window.location.href = '/auth';
-                  }}
+                  onClick={() => createCheckout('medium')}
                 >
                   Upgrade Now
                 </Button>
