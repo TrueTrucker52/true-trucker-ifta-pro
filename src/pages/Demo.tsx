@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Truck } from 'lucide-react';
+import { ArrowLeft, Truck, Play, Video } from 'lucide-react';
 import IFTADemo from '@/components/IFTADemo';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Demo = () => {
   const navigate = useNavigate();
@@ -34,6 +35,44 @@ const Demo = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Video Demo Section */}
+        <div className="mb-12">
+          <Card className="overflow-hidden">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold flex items-center justify-center gap-3">
+                <Video className="h-6 w-6 text-primary" />
+                App Demo Video
+              </CardTitle>
+              <CardDescription>
+                Watch a complete walkthrough of TrueTrucker IFTA Pro features
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="relative aspect-video bg-muted">
+                {/* Video Player */}
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                  <div className="text-center">
+                    <div className="bg-primary/10 border-2 border-primary/20 rounded-full p-6 mb-4 inline-block hover:bg-primary/20 transition-colors cursor-pointer group">
+                      <Play className="h-12 w-12 text-primary group-hover:scale-110 transition-transform" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Complete App Walkthrough
+                    </h3>
+                    <p className="text-muted-foreground max-w-md">
+                      See how easy it is to track mileage, scan receipts, and generate IFTA reports
+                    </p>
+                    {/* Video would be embedded here */}
+                    <div className="mt-4 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-full inline-block">
+                      📹 Demo video coming soon - placeholder for now
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Interactive Demo */}
         <IFTADemo />
         
         {/* Call to Action */}
