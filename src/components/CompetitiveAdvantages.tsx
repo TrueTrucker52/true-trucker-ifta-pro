@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { 
   Zap, 
   Brain, 
@@ -11,7 +13,8 @@ import {
   Star,
   TrendingUp,
   Users,
-  Award
+  Award,
+  ArrowRight
 } from 'lucide-react';
 
 const advantages = [
@@ -104,6 +107,8 @@ const competitorComparison = [
 ];
 
 export const CompetitiveAdvantages = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-8">
       {/* Key Advantages */}
@@ -223,6 +228,25 @@ export const CompetitiveAdvantages = () => {
               <h4 className="font-semibold text-purple-700 mb-1">Cost Reduction</h4>
               <p className="text-2xl font-bold text-purple-600">$2,400</p>
               <p className="text-sm text-purple-600">average annual savings</p>
+            </div>
+          </div>
+          
+          {/* Call to Action */}
+          <div className="mt-8 text-center">
+            <div className="bg-gradient-primary p-6 rounded-xl text-white">
+              <h4 className="text-xl font-bold mb-2">Ready to Experience the Difference?</h4>
+              <p className="text-white/90 mb-4">
+                Join the thousands of truckers who've already made the switch to smarter IFTA management.
+              </p>
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="bg-white text-primary hover:bg-white/90"
+                onClick={() => navigate('/auth')}
+              >
+                Subscribe Now - Start Free Trial
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </CardContent>

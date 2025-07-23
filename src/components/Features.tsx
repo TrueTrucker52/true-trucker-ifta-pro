@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   Calculator, 
   MapPin, 
@@ -11,14 +12,17 @@ import {
   TrendingUp,
   Zap,
   Users,
-  Award
+  Award,
+  ArrowRight
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { RouteVisualization } from "./RouteVisualization";
 import { ReceiptScanAnimation } from "./ReceiptScanAnimation";
 import { InteractiveStateMap } from "./InteractiveStateMap";
 
 const Features = () => {
+  const navigate = useNavigate();
   const features = [
     {
       icon: Calculator,
@@ -262,6 +266,31 @@ const Features = () => {
               Join thousands of truckers who've already made the switch to TrueTrucker IFTA Pro. 
               Start your free trial today and see the difference.
             </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="text-lg px-8 py-4 h-14 bg-white text-primary hover:bg-white/90"
+                onClick={() => navigate('/auth')}
+              >
+                Subscribe Now - Free Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="text-lg px-8 py-4 h-14 border-white text-white hover:bg-white/10"
+                onClick={() => navigate('#pricing')}
+              >
+                View Pricing
+              </Button>
+            </motion.div>
           </div>
         </motion.div>
       </div>

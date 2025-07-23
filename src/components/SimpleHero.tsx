@@ -73,7 +73,7 @@ const SimpleHero = () => {
               className="text-lg px-8 py-4 h-14"
               onClick={() => navigate('/auth')}
             >
-              Start 7-Day Free Trial
+              Subscribe Now - Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
