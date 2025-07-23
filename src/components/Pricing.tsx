@@ -1,10 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Star, Zap } from "lucide-react";
+import { CheckCircle, Star, Zap, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { subscription_tier, createCheckout } = useSubscription();
+
+  const handlePlanClick = (plan: string) => {
+    if (!user) {
+      navigate('/auth');
+    } else {
+      createCheckout(plan);
+    }
+  };
 
   return (
     <section id="pricing" className="py-20 bg-muted/30">
@@ -23,7 +35,19 @@ const Pricing = () => {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Small Fleet Plan */}
-          <Card className="border-2 border-border shadow-lg relative overflow-hidden">
+          <Card className={`border-2 shadow-lg relative overflow-hidden ${
+            subscription_tier === 'small' 
+              ? 'border-primary bg-primary/5' 
+              : 'border-border'
+          }`}>
+            {subscription_tier === 'small' && (
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-primary px-4 py-2 rounded-full flex items-center space-x-2">
+                  <Crown className="h-4 w-4 text-white" />
+                  <span className="text-white font-semibold text-sm">Current Plan</span>
+                </div>
+              </div>
+            )}
             <CardHeader className="text-center pt-8 pb-6">
               <CardTitle className="text-xl font-bold text-foreground mb-2">
                 Small Fleet
@@ -73,26 +97,38 @@ const Pricing = () => {
 
               {/* CTA Button */}
               <div className="space-y-4 pt-6">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="w-full"
-                  onClick={() => navigate('/auth')}
-                >
-                  Start Free Trial
-                </Button>
+              <Button 
+                variant={subscription_tier === 'small' ? 'default' : 'outline'}
+                size="lg" 
+                className="w-full"
+                onClick={() => handlePlanClick('small')}
+                disabled={subscription_tier === 'small'}
+              >
+                {subscription_tier === 'small' ? 'Current Plan' : 'Start Free Trial'}
+              </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Medium Fleet Plan - Most Popular */}
-          <Card className="border-2 border-primary/20 shadow-xl relative overflow-hidden">
+          <Card className={`border-2 shadow-xl relative overflow-hidden ${
+            subscription_tier === 'medium' 
+              ? 'border-primary bg-primary/5' 
+              : 'border-primary/20'
+          }`}>
             {/* Popular Badge */}
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="bg-gradient-sunset px-6 py-2 rounded-full flex items-center space-x-2">
-                <Star className="h-4 w-4 text-white" />
-                <span className="text-white font-semibold text-sm">Most Popular</span>
-              </div>
+              {subscription_tier === 'medium' ? (
+                <div className="bg-primary px-4 py-2 rounded-full flex items-center space-x-2">
+                  <Crown className="h-4 w-4 text-white" />
+                  <span className="text-white font-semibold text-sm">Current Plan</span>
+                </div>
+              ) : (
+                <div className="bg-gradient-sunset px-6 py-2 rounded-full flex items-center space-x-2">
+                  <Star className="h-4 w-4 text-white" />
+                  <span className="text-white font-semibold text-sm">Most Popular</span>
+                </div>
+              )}
             </div>
 
             <CardHeader className="text-center pt-12 pb-6">
@@ -147,13 +183,20 @@ const Pricing = () => {
               {/* CTA Button */}
               <div className="space-y-4 pt-6">
                 <Button 
-                  variant="hero" 
+                  variant={subscription_tier === 'medium' ? 'default' : 'hero'}
                   size="lg" 
                   className="w-full"
-                  onClick={() => navigate('/auth')}
+                  onClick={() => handlePlanClick('medium')}
+                  disabled={subscription_tier === 'medium'}
                 >
-                  <Zap className="mr-2 h-5 w-5" />
-                  Start Your Free Trial
+                  {subscription_tier === 'medium' ? (
+                    'Current Plan'
+                  ) : (
+                    <>
+                      <Zap className="mr-2 h-5 w-5" />
+                      Start Your Free Trial
+                    </>
+                  )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
                   No credit card required for trial
@@ -163,7 +206,19 @@ const Pricing = () => {
           </Card>
 
           {/* Large Fleet Plan */}
-          <Card className="border-2 border-border shadow-lg relative overflow-hidden">
+          <Card className={`border-2 shadow-lg relative overflow-hidden ${
+            subscription_tier === 'large' 
+              ? 'border-primary bg-primary/5' 
+              : 'border-border'
+          }`}>
+            {subscription_tier === 'large' && (
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-primary px-4 py-2 rounded-full flex items-center space-x-2">
+                  <Crown className="h-4 w-4 text-white" />
+                  <span className="text-white font-semibold text-sm">Current Plan</span>
+                </div>
+              </div>
+            )}
             <CardHeader className="text-center pt-8 pb-6">
               <CardTitle className="text-xl font-bold text-foreground mb-2">
                 Large Fleet
@@ -218,12 +273,13 @@ const Pricing = () => {
               {/* CTA Button */}
               <div className="space-y-4 pt-6">
                 <Button 
-                  variant="outline" 
+                  variant={subscription_tier === 'large' ? 'default' : 'outline'}
                   size="lg" 
                   className="w-full"
-                  onClick={() => navigate('/auth')}
+                  onClick={() => handlePlanClick('large')}
+                  disabled={subscription_tier === 'large'}
                 >
-                  Start Free Trial
+                  {subscription_tier === 'large' ? 'Current Plan' : 'Start Free Trial'}
                 </Button>
               </div>
             </CardContent>

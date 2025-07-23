@@ -1,41 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, LogOut, MapPin, Receipt, Calculator, FileText, Users, Settings, Lock } from 'lucide-react';
+import { Truck, LogOut, MapPin, Receipt, Calculator, FileText, Users, Settings, Lock, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [subscriptionStatus, setSubscriptionStatus] = useState('trial');
+  const { subscribed, subscription_tier, openCustomerPortal, createCheckout } = useSubscription();
 
-  // Fetch user profile and subscription status
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('subscription_status, subscription_tier')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (data && !error) {
-          setSubscriptionStatus(data.subscription_status);
-        }
-      }
-    };
-    
-    if (user && !loading) {
-      fetchProfile();
-    }
-  }, [user, loading]);
+  const isPaid = subscribed && subscription_tier !== 'free';
 
   const handleFeatureClick = (featureName: string) => {
-    if (subscriptionStatus === 'trial') {
+    if (!isPaid) {
       toast({
         title: "Upgrade Required",
         description: `${featureName} is only available with a paid subscription. Upgrade now to access all features!`,
@@ -112,8 +93,8 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Trial Banner */}
-        {subscriptionStatus === 'trial' && (
+        {/* Subscription Status Banner */}
+        {!isPaid ? (
           <Card className="mb-8 border-warning/20 bg-warning/5">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -123,8 +104,40 @@ const Dashboard = () => {
                     You can explore the app but functions are locked until you upgrade to a paid plan.
                   </p>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/#pricing')}
+                >
                   Upgrade Now
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-8 border-primary/20 bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Crown className="h-5 w-5 text-primary" />
+                  <div>
+                    <h3 className="font-semibold text-primary mb-1">
+                      {subscription_tier === 'small' && 'Small Fleet Plan'}
+                      {subscription_tier === 'medium' && 'Medium Fleet Plan'}
+                      {subscription_tier === 'large' && 'Large Fleet Plan'}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      All features unlocked. Manage your subscription anytime.
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={openCustomerPortal}
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Manage Subscription
                 </Button>
               </div>
             </CardContent>
@@ -189,15 +202,15 @@ const Dashboard = () => {
               <Button 
                 className="w-full" 
                 onClick={() => {
-                  if (subscriptionStatus === 'trial') {
+                  if (!isPaid) {
                     handleFeatureClick('Track Miles');
                   } else {
                     navigate('/mileage-tracker');
                   }
                 }}
-                disabled={subscriptionStatus === 'trial'}
+                disabled={!isPaid}
               >
-                {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 Start Tracking
               </Button>
             </CardContent>
@@ -220,15 +233,15 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => {
-                  if (subscriptionStatus === 'trial') {
+                  if (!isPaid) {
                     handleFeatureClick('Scan Receipts');
                   } else {
                     navigate('/scan-receipt');
                   }
                 }}
-                disabled={subscriptionStatus === 'trial'}
+                disabled={!isPaid}
               >
-                {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 Upload Receipt
               </Button>
             </CardContent>
@@ -251,15 +264,15 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => {
-                  if (subscriptionStatus === 'trial') {
+                  if (!isPaid) {
                     handleFeatureClick('IFTA Calculator');
                   } else {
                     navigate('/ifta-reports');
                   }
                 }}
-                disabled={subscriptionStatus === 'trial'}
+                disabled={!isPaid}
               >
-                {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 Calculate Taxes
               </Button>
             </CardContent>
@@ -282,9 +295,9 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => handleFeatureClick('Quarterly Returns')}
-                disabled={subscriptionStatus === 'trial'}
+                disabled={!isPaid}
               >
-                {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 View Reports
               </Button>
             </CardContent>
@@ -307,9 +320,9 @@ const Dashboard = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => handleFeatureClick('Fleet Management')}
-                disabled={subscriptionStatus === 'trial'}
+                disabled={!isPaid}
               >
-                {subscriptionStatus === 'trial' && <Lock className="h-4 w-4 mr-2" />}
+                {!isPaid && <Lock className="h-4 w-4 mr-2" />}
                 Manage Fleet
               </Button>
             </CardContent>
