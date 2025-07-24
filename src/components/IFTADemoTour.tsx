@@ -100,6 +100,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
         </div>
       ),
       placement: 'center',
+      disableBeacon: true,
     },
     {
       target: '[data-tour="overview-tab"]',
@@ -109,6 +110,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>The Overview tab shows your key metrics at a glance - total miles, fuel used, taxes owed, and average MPG.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: '[data-tour="key-metrics"]',
@@ -118,6 +120,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>Monitor your fleet's performance with real-time data on mileage, fuel consumption, tax calculations, and efficiency trends.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: '[data-tour="fuel-summary"]',
@@ -127,6 +130,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>See detailed fuel tax calculations for each IFTA jurisdiction. Track miles driven, fuel used, and taxes owed per state.</p>
         </div>
       ),
+      placement: 'top',
     },
     {
       target: '[data-tour="drivers-tab"]',
@@ -136,6 +140,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>Track individual driver performance, fuel efficiency, and compliance metrics across your fleet.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: '[data-tour="vehicles-tab"]',
@@ -145,6 +150,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>Monitor fuel consumption and performance data for each vehicle in your fleet.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: '[data-tour="ifta-tab"]',
@@ -154,6 +160,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>Generate quarterly IFTA reports automatically. View total taxes owed, payments made, and remaining balance.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: '[data-tour="trips-tab"]',
@@ -163,6 +170,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <p>Detailed breakdown of all recorded trips with mileage, fuel consumption, and efficiency calculations.</p>
         </div>
       ),
+      placement: 'bottom',
     },
     {
       target: 'body',
@@ -218,6 +226,7 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
   };
 
   const startTour = () => {
+    console.log('Starting tour...');
     setRunTour(true);
     onTourStart?.();
   };
