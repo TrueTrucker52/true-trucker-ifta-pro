@@ -13,7 +13,7 @@ interface IFTADemoTourProps {
 const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
   const [runTour, setRunTour] = useState(false);
   const [tourKey, setTourKey] = useState(0);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
