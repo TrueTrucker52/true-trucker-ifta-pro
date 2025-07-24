@@ -41,6 +41,8 @@ serve(async (req) => {
       }),
     });
 
+    console.log('OpenAI TTS response status:', response.status);
+
     if (!response.ok) {
       const error = await response.text();
       console.error('OpenAI TTS API error:', error);
