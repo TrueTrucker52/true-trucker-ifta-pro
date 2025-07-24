@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Truck, Play, Video } from 'lucide-react';
 import IFTADemo from '@/components/IFTADemo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import demoThumbnail from '@/assets/demo-video-thumbnail.jpg';
+import demoThumbnail from '@/assets/ifta-app-demo-screenshot.jpg';
 
 const Demo = () => {
   const navigate = useNavigate();
