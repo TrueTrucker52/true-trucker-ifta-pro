@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import IFTADemoTour from './IFTADemoTour';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -65,20 +66,23 @@ const IFTADemo = () => {
             Live Demo
           </Badge>
         </div>
+        
+        {/* Tour Component */}
+        <IFTADemoTour />
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="drivers">Drivers</TabsTrigger>
-          <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
-          <TabsTrigger value="ifta-summary">IFTA Summary</TabsTrigger>
-          <TabsTrigger value="trip-reports">Trip Reports</TabsTrigger>
+          <TabsTrigger value="overview" data-tour="overview-tab">Overview</TabsTrigger>
+          <TabsTrigger value="drivers" data-tour="drivers-tab">Drivers</TabsTrigger>
+          <TabsTrigger value="vehicles" data-tour="vehicles-tab">Vehicles</TabsTrigger>
+          <TabsTrigger value="ifta-summary" data-tour="ifta-tab">IFTA Summary</TabsTrigger>
+          <TabsTrigger value="trip-reports" data-tour="trips-tab">Trip Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4" data-tour="key-metrics">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -145,7 +149,7 @@ const IFTADemo = () => {
           </div>
 
           {/* Fuel Summary by State */}
-          <Card>
+          <Card data-tour="fuel-summary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
