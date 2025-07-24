@@ -8,6 +8,17 @@ import demoThumbnail from '@/assets/ifta-app-demo-screenshot.jpg';
 const Demo = () => {
   const navigate = useNavigate();
 
+  const handleVideoPlay = () => {
+    console.log('Video play clicked');
+    // For now, scroll to the interactive demo
+    const demoElement = document.querySelector('[data-demo-section]');
+    if (demoElement) {
+      demoElement.scrollIntoView({ behavior: 'smooth' });
+    }
+    // You can replace this with actual video functionality later
+    alert('Demo video coming soon! For now, try the interactive demo below.');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -58,7 +69,10 @@ const Demo = () => {
                 />
                 
                 {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group">
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group"
+                  onClick={handleVideoPlay}
+                >
                   <div className="bg-white/10 backdrop-blur border-2 border-white/30 rounded-full p-8 group-hover:scale-110 transition-transform">
                     <Play className="h-16 w-16 text-white fill-white" />
                   </div>
@@ -101,7 +115,9 @@ const Demo = () => {
         </div>
 
         {/* Interactive Demo */}
-        <IFTADemo />
+        <div data-demo-section>
+          <IFTADemo />
+        </div>
         
         {/* Call to Action */}
         <div className="mt-12 text-center">
