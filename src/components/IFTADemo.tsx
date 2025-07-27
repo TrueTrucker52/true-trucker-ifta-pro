@@ -34,6 +34,19 @@ import {
 
 const IFTADemo = () => {
   const [selectedVehicle, setSelectedVehicle] = useState('All Vehicles');
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    scrollToSection(tabId);
+  };
 
   const fuelData = [
     { state: 'CA', miles: 2847, percentage: 32.1, fuelUsed: 593.6, taxOwed: 930.3, trend: 'up' },
@@ -67,7 +80,7 @@ const IFTADemo = () => {
           <div>
             <h2 className="text-3xl font-bold text-foreground flex items-center gap-3">
               <div className="bg-primary/10 p-2 rounded-lg">
-                <Play className="h-6 w-6 text-primary" />
+                <FileText className="h-6 w-6 text-primary" />
               </div>
               TrueTrucker IFTA Pro Demo
             </h2>
@@ -123,7 +136,7 @@ const IFTADemo = () => {
         <IFTADemoTour />
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabClick} className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview" data-tour="overview-tab">Dashboard</TabsTrigger>
           <TabsTrigger value="drivers" data-tour="drivers-tab">Drivers</TabsTrigger>
@@ -133,7 +146,7 @@ const IFTADemo = () => {
           <TabsTrigger value="trip-reports" data-tour="trips-tab">Trip Logs</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6 mt-6">
+        <TabsContent value="overview" id="overview" className="space-y-6 mt-6">
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4" data-tour="key-metrics">
             <Card>
@@ -295,7 +308,7 @@ const IFTADemo = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="drivers" className="space-y-6 mt-6">
+        <TabsContent value="drivers" id="drivers" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold">Driver Performance Scoreboard</h3>
             <Button size="sm">
@@ -383,7 +396,7 @@ const IFTADemo = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="vehicles" className="space-y-6 mt-6">
+        <TabsContent value="vehicles" id="vehicles" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold">Fleet Management</h3>
             <Button size="sm">
@@ -486,7 +499,7 @@ const IFTADemo = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="receipts" className="space-y-6 mt-6">
+        <TabsContent value="receipts" id="receipts" className="space-y-6 mt-6">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold">AI Receipt Scanner</h3>
             <Button size="sm">
@@ -564,7 +577,7 @@ const IFTADemo = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="ifta-summary" className="space-y-6 mt-6">
+        <TabsContent value="ifta-summary" id="ifta-summary" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>IFTA Tax Summary</CardTitle>
@@ -593,7 +606,7 @@ const IFTADemo = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="trip-reports" className="space-y-6 mt-6">
+        <TabsContent value="trip-reports" id="trip-reports" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Trip Reports</CardTitle>

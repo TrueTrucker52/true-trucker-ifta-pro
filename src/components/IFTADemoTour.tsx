@@ -306,15 +306,6 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
           <RotateCcw className="h-4 w-4" />
           Restart Tour
         </Button>
-        <Button 
-          variant="outline" 
-          onClick={() => setVoiceEnabled(!voiceEnabled)}
-          className="flex items-center gap-2"
-          title={voiceEnabled ? 'Disable voice narration' : 'Enable voice narration'}
-        >
-          {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          {voiceEnabled ? 'Voice On' : 'Voice Off'}
-        </Button>
       </div>
     </>
   );

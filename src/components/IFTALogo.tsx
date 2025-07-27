@@ -21,45 +21,65 @@ const IFTALogo: React.FC<IFTALogoProps> = ({ size = 'md', className = '' }) => {
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
       >
-        {/* Background Circle */}
+        {/* Main Circle Background */}
         <circle
           cx="24"
           cy="24"
           r="22"
           fill="currentColor"
-          className="opacity-10"
+          className="opacity-15"
         />
         
-        {/* Truck Silhouette */}
+        {/* Inner Badge Circle */}
+        <circle
+          cx="24"
+          cy="24"
+          r="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="opacity-60"
+        />
+        
+        {/* Highway/Road Symbol */}
         <path
-          d="M8 28h2v4h28v-4h2v-8h-6v-4a2 2 0 0-2-2H14a2 2 0 0-2 2v12z"
+          d="M10 20 L38 20 L36 16 L12 16 Z"
           fill="currentColor"
-          className="opacity-80"
+          className="opacity-70"
         />
-        <rect x="10" y="18" width="4" height="2" fill="currentColor" />
-        <rect x="16" y="18" width="4" height="2" fill="currentColor" />
+        <path
+          d="M10 28 L38 28 L36 32 L12 32 Z"
+          fill="currentColor"
+          className="opacity-70"
+        />
         
-        {/* IFTA Text Overlay */}
+        {/* IFTA Text - Bold and Centered */}
         <text
           x="24"
-          y="26"
+          y="24"
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-current font-bold"
-          style={{ fontSize: '8px', letterSpacing: '0.5px' }}
+          className="fill-current font-black"
+          style={{ fontSize: '10px', letterSpacing: '1px' }}
         >
           IFTA
         </text>
         
-        {/* Tax Symbol */}
-        <circle cx="36" cy="12" r="6" fill="currentColor" className="opacity-20" />
+        {/* Fuel Drops */}
+        <circle cx="14" cy="12" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="34" cy="12" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="14" cy="36" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="34" cy="36" r="2" fill="currentColor" className="opacity-50" />
+        
+        {/* Tax/Dollar Symbol */}
+        <circle cx="40" cy="8" r="4" fill="currentColor" className="opacity-30" />
         <text
-          x="36"
-          y="12"
+          x="40"
+          y="8"
           textAnchor="middle"
           dominantBaseline="central"
           className="fill-current font-bold"
-          style={{ fontSize: '6px' }}
+          style={{ fontSize: '5px' }}
         >
           $
         </text>
