@@ -31,7 +31,10 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 Sign up form submitted', { email, passwordLength: password.length });
+    
     if (!email || !password) {
+      console.log('❌ Validation failed - missing fields');
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -40,27 +43,57 @@ const Auth = () => {
       return;
     }
 
-    setLoading(true);
-    const { error } = await signUp(email, password);
-    
-    if (error) {
+    if (password.length < 6) {
+      console.log('❌ Validation failed - password too short');
       toast({
         title: "Error",
-        description: error.message,
+        description: "Password must be at least 6 characters long",
         variant: "destructive"
       });
-    } else {
+      return;
+    }
+
+    setLoading(true);
+    console.log('📧 Calling signUp function...');
+    
+    try {
+      const { error } = await signUp(email, password);
+      
+      if (error) {
+        console.log('❌ Sign up error:', error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        console.log('✅ Sign up successful!');
+        toast({
+          title: "Success!",
+          description: "Account created successfully! Please check your email to confirm your account before signing in.",
+        });
+        // Clear form
+        setEmail('');
+        setPassword('');
+      }
+    } catch (error) {
+      console.log('💥 Unexpected error during sign up:', error);
       toast({
-        title: "Success!",
-        description: "Account created successfully! You can now sign in.",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
       });
     }
+    
     setLoading(false);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔐 Sign in form submitted', { email, passwordLength: password.length });
+    
     if (!email || !password) {
+      console.log('❌ Validation failed - missing fields');
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -70,17 +103,31 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const { error } = await signIn(email, password);
+    console.log('🔑 Calling signIn function...');
     
-    if (error) {
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        console.log('❌ Sign in error:', error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        console.log('✅ Sign in successful! Redirecting to dashboard...');
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.log('💥 Unexpected error during sign in:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
-    } else {
-      navigate('/dashboard');
     }
+    
     setLoading(false);
   };
 
