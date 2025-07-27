@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { RouteVisualization } from "./RouteVisualization";
+import RouteMap from "./RouteMap";
 import { ReceiptScanAnimation } from "./ReceiptScanAnimation";
 import { InteractiveStateMap } from "./InteractiveStateMap";
 
@@ -115,10 +115,10 @@ const Features = () => {
           className="mb-20"
         >
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-foreground mb-2">Interactive Route Planning</h3>
-            <p className="text-muted-foreground">Visualize your routes and track mileage across IFTA states</p>
+            <h3 className="text-2xl font-bold text-foreground mb-2">Origin to Destination Tracking</h3>
+            <p className="text-muted-foreground">Visualize your routes with real-time mileage and fuel stop tracking across IFTA states</p>
           </div>
-          <RouteVisualization />
+          <RouteMap />
         </motion.div>
 
         {/* Features Grid */}
@@ -277,7 +277,7 @@ const Features = () => {
                 size="lg" 
                 variant="secondary"
                 className="text-lg px-8 py-4 h-14 bg-white text-primary hover:bg-white/90"
-                onClick={() => navigate('/demo')}
+                onClick={() => navigate('/auth')}
               >
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -302,7 +302,12 @@ const Features = () => {
                 size="lg" 
                 variant="outline"
                 className="text-lg px-8 py-4 h-14 border-white text-white hover:bg-white/10"
-                onClick={() => navigate('/#pricing')}
+                onClick={() => {
+                  const pricingElement = document.getElementById('pricing');
+                  if (pricingElement) {
+                    pricingElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
               >
                 View Pricing
               </Button>

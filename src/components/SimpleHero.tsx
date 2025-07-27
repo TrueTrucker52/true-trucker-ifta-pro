@@ -72,7 +72,7 @@ const SimpleHero = () => {
               variant="hero"
               size="lg" 
               className="text-lg px-8 py-4 h-14"
-              onClick={() => navigate('/demo')}
+              onClick={() => navigate('/auth')}
             >
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -99,7 +99,15 @@ const SimpleHero = () => {
               className="text-lg px-8 py-4 h-14"
               onClick={() => navigate('/demo')}
             >
-              Watch Demo
+              Interactive Demo
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="lg" 
+              className="text-lg px-8 py-4 h-14"
+              onClick={() => navigate('/learn')}
+            >
+              Learn More
             </Button>
           </div>
 

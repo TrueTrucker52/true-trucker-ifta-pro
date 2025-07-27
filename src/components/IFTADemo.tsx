@@ -835,7 +835,12 @@ const IFTADemo = () => {
                 <Zap className="h-4 w-4 mr-2" />
                 Start 7-Day Free Trial
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white text-white hover:bg-white/10"
+                onClick={() => window.open('/calculator', '_blank')}
+              >
                 <Calculator className="h-4 w-4 mr-2" />
                 Calculate Your Savings
               </Button>
