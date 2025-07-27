@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Truck, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import IFTALogo from './IFTALogo';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +15,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className="bg-gradient-primary p-2 rounded-lg">
-              <Truck className="h-6 w-6 text-white" />
+              <IFTALogo size="md" className="text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">TrueTrucker</h1>

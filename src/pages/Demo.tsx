@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Truck, Play, Video } from 'lucide-react';
+import { ArrowLeft, Video } from 'lucide-react';
+import IFTALogo from '@/components/IFTALogo';
 import IFTADemo from '@/components/IFTADemo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import demoThumbnail from '@/assets/ifta-app-demo-screenshot.jpg';
@@ -31,7 +32,7 @@ const Demo = () => {
                 Back
               </Button>
               <div className="bg-primary/10 p-2 rounded-lg">
-                <Truck className="h-6 w-6 text-primary" />
+                <IFTALogo size="md" className="text-primary" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">TrueTrucker IFTA Pro</h1>
@@ -61,27 +62,17 @@ const Demo = () => {
             </CardHeader>
             <CardContent className="p-0">
               <div className="relative aspect-video bg-muted overflow-hidden">
-                {/* Video Thumbnail */}
+                {/* Demo Screenshot */}
                 <img 
                   src={demoThumbnail} 
-                  alt="TrueTrucker IFTA Pro Demo Video"
+                  alt="TrueTrucker IFTA Pro Demo Screenshot"
                   className="w-full h-full object-cover"
                 />
                 
-                {/* Play Button Overlay */}
-                <div 
-                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group"
-                  onClick={handleVideoPlay}
-                >
-                  <div className="bg-white/10 backdrop-blur border-2 border-white/30 rounded-full p-8 group-hover:scale-110 transition-transform">
-                    <Play className="h-16 w-16 text-white fill-white" />
-                  </div>
-                </div>
-                
-                {/* Video Info Overlay */}
+                {/* Demo Info Overlay */}
                 <div className="absolute bottom-4 left-4 text-white">
-                  <div className="bg-black/50 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
-                    ▶ 3:45 - Complete Walkthrough
+                  <div className="bg-black/70 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
+                    📊 Interactive Demo Below
                   </div>
                 </div>
               </div>
