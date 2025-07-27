@@ -243,7 +243,10 @@ export const CompetitiveAdvantages = () => {
                   size="lg" 
                   variant="secondary"
                   className="bg-white text-primary hover:bg-white/90"
-                  onClick={() => navigate('/demo')}
+                  onClick={() => {
+                    console.log('🚀 Competitive Advantages Start Free Trial button clicked');
+                    navigate('/auth?mode=signup');
+                  }}
                 >
                   Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4" />

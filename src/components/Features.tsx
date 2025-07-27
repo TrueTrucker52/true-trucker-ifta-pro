@@ -277,7 +277,10 @@ const Features = () => {
                 size="lg" 
                 variant="secondary"
                 className="text-lg px-8 py-4 h-14 bg-white text-primary hover:bg-white/90"
-                onClick={() => navigate('/auth')}
+                onClick={() => {
+                  console.log('🚀 Features Start Free Trial button clicked');
+                  navigate('/auth?mode=signup');
+                }}
               >
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -303,9 +306,12 @@ const Features = () => {
                 variant="outline"
                 className="text-lg px-8 py-4 h-14 border-white text-white hover:bg-white/10"
                 onClick={() => {
+                  console.log('💰 View Pricing button clicked');
                   const pricingElement = document.getElementById('pricing');
                   if (pricingElement) {
                     pricingElement.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    navigate('/#pricing');
                   }
                 }}
               >
