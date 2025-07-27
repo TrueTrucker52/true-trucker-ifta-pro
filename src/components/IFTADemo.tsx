@@ -27,7 +27,9 @@ import {
   Clock,
   BarChart3,
   Calculator,
-  Users
+  Users,
+  Plus,
+  Camera
 } from 'lucide-react';
 
 const IFTADemo = () => {
@@ -122,12 +124,13 @@ const IFTADemo = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" data-tour="overview-tab">Overview</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="overview" data-tour="overview-tab">Dashboard</TabsTrigger>
           <TabsTrigger value="drivers" data-tour="drivers-tab">Drivers</TabsTrigger>
-          <TabsTrigger value="vehicles" data-tour="vehicles-tab">Vehicles</TabsTrigger>
-          <TabsTrigger value="ifta-summary" data-tour="ifta-tab">IFTA Summary</TabsTrigger>
-          <TabsTrigger value="trip-reports" data-tour="trips-tab">Trip Reports</TabsTrigger>
+          <TabsTrigger value="vehicles" data-tour="vehicles-tab">Fleet</TabsTrigger>
+          <TabsTrigger value="receipts" data-tour="receipts-tab">Receipts</TabsTrigger>
+          <TabsTrigger value="ifta-summary" data-tour="ifta-tab">IFTA Reports</TabsTrigger>
+          <TabsTrigger value="trip-reports" data-tour="trips-tab">Trip Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
@@ -293,34 +296,271 @@ const IFTADemo = () => {
         </TabsContent>
 
         <TabsContent value="drivers" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Driver Performance</CardTitle>
-              <CardDescription>Fuel efficiency and compliance metrics by driver</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Driver performance data would appear here</p>
-                <p className="text-sm">Track individual driver fuel efficiency and compliance</p>
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold">Driver Performance Scoreboard</h3>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Driver
+            </Button>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { name: "Mike Johnson", score: 98, mpg: 7.2, violations: 0, trips: 45, rank: 1 },
+              { name: "Sarah Williams", score: 94, mpg: 6.8, violations: 1, trips: 38, rank: 2 },
+              { name: "David Chen", score: 91, mpg: 6.5, violations: 2, trips: 42, rank: 3 }
+            ].map((driver, i) => (
+              <Card key={i} className={`p-4 ${driver.rank === 1 ? 'border-yellow-500/30 bg-yellow-50/30' : ''}`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                      {driver.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    {driver.rank === 1 && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <Star className="h-3 w-3 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-semibold flex items-center gap-2">
+                      {driver.name}
+                      <Badge variant={driver.rank === 1 ? "default" : "secondary"} className="text-xs">
+                        #{driver.rank}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">{driver.trips} trips this quarter</div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Performance Score</span>
+                    <span className={`text-sm font-semibold ${
+                      driver.score >= 95 ? 'text-green-600' : 
+                      driver.score >= 90 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {driver.score}/100
+                    </span>
+                  </div>
+                  <Progress value={driver.score} className="h-2" />
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-muted/30 p-2 rounded text-center">
+                      <div className="font-semibold">{driver.mpg}</div>
+                      <div className="text-muted-foreground">MPG</div>
+                    </div>
+                    <div className="bg-muted/30 p-2 rounded text-center">
+                      <div className={`font-semibold ${driver.violations === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {driver.violations}
+                      </div>
+                      <div className="text-muted-foreground">Violations</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          
+          <Card className="p-6">
+            <h4 className="font-semibold mb-4">Driver Performance Metrics</h4>
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">94.3</div>
+                <div className="text-sm text-muted-foreground">Avg Score</div>
               </div>
-            </CardContent>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">6.8</div>
+                <div className="text-sm text-muted-foreground">Avg MPG</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">3</div>
+                <div className="text-sm text-muted-foreground">Total Violations</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">125</div>
+                <div className="text-sm text-muted-foreground">Total Trips</div>
+              </div>
+            </div>
           </Card>
         </TabsContent>
 
         <TabsContent value="vehicles" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vehicle Fleet Overview</CardTitle>
-              <CardDescription>Monitor fuel consumption across your fleet</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Vehicle fleet data would appear here</p>
-                <p className="text-sm">Compare performance across different vehicles</p>
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold">Fleet Management</h3>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Vehicle
+            </Button>
+          </div>
+          
+          <div className="grid gap-4">
+            {[
+              { 
+                unit: "Unit 001", 
+                vin: "1FUJA6CV**********", 
+                make: "Freightliner Cascadia", 
+                year: 2022,
+                mpg: 7.1, 
+                miles: 89420, 
+                status: "Active",
+                lastTrip: "Chicago, IL → Dallas, TX",
+                driver: "Mike Johnson"
+              },
+              { 
+                unit: "Unit 002", 
+                vin: "1XPWD40X**********", 
+                make: "Peterbilt 579", 
+                year: 2021,
+                mpg: 6.8, 
+                miles: 125750, 
+                status: "In Transit",
+                lastTrip: "Los Angeles, CA → Phoenix, AZ",
+                driver: "Sarah Williams"
+              },
+              { 
+                unit: "Unit 003", 
+                vin: "1FUJA6CK**********", 
+                make: "Freightliner Cascadia", 
+                year: 2023,
+                mpg: 7.3, 
+                miles: 45230, 
+                status: "Maintenance",
+                lastTrip: "Atlanta, GA → Orlando, FL",
+                driver: "David Chen"
+              }
+            ].map((vehicle, i) => (
+              <Card key={i} className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <div className="font-semibold text-lg">{vehicle.unit}</div>
+                    <div className="text-sm text-muted-foreground">{vehicle.year} {vehicle.make}</div>
+                    <div className="text-xs text-muted-foreground">VIN: {vehicle.vin}</div>
+                    <div className="text-xs text-primary mt-1">Driver: {vehicle.driver}</div>
+                  </div>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    vehicle.status === 'Active' ? 'bg-green-100 text-green-700' :
+                    vehicle.status === 'In Transit' ? 'bg-blue-100 text-blue-700' :
+                    'bg-orange-100 text-orange-700'
+                  }`}>
+                    {vehicle.status}
+                  </div>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div className="text-muted-foreground">Total Miles</div>
+                    <div className="font-semibold">{vehicle.miles.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Avg MPG</div>
+                    <div className="font-semibold">{vehicle.mpg}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Last Trip</div>
+                    <div className="font-semibold text-xs">{vehicle.lastTrip}</div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          
+          <Card className="p-6">
+            <h4 className="font-semibold mb-4">Fleet Overview</h4>
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">3</div>
+                <div className="text-sm text-muted-foreground">Total Vehicles</div>
               </div>
-            </CardContent>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">260,400</div>
+                <div className="text-sm text-muted-foreground">Total Miles</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">7.1</div>
+                <div className="text-sm text-muted-foreground">Fleet Avg MPG</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">$4,250</div>
+                <div className="text-sm text-muted-foreground">Monthly Fuel Cost</div>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="receipts" className="space-y-6 mt-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold">AI Receipt Scanner</h3>
+            <Button size="sm">
+              <Camera className="h-4 w-4 mr-2" />
+              Scan Receipt
+            </Button>
+          </div>
+          
+          <Card className="p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Camera className="h-8 w-8 text-primary" />
+              </div>
+              <h4 className="font-semibold mb-2">Industry-Leading Receipt Processing</h4>
+              <p className="text-muted-foreground text-sm">99.8% accuracy • Instant data extraction • Auto-categorization</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="font-medium mb-3">Recent Scans</h5>
+                <div className="space-y-3">
+                  {[
+                    { station: "Love's Travel Stop #342", amount: 234.89, gallons: 67.2, date: "Dec 15, 2024", status: "Verified", state: "TX" },
+                    { station: "TA Petro #198", amount: 189.45, gallons: 54.8, date: "Dec 14, 2024", status: "Verified", state: "NM" },
+                    { station: "Pilot Flying J #445", amount: 267.12, gallons: 76.1, date: "Dec 13, 2024", status: "Processing", state: "AZ" }
+                  ].map((receipt, i) => (
+                    <Card key={i} className="p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-medium text-sm">{receipt.station}</div>
+                        <div className={`text-xs px-2 py-1 rounded ${
+                          receipt.status === 'Verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {receipt.status}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                        <div>Amount: ${receipt.amount}</div>
+                        <div>Gallons: {receipt.gallons}</div>
+                        <div>{receipt.state} • {receipt.date}</div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h5 className="font-medium mb-3">Processing Statistics</h5>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-muted/30 rounded-lg">
+                    <div className="text-xl font-bold text-primary">99.8%</div>
+                    <div className="text-xs text-muted-foreground">Accuracy Rate</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted/30 rounded-lg">
+                    <div className="text-xl font-bold text-green-600">2.1s</div>
+                    <div className="text-xs text-muted-foreground">Avg Process Time</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted/30 rounded-lg">
+                    <div className="text-xl font-bold text-blue-600">247</div>
+                    <div className="text-xs text-muted-foreground">Receipts This Month</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted/30 rounded-lg">
+                    <div className="text-xl font-bold text-orange-600">$18,450</div>
+                    <div className="text-xs text-muted-foreground">Total Fuel Costs</div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                  <h6 className="font-medium text-sm mb-2">Supported Fuel Cards</h6>
+                  <div className="text-xs text-muted-foreground">
+                    Comdata, EFS, Fuelman, WEX, T-Chek, and 25+ more
+                  </div>
+                </div>
+              </div>
+            </div>
           </Card>
         </TabsContent>
 

@@ -48,57 +48,29 @@ const Demo = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Video Demo Section */}
+        {/* Live Demo Hero */}
         <div className="mb-12">
-          <Card className="overflow-hidden">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold flex items-center justify-center gap-3">
-                <Video className="h-6 w-6 text-primary" />
-                App Demo Video
-              </CardTitle>
-              <CardDescription>
-                Watch a complete walkthrough of TrueTrucker IFTA Pro features
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="relative aspect-video bg-muted overflow-hidden">
-                {/* Demo Screenshot */}
-                <img 
-                  src={demoThumbnail} 
-                  alt="TrueTrucker IFTA Pro Demo Screenshot"
-                  className="w-full h-full object-cover"
-                />
-                
-                {/* Demo Info Overlay */}
-                <div className="absolute bottom-4 left-4 text-white">
-                  <div className="bg-black/70 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
-                    📊 Interactive Demo Below
-                  </div>
-                </div>
+          <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+            <CardContent className="p-8 text-center">
+              <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                ✨ Live Interactive Demo
               </div>
-              
-              {/* Video Description */}
-              <div className="p-6 bg-muted/30">
-                <h4 className="font-semibold text-foreground mb-2">What you'll see in this demo:</h4>
-                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                  <div className="space-y-1">
-                    <div>• Dashboard overview and key metrics</div>
-                    <div>• Adding and managing vehicles</div>
-                    <div>• Recording trip mileage</div>
-                    <div>• Receipt scanning with OCR</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div>• Fuel tax calculations by state</div>
-                    <div>• Generating IFTA quarterly reports</div>
-                    <div>• Fleet management features</div>
-                    <div>• Mobile app functionality</div>
-                  </div>
+              <h2 className="text-3xl font-bold mb-3">Experience TrueTrucker IFTA Pro</h2>
+              <p className="text-muted-foreground text-lg mb-6 max-w-2xl mx-auto">
+                See why 15,000+ truckers chose us over competitors. Test all features below - no signup required.
+              </p>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  Import from 30+ fuel cards
                 </div>
-                <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                  <p className="text-sm text-primary font-medium">
-                    💡 To record your own demo video: Use screen recording software to capture the interactive demo below, 
-                    showing each tab and feature with voice narration explaining the benefits.
-                  </p>
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  AI receipt scanning (99.8% accuracy)
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  Driver performance scoring
                 </div>
               </div>
             </CardContent>
