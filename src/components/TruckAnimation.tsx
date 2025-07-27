@@ -49,30 +49,32 @@ export const TruckAnimation = () => {
         <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={2} />
       </Canvas>
       
-      {/* Fallback for simple animation */}
+      {/* Enhanced truck animation with vibrant colors */}
       <motion.div 
-        className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg"
+        className="absolute inset-0 flex items-center justify-center bg-gradient-hero rounded-lg"
         animate={{ 
-          background: [
-            'linear-gradient(45deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1))',
-            'linear-gradient(45deg, hsl(var(--secondary) / 0.1), hsl(var(--primary) / 0.1))',
-            'linear-gradient(45deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1))'
+          scale: [1, 1.02, 1],
+          boxShadow: [
+            '0 0 20px hsl(var(--primary) / 0.3)',
+            '0 0 40px hsl(var(--secondary) / 0.4)',
+            '0 0 20px hsl(var(--accent) / 0.3)'
           ]
         }}
-        transition={{ duration: 3, repeat: Infinity }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       >
         <motion.div
           animate={{ 
-            rotateY: [0, 360],
-            scale: [1, 1.1, 1]
+            rotateY: [0, 15, -15, 0],
+            scale: [1, 1.15, 1],
+            y: [0, -5, 0]
           }}
           transition={{ 
-            duration: 4, 
+            duration: 2.5, 
             repeat: Infinity,
             ease: "easeInOut"
           }}
         >
-          <Truck className="h-16 w-16 text-primary" />
+          <Truck className="h-20 w-20 text-white drop-shadow-2xl" />
         </motion.div>
       </motion.div>
     </motion.div>

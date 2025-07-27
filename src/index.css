@@ -18,33 +18,33 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    /* Primary: Vibrant highway blue - trustworthy and professional */
-    --primary: 215 100% 45%;
+    /* Primary: Electric trucker blue - commanding attention */
+    --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 85% 65%;
+    --primary-glow: 210 90% 70%;
 
-    /* Secondary: Bold sunset orange - inviting and energetic */
-    --secondary: 25 100% 65%;
+    /* Secondary: High-visibility orange - safety and energy */
+    --secondary: 20 100% 55%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 15% 92%;
     --muted-foreground: 215 25% 35%;
 
-    /* Accent: Electric blue for highlights */
-    --accent: 200 100% 55%;
+    /* Accent: Vibrant highway green - efficiency and success */
+    --accent: 145 85% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Success colors for positive actions */
-    --success: 150 60% 45%;
+    --success: 145 85% 45%;
     --success-foreground: 0 0% 100%;
 
-    /* Gradients for hero sections and call-to-actions */
-    --gradient-primary: linear-gradient(135deg, hsl(215 100% 45%), hsl(215 85% 65%));
-    --gradient-sunset: linear-gradient(135deg, hsl(25 100% 65%), hsl(35 95% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(215 100% 45%) 0%, hsl(200 100% 55%) 50%, hsl(25 100% 65%) 100%);
+    /* Bold gradients for maximum visual impact */
+    --gradient-primary: linear-gradient(135deg, hsl(210 100% 50%), hsl(210 90% 70%));
+    --gradient-sunset: linear-gradient(135deg, hsl(20 100% 55%), hsl(35 100% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 50%) 0%, hsl(145 85% 45%) 50%, hsl(20 100% 55%) 100%);
 
     /* Shadows with warm undertones */
     --shadow-elegant: 0 10px 30px -10px hsl(215 85% 25% / 0.3);
