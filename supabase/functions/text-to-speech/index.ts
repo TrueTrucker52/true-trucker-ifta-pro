@@ -2,8 +2,34 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://tlvngzfoxpjdltbpmzaz.supabase.co',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin"
+};
+
+const validateInput = (text: string, voice: string = 'alloy') => {
+  if (!text || typeof text !== 'string') {
+    throw new Error('Text is required and must be a string');
+  }
+  if (text.length > 4000) {
+    throw new Error('Text is too long (max 4000 characters)');
+  }
+  
+  const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+  if (!validVoices.includes(voice)) {
+    throw new Error('Invalid voice selected');
+  }
+  
+  // Sanitize text input
+  const sanitizedText = text
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/[<>]/g, '')
+    .substring(0, 4000);
+    
+  return { sanitizedText, validatedVoice: voice };
 };
 
 serve(async (req) => {
@@ -14,12 +40,9 @@ serve(async (req) => {
 
   try {
     const { text, voice = 'alloy' } = await req.json();
+    const { sanitizedText, validatedVoice } = validateInput(text, voice);
 
-    if (!text) {
-      throw new Error('Text is required');
-    }
-
-    console.log('Generating speech for text:', text.substring(0, 100) + '...');
+    console.log('Generating speech for text:', sanitizedText.substring(0, 100) + '...');
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
@@ -35,8 +58,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'tts-1',
-        input: text,
-        voice: voice,
+        input: sanitizedText,
+        voice: validatedVoice,
         response_format: 'mp3',
       }),
     });
@@ -66,7 +89,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in text-to-speech function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Failed to generate speech' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
