@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Video } from 'lucide-react';
+import { ArrowLeft, Video, X } from 'lucide-react';
+import { useState } from 'react';
 import IFTALogo from '@/components/IFTALogo';
 import IFTADemo from '@/components/IFTADemo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,15 +10,10 @@ import demoThumbnail from '@/assets/ifta-app-demo-screenshot.jpg';
 const Demo = () => {
   const navigate = useNavigate();
 
+  const [showVideo, setShowVideo] = useState(false);
+
   const handleVideoPlay = () => {
-    console.log('Video play clicked');
-    // For now, scroll to the interactive demo
-    const demoElement = document.querySelector('[data-demo-section]');
-    if (demoElement) {
-      demoElement.scrollIntoView({ behavior: 'smooth' });
-    }
-    // You can replace this with actual video functionality later
-    alert('Demo video coming soon! For now, try the interactive demo below.');
+    setShowVideo(true);
   };
 
   return (
@@ -73,6 +69,49 @@ const Demo = () => {
                   Driver performance scoring
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Video Demo Section */}
+        <div className="mb-12">
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              {!showVideo ? (
+                <div className="relative cursor-pointer" onClick={handleVideoPlay}>
+                  <img 
+                    src={demoThumbnail} 
+                    alt="TrueTrucker IFTA Pro Demo Video"
+                    className="w-full aspect-video object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center group hover:bg-black/30 transition-colors">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-6 group-hover:scale-110 transition-transform">
+                      <Video className="h-12 w-12 text-white" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded">
+                    <span className="text-sm font-medium">▶ Watch Demo Video</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative aspect-video">
+                  <iframe
+                    src="https://www.youtube.com/embed/qdilYcOkrPI?autoplay=1"
+                    title="TrueTrucker IFTA Pro Demo"
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white"
+                    onClick={() => setShowVideo(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
