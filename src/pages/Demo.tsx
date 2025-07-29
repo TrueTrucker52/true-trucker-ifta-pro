@@ -120,25 +120,6 @@ const Demo = () => {
         <div data-demo-section>
           <IFTADemo />
         </div>
-        
-        {/* Call to Action */}
-        <div className="mt-12 text-center">
-          <div className="bg-primary/5 p-8 rounded-lg border border-primary/20">
-            <h3 className="text-2xl font-bold mb-4">Ready to streamline your IFTA reporting?</h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join thousands of truckers who have simplified their fuel tax compliance with TrueTrucker IFTA Pro. 
-              Start your free trial today and experience the difference.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Button size="lg" onClick={() => navigate('/#pricing')}>
-                Order Now
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/')}>
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
