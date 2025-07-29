@@ -41,45 +41,64 @@ const IFTALogo: React.FC<IFTALogoProps> = ({ size = 'md', className = '' }) => {
           className="opacity-80"
         />
         
-        {/* Text Background Circle for Better Contrast */}
-        <circle
-          cx="24"
-          cy="24"
-          r="15"
+        {/* Truck Body */}
+        <rect
+          x="14"
+          y="18"
+          width="20"
+          height="8"
+          rx="1"
           fill="currentColor"
           className="opacity-90"
         />
         
-        {/* TRUE TRUCKER PRO Text - Bold and Centered with High Contrast */}
+        {/* Truck Cab */}
+        <rect
+          x="10"
+          y="20"
+          width="8"
+          height="6"
+          rx="1"
+          fill="currentColor"
+          className="opacity-90"
+        />
+        
+        {/* Truck Windows */}
+        <rect
+          x="11"
+          y="21"
+          width="3"
+          height="2"
+          fill="white"
+          className="opacity-80"
+        />
+        <rect
+          x="15"
+          y="21"
+          width="2"
+          height="2"
+          fill="white"
+          className="opacity-80"
+        />
+        
+        {/* Truck Wheels */}
+        <circle cx="15" cy="28" r="2" fill="currentColor" className="opacity-80" />
+        <circle cx="29" cy="28" r="2" fill="currentColor" className="opacity-80" />
+        
+        {/* Wheel Centers */}
+        <circle cx="15" cy="28" r="1" fill="white" className="opacity-90" />
+        <circle cx="29" cy="28" r="1" fill="white" className="opacity-90" />
+        
+        {/* Trucker Pro Text Under Truck */}
         <text
           x="24"
-          y="18"
+          y="36"
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-white font-black"
-          style={{ fontSize: '6px', letterSpacing: '0.3px' }}
+          className="fill-current font-bold"
+          style={{ fontSize: '4px', letterSpacing: '0.3px' }}
         >
-          TRUE
-        </text>
-        <text
-          x="24"
-          y="25"
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-white font-black"
-          style={{ fontSize: '5px', letterSpacing: '0.3px' }}
-        >
-          TRUCKER
-        </text>
-        <text
-          x="24"
-          y="31"
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-white font-bold"
-          style={{ fontSize: '5px', letterSpacing: '0.5px' }}
-        >
-          PRO
+          TRUCKER PRO
         </text>
         
         {/* Highway/Road Symbol - Moved to corners */}
