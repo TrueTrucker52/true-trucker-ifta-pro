@@ -252,9 +252,9 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
         callback={handleJoyrideCallback}
         styles={{
           options: {
-            primaryColor: 'hsl(var(--primary))',
-            backgroundColor: 'hsl(var(--background))',
-            textColor: 'hsl(var(--foreground))',
+            primaryColor: 'hsl(210 100% 50%)',
+            backgroundColor: 'hsl(220 15% 97%)',
+            textColor: 'hsl(215 25% 15%)',
             overlayColor: 'rgba(0, 0, 0, 0.4)',
             zIndex: 1000,
           },
@@ -266,24 +266,24 @@ const IFTADemoTour = ({ onTourStart, onTourEnd }: IFTADemoTourProps) => {
             textAlign: 'left',
           },
           tooltipTitle: {
-            color: 'hsl(var(--foreground))',
+            color: 'hsl(215 25% 15%)',
           },
           tooltipContent: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'hsl(215 25% 35%)',
           },
           buttonNext: {
-            backgroundColor: 'hsl(var(--primary))',
-            color: 'hsl(var(--primary-foreground))',
+            backgroundColor: 'hsl(210 100% 50%)',
+            color: 'hsl(0 0% 100%)',
             borderRadius: 6,
             padding: '8px 16px',
           },
           buttonBack: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'hsl(215 25% 35%)',
             borderRadius: 6,
             padding: '8px 16px',
           },
           buttonSkip: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'hsl(215 25% 35%)',
           },
         }}
       />

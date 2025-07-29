@@ -40,7 +40,7 @@ export const RouteVisualization = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw connections
-    ctx.strokeStyle = 'hsl(var(--primary))';
+    ctx.strokeStyle = 'hsl(210 100% 50%)';
     ctx.lineWidth = 3;
     ctx.setLineDash([5, 5]);
 
@@ -72,7 +72,7 @@ export const RouteVisualization = () => {
         const truckY = fromNode.position.y + (toNode.position.y - fromNode.position.y) * segmentProgress;
 
         // Draw truck
-        ctx.fillStyle = 'hsl(var(--primary))';
+        ctx.fillStyle = 'hsl(210 100% 50%)';
         ctx.fillRect(truckX + 20, truckY + 20, 10, 10);
       }
     }

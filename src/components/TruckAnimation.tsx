@@ -7,10 +7,10 @@ const TruckModel = () => {
   return (
     <mesh rotation={[0, Math.PI / 4, 0]}>
       <boxGeometry args={[2, 1, 4]} />
-      <meshStandardMaterial color="hsl(var(--primary))" />
+      <meshStandardMaterial color="hsl(210 100% 50%)" />
       <mesh position={[0, 0.5, -1.5]}>
         <boxGeometry args={[1.8, 0.8, 1]} />
-        <meshStandardMaterial color="hsl(var(--secondary))" />
+        <meshStandardMaterial color="hsl(20 100% 55%)" />
       </mesh>
       {/* Wheels */}
       <mesh position={[-0.7, -0.7, 1.2]} rotation={[Math.PI / 2, 0, 0]}>

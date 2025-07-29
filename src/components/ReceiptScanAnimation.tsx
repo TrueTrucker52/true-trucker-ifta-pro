@@ -83,7 +83,7 @@ export const ReceiptScanAnimation = () => {
             key={index}
             className="w-2 h-2 rounded-full"
             animate={{
-              backgroundColor: index <= scanStage ? "hsl(var(--primary))" : "hsl(var(--muted))",
+              backgroundColor: index <= scanStage ? "hsl(210 100% 50%)" : "hsl(220 15% 92%)",
               scale: index === scanStage ? 1.5 : 1
             }}
             transition={{ duration: 0.3 }}
