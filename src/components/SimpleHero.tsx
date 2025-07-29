@@ -14,11 +14,11 @@ const SimpleHero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Hero Truck Background */}
       <div className="absolute inset-0 z-0">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
-          style={{
-            backgroundImage: `url(${heroTruck})`,
-          }}
+        <img 
+          src={heroTruck}
+          alt="Professional trucker with IFTA compliance technology"
+          className="absolute inset-0 w-full h-full object-cover transform scale-105"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/60 to-background/85" />
         
@@ -44,46 +44,85 @@ const SimpleHero = () => {
             <span className="text-sm font-medium">Trusted by 10,000+ Professional Truckers</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-foreground">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-foreground leading-tight">
             IFTA Made
             <span className="block text-primary">Simple & Smart</span>
           </h1>
 
-          <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto px-4 leading-relaxed">
             Track mileage, calculate taxes, and manage quarterly returns with ease. 
             Built by truckers, for truckers. Your road to IFTA compliance starts here.
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-10">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mb-10 px-4">
             {[
               "State-by-State Calculations",
               "Receipt Scanning", 
               "Quarterly Returns"
             ].map((feature) => (
-              <div key={feature} className="flex items-center">
-                <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
-                <span>{feature}</span>
+              <div key={feature} className="flex items-center text-sm md:text-base">
+                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-500 flex-shrink-0" />
+                <span className="text-center md:text-left">{feature}</span>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          {/* Primary CTA - Most Prominent */}
+          <div className="mb-8 px-4">
             <Button 
               variant="hero"
               size="lg" 
-              className="text-lg px-8 py-4 h-14"
+              className="text-xl sm:text-2xl px-8 sm:px-12 py-4 sm:py-6 h-16 sm:h-20 bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-2xl hover:shadow-primary/50 transform hover:scale-105 transition-all duration-300 w-full sm:w-auto"
               onClick={() => {
-                console.log('🚀 Start Free Trial button clicked');
+                console.log('🚀 START NOW button clicked');
                 navigate('/auth?mode=signup');
               }}
             >
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5" />
+              START NOW - FREE TRIAL
+              <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6" />
+            </Button>
+          </div>
+
+          {/* App Store Badges */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <img 
+              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
+              alt="Download on the App Store" 
+              className="h-14 hover:scale-105 transition-transform cursor-pointer"
+              loading="lazy"
+              onClick={() => window.open('#', '_blank')}
+            />
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
+              alt="Get it on Google Play" 
+              className="h-14 hover:scale-105 transition-transform cursor-pointer"
+              loading="lazy"
+              onClick={() => window.open('#', '_blank')}
+            />
+          </div>
+
+          {/* Secondary CTAs */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-16 px-4 max-w-4xl mx-auto">
+            <Button 
+              variant="outline"
+              size="lg" 
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 w-full sm:w-auto"
+              onClick={() => {
+                console.log('🛒 View Pricing button clicked - scrolling to pricing');
+                const pricingElement = document.getElementById('pricing');
+                if (pricingElement) {
+                  pricingElement.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  navigate('/#pricing');
+                }
+              }}
+            >
+              View Pricing
             </Button>
             <Button 
               variant="premium"
               size="lg" 
-              className="text-lg px-8 py-4 h-14"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
                 console.log('🛒 Order Now button clicked - scrolling to pricing');
                 const pricingElement = document.getElementById('pricing');
@@ -99,7 +138,7 @@ const SimpleHero = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-lg px-8 py-4 h-14"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
                 console.log('🎯 Interactive Demo button clicked');
                 navigate('/demo');
@@ -110,7 +149,7 @@ const SimpleHero = () => {
             <Button 
               variant="ghost" 
               size="lg" 
-              className="text-lg px-8 py-4 h-14"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
                 console.log('📚 Learn More button clicked');
                 navigate('/learn');

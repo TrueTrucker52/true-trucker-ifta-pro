@@ -22,12 +22,12 @@ const buttonVariants = cva(
         premium: "bg-gradient-sunset text-white hover:scale-105 shadow-xl hover:shadow-2xl border-0",
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-md hover:shadow-lg",
       },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
+        size: {
+          default: "h-12 px-6 py-3 text-base", // Increased for better mobile UX
+          sm: "h-10 rounded-md px-4 text-sm",
+          lg: "h-14 rounded-md px-8 text-lg", // Larger tap targets
+          icon: "h-12 w-12", // Better mobile tap target
+        },
     },
     defaultVariants: {
       variant: "default",

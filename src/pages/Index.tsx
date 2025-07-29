@@ -2,7 +2,9 @@ import Header from "@/components/Header";
 import SimpleHero from "@/components/SimpleHero";
 import Features from "@/components/Features";
 import { CompetitiveAdvantages } from "@/components/CompetitiveAdvantages";
+import TrustBuilders from "@/components/TrustBuilders";
 import Pricing from "@/components/Pricing";
+import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -14,7 +16,9 @@ const Index = () => {
       <SimpleHero />
       <Features />
       <CompetitiveAdvantages />
+      <TrustBuilders />
       <Pricing />
+      <ContactSection />
       <Footer />
     </div>
   );
