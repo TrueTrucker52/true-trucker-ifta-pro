@@ -233,28 +233,26 @@ export const CompetitiveAdvantages = () => {
           
           {/* Call to Action */}
           <div className="mt-8 text-center">
-            <div className="bg-gradient-primary p-6 rounded-xl text-white">
-              <h4 className="text-xl font-bold mb-2">Ready to Experience the Difference?</h4>
-              <p className="text-white/90 mb-4">
+            <div className="bg-primary p-8 rounded-xl text-white shadow-2xl">
+              <h4 className="text-2xl font-bold mb-3">Ready to Experience the Difference?</h4>
+              <p className="text-white/90 mb-6 text-lg">
                 Join the thousands of truckers who've already made the switch to smarter IFTA management.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  variant="secondary"
-                  className="bg-white text-primary hover:bg-white/90"
+                  className="bg-white text-primary hover:bg-gray-100 font-bold text-lg px-8 py-4 h-14 shadow-lg"
                   onClick={() => {
                     console.log('🚀 Competitive Advantages Start Free Trial button clicked');
                     navigate('/auth?mode=signup');
                   }}
                 >
                   Start Free Trial
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   size="lg" 
-                  variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary font-bold text-lg px-8 py-4 h-14 shadow-lg"
                   onClick={() => {
                     console.log('🛒 Competitive Advantages Order Now button clicked - scrolling to pricing');
                     const pricingElement = document.getElementById('pricing');
@@ -265,7 +263,7 @@ export const CompetitiveAdvantages = () => {
                     }
                   }}
                 >
-                  Order Now
+                  View Pricing & Order Now
                 </Button>
               </div>
             </div>
