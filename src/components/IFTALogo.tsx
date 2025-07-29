@@ -53,16 +53,26 @@ const IFTALogo: React.FC<IFTALogoProps> = ({ size = 'md', className = '' }) => {
           className="opacity-70"
         />
         
-        {/* IFTA Text - Bold and Centered */}
+        {/* True Trucker PRO Text - Bold and Centered */}
         <text
           x="24"
-          y="24"
+          y="20"
           textAnchor="middle"
           dominantBaseline="central"
           className="fill-current font-black"
-          style={{ fontSize: '10px', letterSpacing: '1px' }}
+          style={{ fontSize: '5px', letterSpacing: '0.5px' }}
         >
-          IFTA
+          TRUE TRUCKER
+        </text>
+        <text
+          x="24"
+          y="28"
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="fill-current font-bold"
+          style={{ fontSize: '4px', letterSpacing: '0.5px' }}
+        >
+          PRO
         </text>
         
         {/* Fuel Drops */}
