@@ -27,7 +27,7 @@ const IFTALogo: React.FC<IFTALogoProps> = ({ size = 'md', className = '' }) => {
           cy="24"
           r="22"
           fill="currentColor"
-          className="opacity-15"
+          className="opacity-20"
         />
         
         {/* Inner Badge Circle */}
@@ -38,58 +38,87 @@ const IFTALogo: React.FC<IFTALogoProps> = ({ size = 'md', className = '' }) => {
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          className="opacity-60"
+          className="opacity-80"
         />
         
-        {/* Highway/Road Symbol */}
-        <path
-          d="M10 20 L38 20 L36 16 L12 16 Z"
+        {/* Text Background Circle for Better Contrast */}
+        <circle
+          cx="24"
+          cy="24"
+          r="15"
           fill="currentColor"
-          className="opacity-70"
-        />
-        <path
-          d="M10 28 L38 28 L36 32 L12 32 Z"
-          fill="currentColor"
-          className="opacity-70"
+          className="opacity-90"
         />
         
-        {/* True Trucker PRO Text - Bold and Centered */}
+        {/* TRUE TRUCKER PRO Text - Bold and Centered with High Contrast */}
         <text
           x="24"
-          y="20"
+          y="18"
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-current font-black"
-          style={{ fontSize: '5px', letterSpacing: '0.5px' }}
+          className="fill-white font-black"
+          style={{ fontSize: '6px', letterSpacing: '0.3px' }}
         >
-          TRUE TRUCKER
+          TRUE
         </text>
         <text
           x="24"
-          y="28"
+          y="25"
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-current font-bold"
-          style={{ fontSize: '4px', letterSpacing: '0.5px' }}
+          className="fill-white font-black"
+          style={{ fontSize: '5px', letterSpacing: '0.3px' }}
+        >
+          TRUCKER
+        </text>
+        <text
+          x="24"
+          y="31"
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="fill-white font-bold"
+          style={{ fontSize: '5px', letterSpacing: '0.5px' }}
         >
           PRO
         </text>
         
+        {/* Highway/Road Symbol - Moved to corners */}
+        <path
+          d="M6 10 L16 10 L15 8 L7 8 Z"
+          fill="currentColor"
+          className="opacity-60"
+        />
+        <path
+          d="M32 10 L42 10 L41 8 L33 8 Z"
+          fill="currentColor"
+          className="opacity-60"
+        />
+        <path
+          d="M6 38 L16 38 L15 40 L7 40 Z"
+          fill="currentColor"
+          className="opacity-60"
+        />
+        <path
+          d="M32 38 L42 38 L41 40 L33 40 Z"
+          fill="currentColor"
+          className="opacity-60"
+        />
+        
         {/* Fuel Drops */}
-        <circle cx="14" cy="12" r="2" fill="currentColor" className="opacity-50" />
-        <circle cx="34" cy="12" r="2" fill="currentColor" className="opacity-50" />
-        <circle cx="14" cy="36" r="2" fill="currentColor" className="opacity-50" />
-        <circle cx="34" cy="36" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="10" cy="6" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="38" cy="6" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="10" cy="42" r="2" fill="currentColor" className="opacity-50" />
+        <circle cx="38" cy="42" r="2" fill="currentColor" className="opacity-50" />
         
         {/* Tax/Dollar Symbol */}
-        <circle cx="40" cy="8" r="4" fill="currentColor" className="opacity-30" />
+        <circle cx="42" cy="6" r="3" fill="currentColor" className="opacity-40" />
         <text
-          x="40"
-          y="8"
+          x="42"
+          y="6"
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-current font-bold"
-          style={{ fontSize: '5px' }}
+          className="fill-white font-bold"
+          style={{ fontSize: '4px' }}
         >
           $
         </text>
