@@ -288,7 +288,7 @@ const Learn = () => {
                       <Button 
                         className="w-full group-hover:bg-primary group-hover:text-white transition-colors"
                         variant="outline"
-                        onClick={() => navigate('/demo')}
+                        onClick={() => navigate('/calculator')}
                       >
                         Start Learning
                       </Button>
@@ -330,10 +330,10 @@ const Learn = () => {
                   size="lg" 
                   variant="outline"
                   className="border-white text-white hover:bg-white/10"
-                  onClick={() => navigate('/demo')}
+                  onClick={() => navigate('/calculator')}
                 >
                   <Truck className="h-5 w-5 mr-2" />
-                  Try Interactive Demo
+                  Try Calculator
                 </Button>
               </div>
               <p className="mt-4 text-sm text-white/80">

@@ -78,29 +78,36 @@ const SimpleHero = () => {
                 navigate('/auth?mode=signup');
               }}
             >
-              START NOW - FREE TRIAL
+              START YOUR SUBSCRIPTION
               <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
           </div>
 
-          {/* App Store Badges - Coming Soon */}
+          {/* Web App Access */}
           <div className="flex flex-col items-center justify-center gap-4 mb-8">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <img 
-                src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
-                alt="Download on the App Store" 
-                className="h-14 opacity-50 cursor-not-allowed"
-                loading="lazy"
-              />
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
-                alt="Get it on Google Play" 
-                className="h-14 opacity-50 cursor-not-allowed"
-                loading="lazy"
-              />
+            <div className="text-center">
+              <p className="text-muted-foreground mb-4">Access from any device - web browser, mobile, or desktop</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="h-14 px-6"
+                  onClick={() => navigate('/calculator')}
+                >
+                  <span className="text-lg">🌐 Web App</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="h-14 px-6"
+                  onClick={() => navigate('/auth?mode=signup')}
+                >
+                  <span className="text-lg">📱 Mobile Ready</span>
+                </Button>
+              </div>
             </div>
             <div className="text-center">
-              <span className="text-primary font-bold text-sm px-3 py-1 bg-primary/10 rounded-full">Coming Soon</span>
+              <span className="text-green-600 font-bold text-sm px-3 py-1 bg-green-100 rounded-full">Available Now</span>
             </div>
           </div>
 
@@ -143,22 +150,27 @@ const SimpleHero = () => {
               size="lg" 
               className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
-                console.log('🎯 Interactive Demo button clicked');
-                navigate('/demo');
+                console.log('📱 Try Calculator button clicked');
+                navigate('/calculator');
               }}
             >
-              Interactive Demo
+              Try Calculator
             </Button>
             <Button 
               variant="ghost" 
               size="lg" 
               className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
-                console.log('📚 Learn More button clicked');
-                navigate('/learn');
+                console.log('📞 Contact Sales button clicked');
+                const contactElement = document.getElementById('contact');
+                if (contactElement) {
+                  contactElement.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.location.href = 'mailto:support@true-trucker-ifta-pro.com';
+                }
               }}
             >
-              Learn More
+              Contact Sales
             </Button>
           </div>
 

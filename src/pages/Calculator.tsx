@@ -280,10 +280,10 @@ const Calculator = () => {
                         <Button 
                           variant="outline" 
                           className="w-full"
-                          onClick={() => navigate('/demo')}
+                          onClick={() => navigate('/auth?mode=signup')}
                         >
                           <Truck className="h-4 w-4 mr-2" />
-                          See Interactive Demo
+                          Start Your Subscription
                         </Button>
                       </div>
                     </CardContent>

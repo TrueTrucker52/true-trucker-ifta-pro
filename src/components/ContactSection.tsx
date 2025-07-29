@@ -1,19 +1,44 @@
 import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const ContactSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="contact" className="py-16 bg-card">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-card-foreground mb-4">
-              Need Help? We're Here for You
+              Ready to Start Your IFTA Journey?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Professional support from truckers who understand your business
+              Join thousands of professional truckers managing IFTA compliance with confidence
             </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-4"
+                onClick={() => navigate('/auth?mode=signup')}
+              >
+                Start Your Subscription
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="text-lg px-8 py-4"
+                onClick={() => {
+                  const pricingElement = document.getElementById('pricing');
+                  if (pricingElement) {
+                    pricingElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                View Pricing Plans
+              </Button>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
@@ -66,7 +91,7 @@ const ContactSection = () => {
                   onClick={() => window.open('mailto:support@truetruckerifta.com', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Send Message
+                  Contact Support
                 </Button>
               </div>
             </motion.div>

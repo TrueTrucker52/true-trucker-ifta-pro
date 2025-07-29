@@ -9,8 +9,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import Demo from "./pages/Demo";
-import Learn from "./pages/Learn";
 import Calculator from "./pages/Calculator";
 import IFTAReports from "./pages/IFTAReports";
 import MileageTracker from "./pages/MileageTracker";
@@ -34,7 +32,6 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/demo" element={<Demo />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
@@ -60,7 +57,6 @@ const App = () => {
                 <Invoices />
               </ProtectedRoute>
             } />
-            <Route path="/learn" element={<Learn />} />
             <Route path="/calculator" element={<Calculator />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
