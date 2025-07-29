@@ -5,7 +5,7 @@ import { useState } from 'react';
 import IFTALogo from '@/components/IFTALogo';
 import IFTADemo from '@/components/IFTADemo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import demoThumbnail from '@/assets/ifta-app-demo-screenshot.jpg';
+import demoThumbnail from '/lovable-uploads/a1863545-5a30-470a-8f04-d3aa392648ac.png';
 
 const Demo = () => {
   const navigate = useNavigate();
