@@ -129,7 +129,7 @@ const Pricing = () => {
               )}
             </div>
 
-            <CardHeader className="text-center pt-12 pb-6">
+            <CardHeader className="text-center pt-16 pb-6">
               <CardTitle className="text-xl font-bold text-foreground mb-2">
                 Medium Fleet
               </CardTitle>

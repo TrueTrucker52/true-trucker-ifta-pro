@@ -38,7 +38,7 @@ const ContactSection = () => {
                   <Phone className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Phone Support</p>
-                    <p className="text-muted-foreground">1-800-TRUCKER (878-2537)</p>
+                    <p className="text-muted-foreground">321-395-9957</p>
                   </div>
                 </div>
                 
@@ -46,8 +46,7 @@ const ContactSection = () => {
                   <Clock className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Support Hours</p>
-                    <p className="text-muted-foreground">Mon-Fri: 6AM-8PM EST</p>
-                    <p className="text-muted-foreground">Sat-Sun: 8AM-6PM EST</p>
+                    <p className="text-muted-foreground">Mon-Fri: 9AM-5PM EST</p>
                   </div>
                 </div>
                 
@@ -55,7 +54,7 @@ const ContactSection = () => {
                   <MapPin className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Headquarters</p>
-                    <p className="text-muted-foreground">Atlanta, GA</p>
+                    <p className="text-muted-foreground">Apopka, FL</p>
                   </div>
                 </div>
               </div>

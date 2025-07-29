@@ -83,22 +83,30 @@ const SimpleHero = () => {
             </Button>
           </div>
 
-          {/* App Store Badges */}
+          {/* App Store Badges - Coming Soon */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <img 
-              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
-              alt="Download on the App Store" 
-              className="h-14 hover:scale-105 transition-transform cursor-pointer"
-              loading="lazy"
-              onClick={() => window.open('#', '_blank')}
-            />
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
-              alt="Get it on Google Play" 
-              className="h-14 hover:scale-105 transition-transform cursor-pointer"
-              loading="lazy"
-              onClick={() => window.open('#', '_blank')}
-            />
+            <div className="relative">
+              <img 
+                src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
+                alt="Download on the App Store" 
+                className="h-14 opacity-50 cursor-not-allowed"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
+                <span className="text-white font-bold text-xs px-2 py-1 bg-primary rounded">Coming Soon</span>
+              </div>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
+                alt="Get it on Google Play" 
+                className="h-14 opacity-50 cursor-not-allowed"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
+                <span className="text-white font-bold text-xs px-2 py-1 bg-primary rounded">Coming Soon</span>
+              </div>
+            </div>
           </div>
 
           {/* Secondary CTAs */}
@@ -106,7 +114,7 @@ const SimpleHero = () => {
             <Button 
               variant="outline"
               size="lg" 
-              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 w-full sm:w-auto"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white transition-all duration-300 w-full sm:w-auto font-bold shadow-lg"
               onClick={() => {
                 console.log('🛒 View Pricing button clicked - scrolling to pricing');
                 const pricingElement = document.getElementById('pricing');
