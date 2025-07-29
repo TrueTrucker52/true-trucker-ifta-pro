@@ -84,28 +84,23 @@ const SimpleHero = () => {
           </div>
 
           {/* App Store Badges - Coming Soon */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <div className="relative">
+          <div className="flex flex-col items-center justify-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <img 
                 src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
                 alt="Download on the App Store" 
                 className="h-14 opacity-50 cursor-not-allowed"
                 loading="lazy"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
-                <span className="text-white font-bold text-xs px-2 py-1 bg-primary rounded">Coming Soon</span>
-              </div>
-            </div>
-            <div className="relative">
               <img 
                 src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
                 alt="Get it on Google Play" 
                 className="h-14 opacity-50 cursor-not-allowed"
                 loading="lazy"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
-                <span className="text-white font-bold text-xs px-2 py-1 bg-primary rounded">Coming Soon</span>
-              </div>
+            </div>
+            <div className="text-center">
+              <span className="text-primary font-bold text-sm px-3 py-1 bg-primary/10 rounded-full">Coming Soon</span>
             </div>
           </div>
 

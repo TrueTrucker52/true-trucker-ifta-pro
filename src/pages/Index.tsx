@@ -5,13 +5,14 @@ import { CompetitiveAdvantages } from "@/components/CompetitiveAdvantages";
 import TrustBuilders from "@/components/TrustBuilders";
 import Pricing from "@/components/Pricing";
 import ContactSection from "@/components/ContactSection";
+import SupportBot from "@/components/SupportBot";
 import Footer from "@/components/Footer";
 
 const Index = () => {
   console.log('Index page rendering...');
   
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <Header />
       <SimpleHero />
       <Features />
@@ -20,7 +21,8 @@ const Index = () => {
       <Pricing />
       <ContactSection />
       <Footer />
-    </div>
+      <SupportBot />
+    </>
   );
 };
 
