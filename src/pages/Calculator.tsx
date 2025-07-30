@@ -32,10 +32,13 @@ const Calculator = () => {
   const [results, setResults] = useState<any>(null);
 
   const calculateSavings = () => {
-    // Validate required fields
-    if (!formData.currentMethod || !formData.quarterlyMiles || !formData.timeSpentOnIFTA) {
+    // Basic validation - only require method and miles
+    if (!formData.currentMethod || !formData.quarterlyMiles) {
+      console.log('Missing required fields:', { method: formData.currentMethod, miles: formData.quarterlyMiles });
       return;
     }
+    
+    console.log('Calculating savings with data:', formData);
 
     const miles = parseFloat(formData.quarterlyMiles) || 0;
     const fuelPrice = parseFloat(formData.avgFuelPrice) || 3.50; // Default fuel price
@@ -222,7 +225,7 @@ const Calculator = () => {
                       className="w-full" 
                       size="lg"
                       variant="hero"
-                      disabled={!formData.currentMethod || !formData.quarterlyMiles || !formData.timeSpentOnIFTA}
+                      disabled={!formData.currentMethod || !formData.quarterlyMiles}
                     >
                       <DollarSign className="h-5 w-5 mr-2" />
                       Calculate My Savings
