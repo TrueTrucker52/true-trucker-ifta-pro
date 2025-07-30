@@ -13,7 +13,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 const validateInput = (plan: string) => {
-  const validPlans = ['small', 'medium', 'large'];
+  const validPlans = ['owner-operator', 'small', 'intermediate', 'medium', 'large', 'enterprise'];
   if (!plan || typeof plan !== 'string') {
     throw new Error('Plan is required and must be a string');
   }
@@ -69,9 +69,12 @@ serve(async (req) => {
 
     // Define pricing based on plan
     const priceMapping = {
-      "small": { amount: 2000, name: "Small Fleet Plan" }, // $20
-      "medium": { amount: 4000, name: "Medium Fleet Plan" }, // $40  
-      "large": { amount: 7500, name: "Large Fleet Plan" }, // $75
+      "owner-operator": { amount: 1999, name: "Owner-Operator Plan" }, // $19.99
+      "small": { amount: 2999, name: "Small Fleet Plan" }, // $29.99
+      "intermediate": { amount: 3999, name: "Intermediate Fleet Plan" }, // $39.99
+      "medium": { amount: 3999, name: "Medium Fleet Plan" }, // $39.99 (alias for intermediate)
+      "large": { amount: 5999, name: "Large Fleet Plan" }, // $59.99
+      "enterprise": { amount: 9999, name: "Enterprise Plan" }, // $99.99
     };
 
     const selectedPlan = priceMapping[plan as keyof typeof priceMapping];
