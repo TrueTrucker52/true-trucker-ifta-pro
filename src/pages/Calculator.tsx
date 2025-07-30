@@ -32,32 +32,60 @@ const Calculator = () => {
   const [results, setResults] = useState<any>(null);
 
   const calculateSavings = () => {
-    const miles = parseFloat(formData.quarterlyMiles) || 0;
-    const fuelPrice = parseFloat(formData.avgFuelPrice) || 0;
-    const timeHours = parseFloat(formData.timeSpentOnIFTA) || 0;
-    const errorRate = parseFloat(formData.errorRate) || 0;
+    // Validate required fields
+    if (!formData.currentMethod || !formData.quarterlyMiles || !formData.timeSpentOnIFTA) {
+      return;
+    }
 
-    // Calculate current costs
-    const currentTimeCost = timeHours * 25 * 4; // $25/hour * 4 quarters
-    const penaltyCost = (miles * 0.001 * errorRate / 100) * 500; // Estimated penalty costs
-    const paperworkCost = 200; // Annual paperwork and filing costs
-    const totalCurrentCost = currentTimeCost + penaltyCost + paperworkCost;
+    const miles = parseFloat(formData.quarterlyMiles) || 0;
+    const fuelPrice = parseFloat(formData.avgFuelPrice) || 3.50; // Default fuel price
+    const timeHours = parseFloat(formData.timeSpentOnIFTA) || 0;
+    const errorRate = parseFloat(formData.errorRate) || 5; // Default 5% error rate
+
+    // Calculate current costs based on method
+    const hourlyRate = 25; // $25/hour labor cost
+    const currentTimeCost = timeHours * hourlyRate * 4; // 4 quarters per year
+    
+    // Penalty costs based on miles and error rate
+    const penaltyCost = (miles * 4 * 0.002 * errorRate / 100) * 750; // Annual penalty estimate
+    
+    // Method-specific costs
+    let methodSpecificCost = 0;
+    switch (formData.currentMethod) {
+      case 'manual':
+        methodSpecificCost = 500; // Paper filing and administrative costs
+        break;
+      case 'spreadsheet':
+        methodSpecificCost = 200; // Software licenses
+        break;
+      case 'basic-software':
+        methodSpecificCost = 800; // Basic software annual cost
+        break;
+      case 'accountant':
+        methodSpecificCost = 2400; // Professional services
+        break;
+      default:
+        methodSpecificCost = 300;
+    }
+    
+    const totalCurrentCost = currentTimeCost + penaltyCost + methodSpecificCost;
 
     // Calculate savings with TrueTrucker
-    const newTimeCost = timeHours * 0.2 * 25 * 4; // 80% time reduction
-    const newPenaltyCost = penaltyCost * 0.1; // 90% error reduction
-    const subscriptionCost = 348; // Annual subscription (smallest plan $29/month)
+    const newTimeCost = timeHours * 0.2 * hourlyRate * 4; // 80% time reduction
+    const newPenaltyCost = penaltyCost * 0.05; // 95% error reduction
+    const subscriptionCost = 348; // Annual subscription ($29/month)
     const totalNewCost = newTimeCost + newPenaltyCost + subscriptionCost;
 
-    const annualSavings = totalCurrentCost - totalNewCost;
+    const annualSavings = Math.max(0, totalCurrentCost - totalNewCost);
     const timeSavings = timeHours * 4 * 0.8; // Hours saved per year
+    const roiPercentage = subscriptionCost > 0 ? ((annualSavings / subscriptionCost) * 100) : 0;
 
     setResults({
       currentCost: totalCurrentCost,
       newCost: totalNewCost,
       annualSavings,
       timeSavings,
-      roiPercentage: ((annualSavings / subscriptionCost) * 100).toFixed(0)
+      roiPercentage: roiPercentage.toFixed(0)
     });
   };
 
@@ -73,8 +101,8 @@ const Calculator = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate(-1)}
-                className="mr-4 border-white/30 text-white hover:bg-white/10"
+                onClick={() => navigate('/')}
+                className="mr-4 border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -193,7 +221,8 @@ const Calculator = () => {
                       onClick={calculateSavings} 
                       className="w-full" 
                       size="lg"
-                      disabled={!formData.currentMethod || !formData.quarterlyMiles}
+                      variant="hero"
+                      disabled={!formData.currentMethod || !formData.quarterlyMiles || !formData.timeSpentOnIFTA}
                     >
                       <DollarSign className="h-5 w-5 mr-2" />
                       Calculate My Savings
