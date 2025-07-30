@@ -35,11 +35,20 @@ const Calculator = () => {
   const calculateSavings = () => {
     // Basic validation - only require method and miles
     if (!formData.currentMethod || !formData.quarterlyMiles) {
-      console.log('Missing required fields:', { method: formData.currentMethod, miles: formData.quarterlyMiles });
+      console.log('❌ Missing required fields:', { method: formData.currentMethod, miles: formData.quarterlyMiles });
+      // Show user what fields are required
+      if (!formData.currentMethod) {
+        alert('Please select your current IFTA method');
+        return;
+      }
+      if (!formData.quarterlyMiles) {
+        alert('Please enter your quarterly miles driven');
+        return;
+      }
       return;
     }
     
-    console.log('Calculating savings with data:', formData);
+    console.log('✅ Calculating savings with data:', formData);
     console.log('✅ Calculator function executed successfully');
 
     const miles = parseFloat(formData.quarterlyMiles) || 0;
