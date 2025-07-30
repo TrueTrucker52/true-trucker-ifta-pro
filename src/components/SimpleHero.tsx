@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, ArrowRight, Truck } from "lucide-react";
+import { CheckCircle, ArrowRight, Truck, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { AnimatedStatistics } from "./AnimatedStatistics";
 import heroTruck from "@/assets/hero-truck.jpg";
+import appScreenshot1 from "@/assets/app-screenshot-1.jpg";
+import appScreenshot2 from "@/assets/app-screenshot-2.jpg";
+import appScreenshot3 from "@/assets/app-screenshot-3.jpg";
 
 const SimpleHero = () => {
   const navigate = useNavigate();
@@ -83,18 +86,77 @@ const SimpleHero = () => {
             </Button>
           </div>
 
-          {/* Web App Access */}
-          <div className="flex flex-col items-center justify-center gap-4 mb-8">
+          {/* App Preview Section */}
+          <div className="flex flex-col items-center justify-center gap-6 mb-8">
             <div className="text-center">
-              <p className="text-muted-foreground mb-4">Access from any device - web browser, mobile, or desktop</p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="h-14 px-6 opacity-60 cursor-not-allowed"
-                  disabled
+              <p className="text-muted-foreground mb-6 text-lg font-medium">
+                See Our Professional IFTA App in Action
+              </p>
+              
+              {/* App Screenshots Preview */}
+              <div className="flex justify-center space-x-3 sm:space-x-6 mb-8">
+                <motion.div 
+                  className="relative group cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <span className="text-lg">📱 App Store - Coming Soon</span>
+                  <img 
+                    src={appScreenshot1} 
+                    alt="IFTA Dashboard - Professional fuel tax calculations and mileage tracking interface"
+                    className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
+                      <Smartphone className="h-3 w-3 inline mr-1" />
+                      Dashboard
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="relative group cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <img 
+                    src={appScreenshot2} 
+                    alt="Route Tracking - Interactive state-by-state mileage breakdown for IFTA compliance"
+                    className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
+                      <Smartphone className="h-3 w-3 inline mr-1" />
+                      Route Tracking
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="relative group cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <img 
+                    src={appScreenshot3} 
+                    alt="Receipt Scanner - AI-powered automatic fuel receipt data extraction"
+                    className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
+                      <Smartphone className="h-3 w-3 inline mr-1" />
+                      Receipt Scanner
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* App Store Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                <Button 
+                  variant="secondary" 
+                  size="lg"
+                  className="h-14 px-6 bg-black text-white hover:bg-gray-800 transition-all duration-200"
+                  onClick={() => window.open('https://apps.apple.com/search?term=trucking%20IFTA', '_blank')}
+                >
+                  <span className="text-lg">📱 App Store</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -105,17 +167,20 @@ const SimpleHero = () => {
                   <span className="text-lg">🎥 Watch Demo</span>
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant="secondary" 
                   size="lg"
-                  className="h-14 px-6 opacity-60 cursor-not-allowed"
-                  disabled
+                  className="h-14 px-6 bg-green-600 text-white hover:bg-green-700 transition-all duration-200"
+                  onClick={() => window.open('https://play.google.com/store/search?q=trucking%20IFTA', '_blank')}
                 >
-                  <span className="text-lg">🍎 Google Play - Coming Soon</span>
+                  <span className="text-lg">📱 Google Play</span>
                 </Button>
               </div>
-            </div>
-            <div className="text-center">
-              <span className="text-orange-600 font-bold text-sm px-3 py-1 bg-orange-100 rounded-full">Mobile Apps Coming Soon</span>
+              
+              <div className="flex justify-center space-x-8 text-muted-foreground text-sm">
+                <span>📱 iOS 15+</span>
+                <span>🤖 Android 8+</span>
+                <span>💻 Web Browser</span>
+              </div>
             </div>
           </div>
 

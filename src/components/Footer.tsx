@@ -64,10 +64,10 @@ const Footer = () => {
           <p className="text-primary-foreground/60 text-sm">
             © 2024 TrueTrucker IFTA Pro. All rights reserved.
           </p>
-          <div className="flex space-x-6 text-primary-foreground/60 text-sm mt-4 md:mt-0">
-            <a href="https://www.privacypolicygenerator.info/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="https://www.termsofservicegenerator.net/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">IFTA Compliance</a>
+          <div className="flex space-x-6 text-white/90 text-sm mt-4 md:mt-0 font-medium">
+            <a href="https://www.privacypolicygenerator.info/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Privacy Policy</a>
+            <a href="https://www.termsofservicegenerator.net/live.php?token=example" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Terms of Service</a>
+            <a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">IFTA Compliance</a>
           </div>
         </div>
       </div>
