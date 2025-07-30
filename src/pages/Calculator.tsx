@@ -21,6 +21,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 const Calculator = () => {
+  console.log('🧮 Calculator page rendering...');
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     currentMethod: '',

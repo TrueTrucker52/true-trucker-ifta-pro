@@ -159,7 +159,9 @@ const SimpleHero = () => {
               className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto"
               onClick={() => {
                 console.log('📱 Try Calculator button clicked');
+                console.log('📱 Current location before navigation:', window.location.pathname);
                 navigate('/calculator');
+                console.log('📱 Navigation to /calculator attempted');
               }}
             >
               Try Calculator
