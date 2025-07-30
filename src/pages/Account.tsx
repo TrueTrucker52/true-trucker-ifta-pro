@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { User, Building, MapPin, Mail, Phone, FileText, Lock } from 'lucide-react';
+import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Account = () => {
@@ -142,6 +142,14 @@ const Account = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
+              className="absolute top-8 left-8"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
             <div className="bg-primary/10 p-3 rounded-full">
               <User className="h-8 w-8 text-primary" />
             </div>
