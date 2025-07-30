@@ -91,10 +91,10 @@ const SimpleHero = () => {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="h-14 px-6"
-                  onClick={() => navigate('/calculator')}
+                  className="h-14 px-6 opacity-60 cursor-not-allowed"
+                  disabled
                 >
-                  <span className="text-lg">🌐 Web App</span>
+                  <span className="text-lg">📱 App Store - Coming Soon</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -107,15 +107,15 @@ const SimpleHero = () => {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="h-14 px-6"
-                  onClick={() => navigate('/auth?mode=signup')}
+                  className="h-14 px-6 opacity-60 cursor-not-allowed"
+                  disabled
                 >
-                  <span className="text-lg">📱 Mobile Ready</span>
+                  <span className="text-lg">🍎 Google Play - Coming Soon</span>
                 </Button>
               </div>
             </div>
             <div className="text-center">
-              <span className="text-green-600 font-bold text-sm px-3 py-1 bg-green-100 rounded-full">Available Now</span>
+              <span className="text-orange-600 font-bold text-sm px-3 py-1 bg-orange-100 rounded-full">Mobile Apps Coming Soon</span>
             </div>
           </div>
 

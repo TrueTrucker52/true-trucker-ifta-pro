@@ -30,12 +30,17 @@ const SupportBot = () => {
   ];
 
   const botResponses: { [key: string]: string } = {
-    "what is ifta": "IFTA (International Fuel Tax Agreement) is a cooperative agreement between U.S. states and Canadian provinces to simplify fuel tax reporting for interstate motor carriers. Our app helps you track mileage and calculate taxes automatically!",
-    "mileage tracking": "Our app automatically tracks your miles using GPS and allows manual entry. It calculates fuel tax by state/province and generates quarterly reports for IFTA compliance.",
-    "pricing": "We offer three plans: Small Fleet ($20/month for 1-3 trucks), Medium Fleet ($40/month for 4-7 trucks), and Large Fleet ($75/month for 8-12 trucks). All plans include a 30-day money-back guarantee!",
-    "contact": "You can reach our support team at support@truetruckerifta.com or call 321-395-9957. Our hours are Monday-Friday, 9AM-5PM EST. We're based in Apopka, FL.",
-    "help": "I can help you with IFTA questions, explain our features, provide pricing information, or connect you with human support. What would you like to know?",
-    "default": "I understand you're asking about that topic. For detailed assistance, please contact our support team at support@truetruckerifta.com or call 321-395-9957. Our trucking experts are ready to help!"
+    "what is ifta": "IFTA (International Fuel Tax Agreement) is a cooperative agreement between U.S. states and Canadian provinces to simplify fuel tax reporting for interstate motor carriers. Our platform calculates taxes by state and generates quarterly reports automatically!",
+    "mileage tracking": "Our system tracks miles driven in each IFTA jurisdiction and calculates fuel taxes owed. You can manually enter trips or use GPS tracking when available.",
+    "pricing": "We offer three plans: Starter ($29/month for 1-3 trucks), Professional ($59/month for 4-10 trucks), and Enterprise ($129/month for 10+ trucks). All plans include quarterly IFTA reporting and audit defense tools!",
+    "quarterly": "IFTA quarterly returns are due by the last day of the month following each quarter (April 30, July 31, October 31, January 31). Our system generates these reports automatically with state-by-state breakdowns.",
+    "tax calculation": "We calculate IFTA taxes by tracking miles driven and gallons purchased in each jurisdiction. The system applies each state's tax rate and determines if you owe money or are due a refund.",
+    "audit": "Our audit defense tools help you maintain proper records and respond to IFTA audits. We provide detailed trip logs, receipts management, and compliance documentation.",
+    "states": "IFTA covers 48 U.S. states (excluding Alaska and Hawaii) plus 10 Canadian provinces. Each jurisdiction has different tax rates that our system tracks automatically.",
+    "fuel receipts": "Keep all fuel receipts showing gallons purchased, location, date, and truck identification. Our receipt scanner (coming soon) will digitize these automatically.",
+    "contact": "Reach our IFTA experts at support@truetruckerifta.com or call 321-395-9957. Hours: Monday-Friday, 9AM-5PM EST. We're trucking professionals based in Apopka, FL.",
+    "help": "I can explain IFTA requirements, our pricing plans, quarterly reporting deadlines, tax calculations, audit preparation, or connect you with our trucking experts. What do you need help with?",
+    "default": "That's a great IFTA question! For detailed guidance, contact our trucking experts at support@truetruckerifta.com or call 321-395-9957. We specialize in IFTA compliance and are here to help!"
   };
 
   const handleSendMessage = (text: string) => {
