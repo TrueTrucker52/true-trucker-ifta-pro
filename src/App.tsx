@@ -13,6 +13,8 @@ import Calculator from "./pages/Calculator";
 import IFTAReports from "./pages/IFTAReports";
 import MileageTracker from "./pages/MileageTracker";
 import ReceiptScan from "./pages/ReceiptScan";
+import VehicleManagement from "./pages/VehicleManagement";
+import Reports from "./pages/Reports";
 import Invoices from "./pages/Invoices";
 import SiteTest from "./pages/SiteTest";
 import Pricing from "./pages/Pricing";
@@ -45,11 +47,21 @@ const App = () => {
                 <IFTAReports />
               </ProtectedRoute>
             } />
-            <Route path="/mileage-tracker" element={
-              <ProtectedRoute>
-                <MileageTracker />
-              </ProtectedRoute>
-            } />
+              <Route path="/mileage-tracker" element={
+                <ProtectedRoute>
+                  <MileageTracker />
+                </ProtectedRoute>
+              } />
+              <Route path="/vehicles" element={
+                <ProtectedRoute>
+                  <VehicleManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } />
             <Route path="/scan-receipt" element={
               <ProtectedRoute>
                 <ReceiptScan />
