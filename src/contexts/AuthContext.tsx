@@ -77,23 +77,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    // Check rate limiting
-    if (securityMonitor.checkRateLimit(`auth_${email}`, 5, 15 * 60 * 1000)) {
-      const error = new Error('Too many failed attempts. Please try again later.');
+    console.log('🔄 AuthContext signIn called', { email, passwordLength: password.length });
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.log('❌ Supabase signIn error:', error);
+      } else {
+        console.log('✅ Supabase signIn successful');
+      }
+
+      return { error };
+    } catch (error) {
+      console.log('💥 Unexpected error in signIn:', error);
       return { error };
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    // Log authentication failures for security monitoring
-    if (error) {
-      securityMonitor.logAuthFailure(email, error.message, navigator.userAgent);
-    }
-
-    return { error };
   };
 
   const signOut = async () => {

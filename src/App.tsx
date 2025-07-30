@@ -14,6 +14,8 @@ import IFTAReports from "./pages/IFTAReports";
 import MileageTracker from "./pages/MileageTracker";
 import ReceiptScan from "./pages/ReceiptScan";
 import Invoices from "./pages/Invoices";
+import SiteTest from "./pages/SiteTest";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +60,8 @@ const App = () => {
               </ProtectedRoute>
             } />
             <Route path="/calculator" element={<Calculator />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/site-test" element={<SiteTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

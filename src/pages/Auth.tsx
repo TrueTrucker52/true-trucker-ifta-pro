@@ -248,6 +248,9 @@ const Auth = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       No credit card required. Cancel anytime.
                     </p>
+                    <p className="text-xs text-success font-medium mt-2">
+                      💳 Credit card trials recommended for consumer protection
+                    </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Start Free Trial"}
