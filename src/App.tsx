@@ -18,6 +18,7 @@ import Reports from "./pages/Reports";
 import Invoices from "./pages/Invoices";
 import SiteTest from "./pages/SiteTest";
 import Pricing from "./pages/Pricing";
+import Account from "./pages/Account";
 import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
@@ -74,6 +75,7 @@ const App = () => {
             } />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/account" element={<Account />} />
             <Route path="/demo" element={<Demo />} />
             <Route path="/site-test" element={<SiteTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
