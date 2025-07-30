@@ -33,16 +33,16 @@ const Demo = () => {
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <div className="relative aspect-video bg-muted">
-                <img 
-                  src={demoThumbnail} 
-                  alt="IFTA Pro Demo Video Thumbnail"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <Button size="lg" className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90">
-                    <Play className="h-8 w-8 ml-1" />
-                  </Button>
-                </div>
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/qdilYcOkrPI"
+                  title="IFTA Pro Demo Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
               </div>
             </CardContent>
           </Card>
