@@ -16,6 +16,7 @@ import ReceiptScan from "./pages/ReceiptScan";
 import Invoices from "./pages/Invoices";
 import SiteTest from "./pages/SiteTest";
 import Pricing from "./pages/Pricing";
+import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => {
             } />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="/site-test" element={<SiteTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

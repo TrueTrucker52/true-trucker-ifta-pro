@@ -100,9 +100,9 @@ const SimpleHero = () => {
                   variant="outline" 
                   size="lg"
                   className="h-14 px-6"
-                  onClick={() => navigate('/pricing')}
+                  onClick={() => navigate('/demo')}
                 >
-                  <span className="text-lg">💰 View Pricing</span>
+                  <span className="text-lg">🎥 Watch Demo</span>
                 </Button>
                 <Button 
                   variant="outline" 
