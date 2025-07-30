@@ -21,7 +21,14 @@ interface TripRecord {
   created_at: string;
 }
 
+import { ComingSoon } from "@/components/ComingSoon";
+
 const MileageTracker = () => {
+  return <ComingSoon 
+    title="Mileage Tracker Coming Soon" 
+    description="Smart mileage tracking with GPS integration and automatic state detection"
+    icon={MapPin}
+  />;
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();

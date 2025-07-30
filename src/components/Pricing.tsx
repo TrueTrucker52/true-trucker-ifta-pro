@@ -61,10 +61,10 @@ const Pricing = () => {
               
               {/* Pricing */}
               <div className="space-y-4">
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-foreground">$20</span>
-                  <span className="text-muted-foreground ml-2">/month</span>
-                </div>
+                 <div className="text-center">
+                   <span className="text-4xl font-bold text-foreground">$29</span>
+                   <span className="text-muted-foreground ml-2">/month</span>
+                 </div>
                 <p className="text-sm text-muted-foreground">
                   1-3 trucks • Cancel anytime
                 </p>
@@ -139,10 +139,10 @@ const Pricing = () => {
               
               {/* Pricing */}
               <div className="space-y-4">
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-foreground">$40</span>
-                  <span className="text-muted-foreground ml-2">/month</span>
-                </div>
+                 <div className="text-center">
+                   <span className="text-4xl font-bold text-foreground">$59</span>
+                   <span className="text-muted-foreground ml-2">/month</span>
+                 </div>
                 <p className="text-sm text-muted-foreground">
                   4-7 trucks • Cancel anytime
                 </p>
@@ -219,10 +219,10 @@ const Pricing = () => {
               
               {/* Pricing */}
               <div className="space-y-4">
-                <div className="text-center">
-                  <span className="text-4xl font-bold text-foreground">$75</span>
-                  <span className="text-muted-foreground ml-2">/month</span>
-                </div>
+                 <div className="text-center">
+                   <span className="text-4xl font-bold text-foreground">$129</span>
+                   <span className="text-muted-foreground ml-2">/month</span>
+                 </div>
                 <p className="text-sm text-muted-foreground">
                   8-12 trucks • Cancel anytime
                 </p>
@@ -287,8 +287,8 @@ const Pricing = () => {
           <div className="space-y-6">
             {[
               {
-                question: "How does billing work?",
-                answer: "You'll be charged monthly based on your selected plan: Small Fleet ($20/month), Medium Fleet ($40/month), or Large Fleet ($75/month). You can cancel anytime with no penalty."
+                 question: "How does billing work?",
+                 answer: "You'll be charged monthly based on your selected plan: Small Fleet ($29/month), Medium Fleet ($59/month), or Large Fleet ($129/month). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",
