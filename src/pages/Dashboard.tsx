@@ -102,18 +102,22 @@ const Dashboard = () => {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button onClick={() => navigate('/calculator')} className="h-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button onClick={() => navigate('/ifta-reports')} className="h-16">
                 <Calculator className="mr-2 h-5 w-5" />
-                IFTA Calculator
+                IFTA Tax Calculator
               </Button>
-              <Button onClick={() => navigate('/receipt-scan')} variant="outline" className="h-16">
+              <Button onClick={() => navigate('/scan-receipt')} variant="outline" className="h-16">
                 <FileText className="mr-2 h-5 w-5" />
                 Scan Receipt
               </Button>
               <Button onClick={() => navigate('/mileage-tracker')} variant="outline" className="h-16">
                 <Truck className="mr-2 h-5 w-5" />
                 Track Mileage
+              </Button>
+              <Button onClick={() => navigate('/calculator')} variant="outline" className="h-16">
+                <Calculator className="mr-2 h-5 w-5" />
+                Savings Calculator
               </Button>
             </div>
           </CardContent>
