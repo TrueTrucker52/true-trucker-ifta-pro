@@ -35,6 +35,7 @@ const MileageTracker = () => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [purpose, setPurpose] = useState('business');
   const [notes, setNotes] = useState('');
+  const [calculatingDistance, setCalculatingDistance] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -58,6 +59,43 @@ const MileageTracker = () => {
       setTrips(data || []);
     } catch (error: any) {
       console.error('Error fetching trips:', error);
+    }
+  };
+
+  const calculateDistance = async () => {
+    if (!startLocation || !endLocation) {
+      toast({
+        title: "Error",
+        description: "Please enter both start and end locations",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setCalculatingDistance(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('calculate-distance', {
+        body: { startLocation, endLocation }
+      });
+
+      if (error) throw error;
+
+      if (data.distance) {
+        setMiles(data.distance.toString());
+        toast({
+          title: "Distance Calculated",
+          description: `${data.distance} miles from ${data.startLocation} to ${data.endLocation}`,
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Could not calculate distance. Please enter miles manually.",
+        variant: "destructive"
+      });
+      console.error('Error calculating distance:', error);
+    } finally {
+      setCalculatingDistance(false);
     }
   };
 
@@ -179,15 +217,27 @@ const MileageTracker = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="miles">Miles</Label>
-                    <Input
-                      id="miles"
-                      type="number"
-                      step="0.1"
-                      placeholder="0"
-                      value={miles}
-                      onChange={(e) => setMiles(e.target.value)}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="miles"
+                        type="number"
+                        step="0.1"
+                        placeholder="0"
+                        value={miles}
+                        onChange={(e) => setMiles(e.target.value)}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={calculateDistance}
+                        disabled={calculatingDistance || !startLocation || !endLocation}
+                        className="whitespace-nowrap"
+                      >
+                        {calculatingDistance ? "..." : "Auto"}
+                      </Button>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
