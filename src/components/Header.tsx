@@ -3,10 +3,12 @@ import { Menu, X } from "lucide-react";
 import IFTALogo from './IFTALogo';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
@@ -38,12 +40,25 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>
-              Sign In
-            </Button>
-            <Button variant="hero" size="lg" onClick={() => navigate('/auth?mode=signup')}>
-              Sign Up
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Button variant="ghost" onClick={() => navigate('/dashboard')}>
+                  Dashboard
+                </Button>
+                <Button variant="ghost" onClick={signOut}>
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>
+                  Sign In
+                </Button>
+                <Button variant="hero" size="lg" onClick={() => navigate('/auth?mode=signup')}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -69,12 +84,25 @@ const Header = () => {
                 Contact
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" className="justify-start" onClick={() => navigate('/auth?mode=signin')}>
-                  Sign In
-                </Button>
-                <Button variant="hero" onClick={() => navigate('/auth?mode=signup')}>
-                  Sign Up
-                </Button>
+                {user ? (
+                  <>
+                    <Button variant="ghost" className="justify-start" onClick={() => navigate('/dashboard')}>
+                      Dashboard
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={signOut}>
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="justify-start" onClick={() => navigate('/auth?mode=signin')}>
+                      Sign In
+                    </Button>
+                    <Button variant="hero" onClick={() => navigate('/auth?mode=signup')}>
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>
