@@ -3,13 +3,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts";
-import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign } from "lucide-react";
+import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { openCustomerPortal } = useSubscription();
 
   const quickStats = [
     { title: "Total Miles", value: "12,847", icon: MapPin, trend: "+8.2%" },
@@ -118,6 +120,29 @@ const Dashboard = () => {
               <Button onClick={() => navigate('/calculator')} variant="outline" className="h-16">
                 <Calculator className="mr-2 h-5 w-5" />
                 Savings Calculator
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Management & Settings */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Management & Settings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button onClick={() => navigate('/vehicles')} variant="outline" className="h-16">
+                <Users className="mr-2 h-5 w-5" />
+                Fleet Management
+              </Button>
+              <Button onClick={openCustomerPortal} variant="outline" className="h-16">
+                <CreditCard className="mr-2 h-5 w-5" />
+                Manage Subscription
+              </Button>
+              <Button onClick={() => navigate('/account')} variant="outline" className="h-16">
+                <Settings className="mr-2 h-5 w-5" />
+                Settings / Configure Account
               </Button>
             </div>
           </CardContent>
