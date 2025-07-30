@@ -39,6 +39,7 @@ const Calculator = () => {
     }
     
     console.log('Calculating savings with data:', formData);
+    console.log('✅ Calculator function executed successfully');
 
     const miles = parseFloat(formData.quarterlyMiles) || 0;
     const fuelPrice = parseFloat(formData.avgFuelPrice) || 3.50; // Default fuel price
@@ -83,13 +84,16 @@ const Calculator = () => {
     const timeSavings = timeHours * 4 * 0.8; // Hours saved per year
     const roiPercentage = subscriptionCost > 0 ? ((annualSavings / subscriptionCost) * 100) : 0;
 
-    setResults({
+    const calculationResults = {
       currentCost: totalCurrentCost,
       newCost: totalNewCost,
       annualSavings,
       timeSavings,
       roiPercentage: roiPercentage.toFixed(0)
-    });
+    };
+    
+    console.log('✅ Calculation results:', calculationResults);
+    setResults(calculationResults);
   };
 
   return (
