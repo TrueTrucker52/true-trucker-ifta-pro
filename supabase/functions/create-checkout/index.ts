@@ -77,10 +77,10 @@ serve(async (req) => {
       "enterprise": { amount: 9999, name: "Enterprise Plan" }, // $99.99
     };
 
-    const selectedPlan = priceMapping[plan as keyof typeof priceMapping];
+    const selectedPlan = priceMapping[validatedPlan as keyof typeof priceMapping];
     if (!selectedPlan) throw new Error("Invalid plan selected");
 
-    logStep("Creating checkout session", { plan, amount: selectedPlan.amount });
+    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -104,7 +104,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/?canceled=true`,
       metadata: {
         user_id: user.id,
-        plan: plan,
+        plan: validatedPlan,
       },
     });
 
