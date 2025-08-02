@@ -10,35 +10,35 @@ All colors MUST be HSL.
   :root {
     /* TrueTrucker IFTA Pro - Warm & Professional Color System */
     --background: 220 15% 97%;
-    --foreground: 215 25% 15%;
+    --foreground: 215 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 215 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 215 25% 10%;
 
     /* Primary: Electric trucker blue - commanding attention */
-    --primary: 210 100% 50%;
+    --primary: 210 100% 45%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 210 90% 70%;
 
     /* Secondary: High-visibility orange - safety and energy */
-    --secondary: 20 100% 55%;
+    --secondary: 20 100% 50%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 15% 92%;
-    --muted-foreground: 215 25% 35%;
+    --muted-foreground: 215 25% 25%;
 
     /* Accent: Vibrant highway green - efficiency and success */
-    --accent: 145 85% 45%;
+    --accent: 145 85% 40%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 85% 55%;
+    --destructive: 0 85% 50%;
     --destructive-foreground: 0 0% 100%;
 
     /* Success colors for positive actions */
-    --success: 145 85% 45%;
+    --success: 145 85% 40%;
     --success-foreground: 0 0% 100%;
 
     /* Bold gradients for maximum visual impact */
