@@ -90,6 +90,7 @@ const SupportBot = () => {
           onClick={() => setIsOpen(true)}
           className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
           size="lg"
+          aria-label="Open IFTA support chat"
         >
           <MessageCircle className="h-6 w-6 text-white" />
         </Button>
@@ -122,6 +123,7 @@ const SupportBot = () => {
                 size="sm"
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:bg-white/20"
+                aria-label="Close support chat"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -189,6 +191,7 @@ const SupportBot = () => {
                   }}
                   size="sm"
                   className="px-3"
+                  aria-label="Send message"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
