@@ -45,14 +45,14 @@ const Header = () => {
                 <Button variant="ghost" onClick={() => navigate('/dashboard')}>
                   Dashboard
                 </Button>
-                <Button variant="ghost" onClick={signOut}>
-                  Sign Out
+                <Button variant="premium" onClick={signOut}>
+                  Log Out
                 </Button>
               </div>
             ) : (
               <>
-                <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>
-                  Sign In
+                <Button variant="premium" onClick={() => navigate('/auth?mode=signin')}>
+                  Log In
                 </Button>
                 <Button variant="hero" size="lg" onClick={() => navigate('/auth?mode=signup')}>
                   Sign Up
@@ -89,14 +89,14 @@ const Header = () => {
                     <Button variant="ghost" className="justify-start" onClick={() => navigate('/dashboard')}>
                       Dashboard
                     </Button>
-                    <Button variant="ghost" className="justify-start" onClick={signOut}>
-                      Sign Out
+                    <Button variant="premium" className="justify-start" onClick={signOut}>
+                      Log Out
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" className="justify-start" onClick={() => navigate('/auth?mode=signin')}>
-                      Sign In
+                    <Button variant="premium" className="justify-start" onClick={() => navigate('/auth?mode=signin')}>
+                      Log In
                     </Button>
                     <Button variant="hero" onClick={() => navigate('/auth?mode=signup')}>
                       Sign Up
