@@ -212,7 +212,7 @@ const Pricing = () => {
             {[
               {
                  question: "How does billing work?",
-                 answer: "You'll be charged monthly based on your selected plan: Small Fleet ($29/month), Medium Fleet ($59/month), or Large Fleet ($129/month). You can cancel anytime with no penalty."
+                 answer: "You'll be charged monthly based on your selected plan: Owner-Operator ($19.99/month), Small ($29.99/month), Intermediate ($39.99/month), Large ($59.99/month), or Enterprise ($99.99/month). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",
