@@ -20,6 +20,7 @@ import SiteTest from "./pages/SiteTest";
 import Pricing from "./pages/Pricing";
 import Account from "./pages/Account";
 import Demo from "./pages/Demo";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ const App = () => {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/account" element={<Account />} />
             <Route path="/demo" element={<Demo />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/site-test" element={<SiteTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
