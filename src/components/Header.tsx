@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import IFTALogo from './IFTALogo';
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,8 +16,12 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="bg-gradient-primary p-2 rounded-lg">
-              <IFTALogo size="md" className="text-white" />
+            <div className="rounded-lg overflow-hidden">
+              <img 
+                src="/lovable-uploads/a79795bc-cbdf-4383-a981-38b663a1e935.png" 
+                alt="TrueTrucker IFTA Pro App Icon"
+                className="h-10 w-10 object-cover"
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">TrueTrucker</h1>
