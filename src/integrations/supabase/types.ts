@@ -286,7 +286,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      log_auth_event: {
+        Args: {
+          details?: Json
+          event_type: string
+          ip_address?: string
+          user_agent?: string
+          user_email?: string
+        }
+        Returns: undefined
+      }
+      should_rate_limit: {
+        Args: {
+          identifier: string
+          max_attempts?: number
+          window_minutes?: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

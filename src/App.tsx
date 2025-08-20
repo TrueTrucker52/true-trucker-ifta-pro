@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import SecurityMonitor from "@/components/SecurityMonitor";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -84,11 +85,12 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <SecurityMonitor />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
-    </ErrorBoundary>
-  );
+</ErrorBoundary>
+);
 };
 
 export default App;

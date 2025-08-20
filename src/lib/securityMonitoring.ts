@@ -94,23 +94,37 @@ class SecurityMonitor {
     }
   }
 
-  // Send to security monitoring system (placeholder)
+  // Send to security monitoring system (enhanced)
   private async sendToSecurityLog(event: SecurityEvent) {
     try {
-      // In production, this would be sent to a security monitoring service
-      // For now, we'll store in localStorage for demonstration
-      const existingLogs = JSON.parse(localStorage.getItem('security_logs') || '[]');
-      existingLogs.push({
-        ...event,
-        timestamp: new Date().toISOString()
-      });
+      // Log to database if available
+      const { supabase } = await import('@/integrations/supabase/client');
       
-      // Keep only last 50 security events
-      if (existingLogs.length > 50) {
-        existingLogs.splice(0, existingLogs.length - 50);
+      try {
+        await supabase.rpc('log_auth_event', {
+          event_type: event.event_type,
+          user_email: event.details.email,
+          ip_address: event.ip_address,
+          user_agent: event.user_agent,
+          details: event.details
+        });
+      } catch (dbError) {
+        console.warn('Database logging failed, falling back to localStorage:', dbError);
+        
+        // Fallback to localStorage
+        const existingLogs = JSON.parse(localStorage.getItem('security_logs') || '[]');
+        existingLogs.push({
+          ...event,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Keep only last 50 security events
+        if (existingLogs.length > 50) {
+          existingLogs.splice(0, existingLogs.length - 50);
+        }
+        
+        localStorage.setItem('security_logs', JSON.stringify(existingLogs));
       }
-      
-      localStorage.setItem('security_logs', JSON.stringify(existingLogs));
     } catch (error) {
       console.error('Failed to log security event:', error);
     }

@@ -51,6 +51,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     console.log('🔄 AuthContext signUp called', { email, passwordLength: password.length });
+    
+    // Check rate limiting
+    if (securityMonitor.checkRateLimit(`signup_${email}`, 3)) {
+      const error = { message: 'Too many signup attempts. Please try again later.' };
+      securityMonitor.logAuthFailure(email, 'Rate limit exceeded for signup');
+      return { error };
+    }
+
     const redirectUrl = `${window.location.origin}/`;
     console.log('🔗 Redirect URL:', redirectUrl);
     
@@ -65,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.log('❌ Supabase signUp error:', error);
+        securityMonitor.logAuthFailure(email, `Signup failed: ${error.message}`);
       } else {
         console.log('✅ Supabase signUp successful');
       }
@@ -72,12 +81,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error };
     } catch (error) {
       console.log('💥 Unexpected error in signUp:', error);
+      securityMonitor.logAuthFailure(email, `Signup error: ${error}`);
       return { error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     console.log('🔄 AuthContext signIn called', { email, passwordLength: password.length });
+    
+    // Check rate limiting
+    if (securityMonitor.checkRateLimit(`signin_${email}`, 5)) {
+      const error = { message: 'Too many login attempts. Please try again later.' };
+      securityMonitor.logAuthFailure(email, 'Rate limit exceeded for signin');
+      return { error };
+    }
     
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -87,6 +104,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.log('❌ Supabase signIn error:', error);
+        securityMonitor.logAuthFailure(email, `Signin failed: ${error.message}`);
+        
+        // Log authentication event to database
+        try {
+          await supabase.rpc('log_auth_event', {
+            event_type: 'auth_failure',
+            user_email: email,
+            details: { error: error.message }
+          });
+        } catch (logError) {
+          console.warn('Failed to log auth event:', logError);
+        }
       } else {
         console.log('✅ Supabase signIn successful');
       }
@@ -94,6 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error };
     } catch (error) {
       console.log('💥 Unexpected error in signIn:', error);
+      securityMonitor.logAuthFailure(email, `Signin error: ${error}`);
       return { error };
     }
   };
