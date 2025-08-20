@@ -76,6 +76,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         securityMonitor.logAuthFailure(email, `Signup failed: ${error.message}`);
       } else {
         console.log('✅ Supabase signUp successful');
+        
+        // Send welcome email to new user
+        try {
+          console.log('📧 Sending welcome email to:', email);
+          await supabase.functions.invoke('send-welcome-email', {
+            body: { email }
+          });
+          console.log('✅ Welcome email sent successfully');
+        } catch (emailError) {
+          console.log('⚠️ Welcome email failed to send:', emailError);
+          // Don't return error - sign up should still succeed even if email fails
+        }
       }
 
       return { error };
