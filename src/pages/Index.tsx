@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { TrialBanner } from "@/components/TrialBanner";
 import SimpleHero from "@/components/SimpleHero";
 import Features from "@/components/Features";
 import { CompetitiveAdvantages } from "@/components/CompetitiveAdvantages";
@@ -14,6 +15,7 @@ const Index = () => {
   return (
     <>
       <Header />
+      <TrialBanner />
       <SimpleHero />
       <Features />
       <CompetitiveAdvantages />

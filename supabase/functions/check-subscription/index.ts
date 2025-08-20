@@ -26,10 +26,6 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
     logStep("Authorization header found");
@@ -43,106 +39,173 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    
-    if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state");
-      await supabaseClient.from("subscribers").upsert({
-        email: user.email,
-        user_id: user.id,
-        stripe_customer_id: null,
-        subscribed: false,
-        subscription_tier: null,
-        subscription_end: null,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'email' });
+    // First check the user's profile for trial/subscription status
+    const { data: profile, error: profileError } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-      // Also update profiles table for compatibility
-      await supabaseClient.from("profiles").upsert({
-        email: user.email,
+    if (profileError) {
+      throw new Error(`Profile fetch error: ${profileError.message}`);
+    }
+
+    const now = new Date();
+    let userStatus = {
+      subscribed: false,
+      subscription_tier: 'free',
+      subscription_end: null,
+      trial_active: false,
+      trial_days_remaining: 0,
+      trial_end_date: null,
+      subscription_status: 'trial'
+    };
+
+    if (profile) {
+      logStep("Profile found", { 
+        subscription_status: profile.subscription_status,
+        subscription_tier: profile.subscription_tier,
+        trial_end_date: profile.trial_end_date 
+      });
+
+      // Check trial status
+      if (profile.trial_end_date) {
+        const trialEndDate = new Date(profile.trial_end_date);
+        const trialDaysRemaining = Math.max(0, Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+        const trialActive = trialDaysRemaining > 0;
+
+        userStatus.trial_active = trialActive;
+        userStatus.trial_days_remaining = trialDaysRemaining;
+        userStatus.trial_end_date = profile.trial_end_date;
+        userStatus.subscription_status = profile.subscription_status;
+
+        logStep("Trial status calculated", { 
+          trialActive, 
+          trialDaysRemaining, 
+          trialEndDate: trialEndDate.toISOString() 
+        });
+
+        // If trial has expired, update status to expired
+        if (!trialActive && profile.subscription_status === 'trial') {
+          await supabaseClient
+            .from("profiles")
+            .update({ 
+              subscription_status: 'trial_expired',
+              updated_at: now.toISOString()
+            })
+            .eq("user_id", user.id);
+          
+          userStatus.subscription_status = 'trial_expired';
+          logStep("Updated expired trial status");
+        }
+      }
+
+      // Check for active paid subscription via Stripe if user has a customer ID
+      if (profile.stripe_customer_id) {
+        const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+        if (stripeKey) {
+          try {
+            const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+            const subscriptions = await stripe.subscriptions.list({
+              customer: profile.stripe_customer_id,
+              status: "active",
+              limit: 1,
+            });
+
+            if (subscriptions.data.length > 0) {
+              const subscription = subscriptions.data[0];
+              const subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+              
+              // Determine subscription tier from price
+              const priceId = subscription.items.data[0].price.id;
+              const price = await stripe.prices.retrieve(priceId);
+              const amount = price.unit_amount || 0;
+              let subscriptionTier = 'owner-operator';
+              
+              if (amount >= 9999) {
+                subscriptionTier = 'enterprise';
+              } else if (amount >= 5999) {
+                subscriptionTier = 'large';
+              } else if (amount >= 3999) {
+                subscriptionTier = 'intermediate';
+              } else if (amount >= 2999) {
+                subscriptionTier = 'small';
+              } else if (amount >= 1999) {
+                subscriptionTier = 'owner-operator';
+              }
+
+              userStatus.subscribed = true;
+              userStatus.subscription_tier = subscriptionTier;
+              userStatus.subscription_end = subscriptionEnd;
+              userStatus.subscription_status = 'active';
+
+              // Update profile with active subscription
+              await supabaseClient
+                .from("profiles")
+                .update({ 
+                  subscription_status: 'active',
+                  subscription_tier: subscriptionTier,
+                  subscription_end: subscriptionEnd,
+                  updated_at: now.toISOString()
+                })
+                .eq("user_id", user.id);
+
+              logStep("Updated active subscription status", { subscriptionTier, subscriptionEnd });
+            }
+          } catch (stripeError) {
+            logStep("Stripe check failed", { error: stripeError.message });
+          }
+        }
+      }
+
+      // Set subscription tier from profile if not overridden by Stripe
+      if (!userStatus.subscribed) {
+        userStatus.subscription_tier = profile.subscription_tier || 'free';
+      }
+    } else {
+      // No profile found - this shouldn't happen with our trigger, but handle gracefully
+      logStep("No profile found - creating default profile");
+      await supabaseClient.from("profiles").insert({
         user_id: user.id,
+        email: user.email,
         subscription_status: 'trial',
         subscription_tier: 'free',
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
-
-      return new Response(JSON.stringify({ subscribed: false, subscription_tier: 'free' }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
+        trial_start_date: now.toISOString(),
+        trial_end_date: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
       });
+
+      userStatus.trial_active = true;
+      userStatus.trial_days_remaining = 7;
+      userStatus.trial_end_date = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
     }
 
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
-
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 1,
-    });
-    const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTier = null;
-    let subscriptionEnd = null;
-
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
-      
-      const priceId = subscription.items.data[0].price.id;
-      const price = await stripe.prices.retrieve(priceId);
-      const amount = price.unit_amount || 0;
-      
-      if (amount <= 2500) {
-        subscriptionTier = "small";
-      } else if (amount <= 5000) {
-        subscriptionTier = "medium";
-      } else {
-        subscriptionTier = "large";
-      }
-      logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
-    } else {
-      logStep("No active subscription found");
-      subscriptionTier = "free";
-    }
-
-    // Update subscribers table
+    // Update subscribers table for backward compatibility
     await supabaseClient.from("subscribers").upsert({
       email: user.email,
       user_id: user.id,
-      stripe_customer_id: customerId,
-      subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      updated_at: new Date().toISOString(),
+      stripe_customer_id: profile?.stripe_customer_id || null,
+      subscribed: userStatus.subscribed,
+      subscription_tier: userStatus.subscription_tier,
+      subscription_end: userStatus.subscription_end,
+      updated_at: now.toISOString(),
     }, { onConflict: 'email' });
 
-    // Update profiles table for compatibility
-    await supabaseClient.from("profiles").upsert({
-      email: user.email,
-      user_id: user.id,
-      subscription_status: hasActiveSub ? 'active' : 'trial',
-      subscription_tier: subscriptionTier,
-      stripe_customer_id: customerId,
-      subscription_end: subscriptionEnd,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id' });
-
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
-    
-    return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd
-    }), {
+    logStep("Final user status", userStatus);
+    return new Response(JSON.stringify(userStatus), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
-    return new Response(JSON.stringify({ error: "Failed to check subscription status" }), {
+    return new Response(JSON.stringify({ 
+      error: "Failed to check subscription status",
+      subscribed: false,
+      subscription_tier: 'free',
+      trial_active: false,
+      trial_days_remaining: 0,
+      subscription_status: 'error'
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

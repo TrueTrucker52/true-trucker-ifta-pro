@@ -243,15 +243,15 @@ const Auth = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="bg-success/10 p-3 rounded-lg">
-                    <p className="text-sm text-success font-medium">🎉 7-Day Free Trial</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      No credit card required. Cancel anytime.
-                    </p>
-                    <p className="text-xs text-success font-medium mt-2">
-                      💳 Credit card trials recommended for consumer protection
-                    </p>
-                  </div>
+          <div className="bg-success/10 p-3 rounded-lg">
+            <p className="text-sm text-success font-medium">🎉 7-Day FREE Trial</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              <strong>Full access to all features • No credit card required</strong>
+            </p>
+            <p className="text-xs text-success font-medium mt-2">
+              ✅ Try everything risk-free for 7 days
+            </p>
+          </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Start Free Trial"}
                   </Button>

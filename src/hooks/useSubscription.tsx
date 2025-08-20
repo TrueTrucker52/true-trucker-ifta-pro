@@ -7,6 +7,10 @@ interface SubscriptionData {
   subscribed: boolean;
   subscription_tier: string | null;
   subscription_end: string | null;
+  trial_active: boolean;
+  trial_days_remaining: number;
+  trial_end_date: string | null;
+  subscription_status: string;
   loading: boolean;
 }
 
@@ -17,6 +21,10 @@ export const useSubscription = () => {
     subscribed: false,
     subscription_tier: 'free',
     subscription_end: null,
+    trial_active: false,
+    trial_days_remaining: 0,
+    trial_end_date: null,
+    subscription_status: 'trial',
     loading: true,
   });
 
@@ -26,6 +34,10 @@ export const useSubscription = () => {
         subscribed: false,
         subscription_tier: 'free',
         subscription_end: null,
+        trial_active: false,
+        trial_days_remaining: 0,
+        trial_end_date: null,
+        subscription_status: 'trial',
         loading: false,
       });
       return;
@@ -46,6 +58,10 @@ export const useSubscription = () => {
         subscribed: data.subscribed || false,
         subscription_tier: data.subscription_tier || 'free',
         subscription_end: data.subscription_end,
+        trial_active: data.trial_active || false,
+        trial_days_remaining: data.trial_days_remaining || 0,
+        trial_end_date: data.trial_end_date,
+        subscription_status: data.subscription_status || 'trial',
         loading: false,
       });
     } catch (error) {
@@ -54,6 +70,10 @@ export const useSubscription = () => {
         subscribed: false,
         subscription_tier: 'free',
         subscription_end: null,
+        trial_active: false,
+        trial_days_remaining: 0,
+        trial_end_date: null,
+        subscription_status: 'error',
         loading: false,
       });
     }

@@ -3,15 +3,24 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts";
-import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft } from "lucide-react";
+import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
+import { TrialGuard } from "@/components/TrialGuard";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { openCustomerPortal } = useSubscription();
+  const { 
+    openCustomerPortal, 
+    trial_active, 
+    trial_days_remaining, 
+    subscription_status, 
+    subscribed,
+    subscription_tier,
+    createCheckout 
+  } = useSubscription();
 
   const quickStats = [
     { title: "Total Miles", value: "12,847", icon: MapPin, trend: "+8.2%" },
@@ -49,6 +58,98 @@ const Dashboard = () => {
               Home
             </Button>
           </div>
+
+          {/* Trial Status Card */}
+          {!subscribed && (
+            <Card className={`mb-6 ${trial_active ? 'border-primary/50 bg-primary/5' : 'border-destructive/50 bg-destructive/5'}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${trial_active ? 'bg-primary/20' : 'bg-destructive/20'}`}>
+                      {trial_active ? (
+                        <Clock className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Star className="h-5 w-5 text-destructive" />
+                      )}
+                    </div>
+                    <div>
+                      {trial_active ? (
+                        <>
+                          <h3 className="font-semibold text-foreground">
+                            Free Trial Active - {trial_days_remaining} day{trial_days_remaining !== 1 ? 's' : ''} remaining
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            You're currently enjoying full access to all IFTA features
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="font-semibold text-foreground">
+                            Free Trial Ended
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Subscribe to continue using all IFTA features
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {trial_active && trial_days_remaining <= 3 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => createCheckout('intermediate')}
+                      >
+                        <Star className="h-4 w-4 mr-2" />
+                        Upgrade Now
+                      </Button>
+                    )}
+                    {subscription_status === 'trial_expired' && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => createCheckout('intermediate')}
+                      >
+                        <Star className="h-4 w-4 mr-2" />
+                        Subscribe Now
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {subscribed && (
+            <Card className="mb-6 border-success/50 bg-success/5">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-success/20">
+                      <Star className="h-5 w-5 text-success" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">
+                        {subscription_tier?.toUpperCase()} Plan Active
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        You have full access to all IFTA features
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={openCustomerPortal}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Manage Subscription
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Quick Stats */}
@@ -70,41 +171,43 @@ const Dashboard = () => {
         </div>
 
         {/* Charts Section */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          {/* Monthly Miles */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Mileage</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig}>
-                <BarChart data={monthlyData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="miles" fill="var(--color-miles)" />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
+        <TrialGuard feature="Advanced Analytics" requiredTier="small">
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            {/* Monthly Miles */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Monthly Mileage</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig}>
+                  <BarChart data={monthlyData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="miles" fill="var(--color-miles)" />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
 
-          {/* Fuel Spending */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Fuel Spending Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig}>
-                <LineChart data={monthlyData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="fuel" stroke="var(--color-fuel)" strokeWidth={2} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
+            {/* Fuel Spending */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Fuel Spending Trend</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig}>
+                  <LineChart data={monthlyData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Line type="monotone" dataKey="fuel" stroke="var(--color-fuel)" strokeWidth={2} />
+                  </LineChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+        </TrialGuard>
 
         {/* Quick Actions */}
         <Card>
@@ -134,27 +237,29 @@ const Dashboard = () => {
         </Card>
 
         {/* Management & Settings */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Management & Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button onClick={() => navigate('/vehicles')} variant="outline" className="h-16">
-                <Users className="mr-2 h-5 w-5" />
-                Fleet Management
-              </Button>
-              <Button onClick={openCustomerPortal} variant="outline" className="h-16">
-                <CreditCard className="mr-2 h-5 w-5" />
-                Manage Subscription
-              </Button>
-              <Button onClick={() => navigate('/account')} variant="outline" className="h-16">
-                <Settings className="mr-2 h-5 w-5" />
-                Settings / Configure Account
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <TrialGuard feature="Fleet Management" requiredTier="intermediate">
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Management & Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button onClick={() => navigate('/vehicles')} variant="outline" className="h-16">
+                  <Users className="mr-2 h-5 w-5" />
+                  Fleet Management
+                </Button>
+                <Button onClick={openCustomerPortal} variant="outline" className="h-16">
+                  <CreditCard className="mr-2 h-5 w-5" />
+                  Manage Subscription
+                </Button>
+                <Button onClick={() => navigate('/account')} variant="outline" className="h-16">
+                  <Settings className="mr-2 h-5 w-5" />
+                  Settings / Configure Account
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TrialGuard>
       </div>
     </div>
   );
