@@ -7,13 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { ArrowLeft, MapPin, Plus, Calendar, Truck, Edit, Trash2, Save, X, CalendarIcon } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ArrowLeft, MapPin, Plus, Calendar, Truck, Edit, Trash2, Save, X, CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { searchLocations, extractStateFromLocation, formatLocation, type LocationData } from '@/lib/locations';
 
 interface TripRecord {
   id: string;
@@ -25,6 +27,111 @@ interface TripRecord {
   notes?: string;
   created_at: string;
 }
+
+// Location selector component
+const LocationSelector = ({ 
+  value, 
+  onValueChange, 
+  placeholder = "Select location...",
+  label 
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  label: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState(value);
+  const [suggestions, setSuggestions] = useState<LocationData[]>([]);
+
+  useEffect(() => {
+    if (searchValue.length >= 2) {
+      const results = searchLocations(searchValue);
+      setSuggestions(results);
+    } else {
+      setSuggestions([]);
+    }
+  }, [searchValue]);
+
+  const handleInputChange = (newValue: string) => {
+    setSearchValue(newValue);
+    onValueChange(newValue);
+  };
+
+  const handleSelect = (location: LocationData) => {
+    const formatted = formatLocation(location.city, location.stateCode);
+    setSearchValue(formatted);
+    onValueChange(formatted);
+    setOpen(false);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between text-left font-normal"
+          >
+            <Input
+              value={searchValue}
+              onChange={(e) => handleInputChange(e.target.value)}
+              placeholder={placeholder}
+              className="border-0 p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
+              onFocus={() => setOpen(true)}
+            />
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          <Command>
+            <CommandInput 
+              placeholder={`Search ${label.toLowerCase()}...`}
+              value={searchValue}
+              onValueChange={handleInputChange}
+            />
+            <CommandList>
+              <CommandEmpty>
+                {searchValue.length < 2 ? "Type to search locations..." : "No locations found."}
+              </CommandEmpty>
+              {suggestions.length > 0 && (
+                <CommandGroup>
+                  {suggestions.map((location) => (
+                    <CommandItem
+                      key={`${location.city}-${location.stateCode}`}
+                      onSelect={() => handleSelect(location)}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex flex-col">
+                        <span>{location.displayName}</span>
+                        {location.type !== 'major_city' && (
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {location.type.replace('_', ' ')}
+                          </span>
+                        )}
+                      </div>
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          searchValue === formatLocation(location.city, location.stateCode)
+                            ? "opacity-100" 
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 
 const MileageTracker = () => {
   const { user } = useAuth();
@@ -265,26 +372,18 @@ const MileageTracker = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="start">Starting Location</Label>
-                    <Input
-                      id="start"
-                      placeholder="e.g., Los Angeles, CA"
-                      value={startLocation}
-                      onChange={(e) => setStartLocation(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="end">Ending Location</Label>
-                    <Input
-                      id="end"
-                      placeholder="e.g., Phoenix, AZ"
-                      value={endLocation}
-                      onChange={(e) => setEndLocation(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <LocationSelector
+                    label="🏁 Pickup Location"
+                    value={startLocation}
+                    onValueChange={setStartLocation}
+                    placeholder="e.g., Los Angeles, CA"
+                  />
+                  <LocationSelector
+                    label="🎯 Delivery Location"
+                    value={endLocation}
+                    onValueChange={setEndLocation}
+                    placeholder="e.g., Phoenix, AZ"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -381,24 +480,18 @@ const MileageTracker = () => {
                         // Edit Mode
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <Label className="text-xs">Start Location</Label>
-                              <Input
-                                value={editForm.start_location}
-                                onChange={(e) => setEditForm({...editForm, start_location: e.target.value})}
-                                placeholder="Starting location"
-                                className="mt-1"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs">End Location</Label>
-                              <Input
-                                value={editForm.end_location}
-                                onChange={(e) => setEditForm({...editForm, end_location: e.target.value})}
-                                placeholder="Destination"
-                                className="mt-1"
-                              />
-                            </div>
+                            <LocationSelector
+                              label="🏁 Pickup Location"
+                              value={editForm.start_location}
+                              onValueChange={(value) => setEditForm({...editForm, start_location: value})}
+                              placeholder="Starting location"
+                            />
+                            <LocationSelector
+                              label="🎯 Delivery Location"
+                              value={editForm.end_location}
+                              onValueChange={(value) => setEditForm({...editForm, end_location: value})}
+                              placeholder="Destination"
+                            />
                           </div>
                           
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -491,15 +584,44 @@ const MileageTracker = () => {
                         <>
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex-1">
-                              <p className="font-medium">{trip.start_location} → {trip.end_location}</p>
-                              <p className="text-sm text-muted-foreground">{format(new Date(trip.date), "MMM dd, yyyy")}</p>
+                              <div className="mb-2">
+                                <p className="text-sm text-muted-foreground">🏁 Pickup</p>
+                                <p className="font-medium text-primary">{trip.start_location}</p>
+                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                                  {extractStateFromLocation(trip.start_location) || 'State N/A'}
+                                </span>
+                              </div>
+                              <div className="mb-2">
+                                <p className="text-sm text-muted-foreground">🎯 Delivery</p>
+                                <p className="font-medium text-primary">{trip.end_location}</p>
+                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                                  {extractStateFromLocation(trip.end_location) || 'State N/A'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-2">
+                                <p className="text-sm text-muted-foreground">{format(new Date(trip.date), "MMM dd, yyyy")}</p>
+                                {(() => {
+                                  const startState = extractStateFromLocation(trip.start_location);
+                                  const endState = extractStateFromLocation(trip.end_location);
+                                  const stateCount = new Set([startState, endState].filter(Boolean)).size;
+                                  if (stateCount > 1) {
+                                    return (
+                                      <span className="text-xs bg-success/10 text-success px-2 py-1 rounded">
+                                        Multi-state route ({stateCount} states)
+                                      </span>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                              </div>
                               {trip.notes && (
                                 <p className="text-xs text-muted-foreground mt-1 italic">"{trip.notes}"</p>
                               )}
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold">{trip.miles} mi</p>
-                              <p className="text-sm text-muted-foreground capitalize">{trip.purpose}</p>
+                            <div className="text-right ml-4">
+                              <p className="font-bold text-2xl">{trip.miles}</p>
+                              <p className="text-sm text-muted-foreground">miles</p>
+                              <p className="text-sm text-muted-foreground capitalize mt-1">{trip.purpose}</p>
                             </div>
                           </div>
                           
