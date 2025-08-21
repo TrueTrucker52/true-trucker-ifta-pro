@@ -38,9 +38,9 @@ const SupportBot = () => {
     "audit": "Our audit defense tools help you maintain proper records and respond to IFTA audits. We provide detailed trip logs, receipts management, and compliance documentation.",
     "states": "IFTA covers 48 U.S. states (excluding Alaska and Hawaii) plus 10 Canadian provinces. Each jurisdiction has different tax rates that our system tracks automatically.",
     "fuel receipts": "Keep all fuel receipts showing gallons purchased, location, date, and truck identification. Our receipt scanner (coming soon) will digitize these automatically.",
-    "contact": "Reach our IFTA experts at support@truetruckerifta.com or call 321-395-9957. Hours: Monday-Friday, 9AM-5PM EST. We're trucking professionals based in Apopka, FL.",
+    "contact": "Reach our IFTA experts at support@true-trucker-ifta-pro.com or call 321-395-9957. Hours: Monday-Friday, 9AM-5PM EST. We're trucking professionals based in Apopka, FL.",
     "help": "I can explain IFTA requirements, our pricing plans, quarterly reporting deadlines, tax calculations, audit preparation, or connect you with our trucking experts. What do you need help with?",
-    "default": "That's a great IFTA question! For detailed guidance, contact our trucking experts at support@truetruckerifta.com or call 321-395-9957. We specialize in IFTA compliance and are here to help!"
+    "default": "That's a great IFTA question! For detailed guidance, contact our trucking experts at support@true-trucker-ifta-pro.com or call 321-395-9957. We specialize in IFTA compliance and are here to help!"
   };
 
   const handleSendMessage = (text: string) => {
