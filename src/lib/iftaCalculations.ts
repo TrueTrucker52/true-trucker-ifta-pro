@@ -15,6 +15,7 @@ export interface IFTAData {
   taxOwed: number;
   fuelUsed: number;
   netTax: number;
+  kyuTax?: number; // Kentucky Weight Distance Tax
 }
 
 export interface IFTACalculationResult {
@@ -27,6 +28,8 @@ export interface IFTACalculationResult {
   averageMPG: number;
   stateBreakdown: IFTAData[];
   netAmount: number; // Amount owed or refund
+  totalKyuTax?: number; // Kentucky Weight Distance Tax total
+  hasKentuckyMiles?: boolean; // Flag to show KY warning
 }
 
 // Current IFTA tax rates by state (2024 rates - should be updated annually)
@@ -81,6 +84,9 @@ export const STATE_TAX_RATES: Record<string, StateInfo> = {
   'WI': { code: 'WI', name: 'Wisconsin', taxRate: 0.3290, fuelTaxRate: 0.3290 },
   'WY': { code: 'WY', name: 'Wyoming', taxRate: 0.2400, fuelTaxRate: 0.2400 }
 };
+
+// Kentucky Weight Distance Tax (KYU) rate
+export const KYU_TAX_RATE = 0.0285; // $0.0285 per mile for vehicles over 59,999 lbs
 
 // Extract state code from location string
 export function extractStateCode(location: string): string {
@@ -212,6 +218,8 @@ export function calculateIFTA(
   const stateBreakdown: IFTAData[] = [];
   let totalTaxOwed = 0;
   let totalFuelUsed = 0;
+  let totalKyuTax = 0;
+  let hasKentuckyMiles = false;
   
   Array.from(allStates).forEach(stateCode => {
     if (!STATE_TAX_RATES[stateCode]) return;
@@ -223,6 +231,14 @@ export function calculateIFTA(
     const fuelTaxPaid = fuelPurchased * STATE_TAX_RATES[stateCode].taxRate;
     const netTax = taxOwed - fuelTaxPaid;
     
+    // Calculate Kentucky Weight Distance Tax (KYU)
+    let kyuTax = 0;
+    if (stateCode === 'KY' && miles > 0) {
+      kyuTax = miles * KYU_TAX_RATE;
+      totalKyuTax += kyuTax;
+      hasKentuckyMiles = true;
+    }
+    
     totalTaxOwed += taxOwed;
     totalFuelUsed += fuelUsed;
     
@@ -233,7 +249,8 @@ export function calculateIFTA(
         fuelPurchased: Math.round(fuelPurchased * 100) / 100,
         taxOwed: Math.round(taxOwed * 100) / 100,
         fuelUsed: Math.round(fuelUsed * 100) / 100,
-        netTax: Math.round(netTax * 100) / 100
+        netTax: Math.round(netTax * 100) / 100,
+        kyuTax: kyuTax > 0 ? Math.round(kyuTax * 100) / 100 : undefined
       });
     }
   });
@@ -259,7 +276,9 @@ export function calculateIFTA(
     totalFuelUsed: Math.round(totalFuelUsed * 100) / 100,
     averageMPG: Math.round(averageMPG * 100) / 100,
     stateBreakdown,
-    netAmount: Math.round(netAmount * 100) / 100
+    netAmount: Math.round(netAmount * 100) / 100,
+    totalKyuTax: totalKyuTax > 0 ? Math.round(totalKyuTax * 100) / 100 : undefined,
+    hasKentuckyMiles
   };
 }
 

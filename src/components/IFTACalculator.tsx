@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Calculator, FileText, TrendingUp, TrendingDown, DollarSign, Fuel, MapPin, Clock } from 'lucide-react';
+import { Calculator, FileText, TrendingUp, TrendingDown, DollarSign, Fuel, MapPin, Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -221,6 +221,16 @@ const IFTACalculator = () => {
             </Card>
           </div>
 
+          {/* Kentucky KYU Warning */}
+          {calculation.hasKentuckyMiles && (
+            <Alert className="border-warning bg-warning/5">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Kentucky Weight Distance Tax (KYU) Notice:</strong> Kentucky requires a separate Weight Distance Tax of <strong>${formatCurrency(calculation.totalKyuTax || 0)}</strong> for your {calculation.stateBreakdown.find(s => s.state === 'KY')?.miles || 0} miles driven in Kentucky this quarter. This cannot be paid through IFTA and requires separate registration and quarterly reporting through Kentucky's KYU system. Visit <a href="https://drive.ky.gov/Motor-Carriers/Pages/KYU.aspx" target="_blank" rel="noopener noreferrer" className="text-primary underline">drive.ky.gov</a> for more information.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Net Amount Alert */}
           <Alert className={calculation.netAmount !== 0 ? 'border-primary' : ''}>
             <Clock className="h-4 w-4" />
@@ -267,6 +277,7 @@ const IFTACalculator = () => {
                       <TableHead className="text-right">Tax Rate</TableHead>
                       <TableHead className="text-right">Tax Owed</TableHead>
                       <TableHead className="text-right">Net Tax</TableHead>
+                      <TableHead className="text-right">KY KYU Tax</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -289,6 +300,15 @@ const IFTACalculator = () => {
                         <TableCell className="text-right">{formatCurrency(state.taxOwed)}</TableCell>
                         <TableCell className={`text-right font-medium ${getStatusColor(state.netTax)}`}>
                           {formatCurrency(state.netTax)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {state.kyuTax ? (
+                            <span className="font-medium text-warning">
+                              {formatCurrency(state.kyuTax)}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
