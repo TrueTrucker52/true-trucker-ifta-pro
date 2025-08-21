@@ -22,6 +22,7 @@ import Pricing from "./pages/Pricing";
 import Account from "./pages/Account";
 import Demo from "./pages/Demo";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 
@@ -81,6 +82,7 @@ const App = () => {
             <Route path="/account" element={<Account />} />
             <Route path="/demo" element={<Demo />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/site-test" element={<SiteTest />} />
             <Route path="/admin" element={
               <ProtectedRoute>
