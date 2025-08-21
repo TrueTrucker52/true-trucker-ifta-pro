@@ -304,7 +304,7 @@ const Features = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="text-lg px-8 py-4 h-14 border-white text-white hover:bg-white/10"
+                className="text-lg px-8 py-4 h-14 border-white bg-white/10 text-white hover:bg-white hover:text-primary transition-all duration-300 font-semibold"
                 onClick={() => {
                   console.log('💰 View Pricing button clicked');
                   const pricingElement = document.getElementById('pricing');
