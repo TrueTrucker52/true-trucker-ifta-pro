@@ -15,6 +15,7 @@ import IFTAReports from "./pages/IFTAReports";
 import MileageTracker from "./pages/MileageTracker";
 import ReceiptScan from "./pages/ReceiptScan";
 import VehicleManagement from "./pages/VehicleManagement";
+import TripManagement from "./pages/TripManagement";
 import Reports from "./pages/Reports";
 import Invoices from "./pages/Invoices";
 import SiteTest from "./pages/SiteTest";
@@ -60,6 +61,11 @@ const App = () => {
               <Route path="/vehicles" element={
                 <ProtectedRoute>
                   <VehicleManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/trips" element={
+                <ProtectedRoute>
+                  <TripManagement />
                 </ProtectedRoute>
               } />
               <Route path="/reports" element={

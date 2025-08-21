@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Truck } from 'lucide-react';
-import TruckManager from '@/components/TruckManager';
+import { ArrowLeft, Route } from 'lucide-react';
+import TripManager from '@/components/TripManager';
 
-const VehicleManagement = () => {
+const TripManagement = () => {
   const navigate = useNavigate();
 
   return (
@@ -17,21 +17,21 @@ const VehicleManagement = () => {
               Back to Dashboard
             </Button>
             <div className="bg-primary/10 p-2 rounded-lg">
-              <Truck className="h-6 w-6 text-primary" />
+              <Route className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Fleet Management</h1>
-              <p className="text-sm text-muted-foreground">Manage your trucks and trips</p>
+              <h1 className="text-xl font-bold text-foreground">Trip Management</h1>
+              <p className="text-sm text-muted-foreground">Manage your trips and mileage tracking</p>
             </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <TruckManager />
+        <TripManager />
       </main>
     </div>
   );
 };
 
-export default VehicleManagement;
+export default TripManagement;
