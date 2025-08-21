@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, MapPin, Plus, Truck, Calendar } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { ArrowLeft, MapPin, Plus, Calendar, Truck, Edit, Trash2, Save, X, CalendarIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface TripRecord {
   id: string;
@@ -18,17 +22,15 @@ interface TripRecord {
   miles: number;
   date: string;
   purpose: string;
+  notes?: string;
   created_at: string;
 }
 
 const MileageTracker = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [trips, setTrips] = useState<TripRecord[]>([]);
-  
-  // Form state
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
   const [miles, setMiles] = useState('');
@@ -36,6 +38,17 @@ const MileageTracker = () => {
   const [purpose, setPurpose] = useState('business');
   const [notes, setNotes] = useState('');
   const [calculatingDistance, setCalculatingDistance] = useState(false);
+  
+  // Editing state
+  const [editingTrip, setEditingTrip] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    start_location: '',
+    end_location: '',
+    miles: '',
+    date: new Date(),
+    purpose: 'business',
+    notes: ''
+  });
 
   useEffect(() => {
     if (user) {
@@ -64,11 +77,7 @@ const MileageTracker = () => {
 
   const calculateDistance = async () => {
     if (!startLocation || !endLocation) {
-      toast({
-        title: "Error",
-        description: "Please enter both start and end locations",
-        variant: "destructive"
-      });
+      toast.error("Please enter both start and end locations");
       return;
     }
 
@@ -82,17 +91,10 @@ const MileageTracker = () => {
 
       if (data.distance) {
         setMiles(data.distance.toString());
-        toast({
-          title: "Distance Calculated",
-          description: `${data.distance} miles from ${data.startLocation} to ${data.endLocation}`,
-        });
+        toast.success(`Distance calculated: ${data.distance} miles from ${data.startLocation} to ${data.endLocation}`);
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Could not calculate distance. Please enter miles manually.",
-        variant: "destructive"
-      });
+      toast.error("Could not calculate distance. Please enter miles manually.");
       console.error('Error calculating distance:', error);
     } finally {
       setCalculatingDistance(false);
@@ -104,11 +106,7 @@ const MileageTracker = () => {
     if (!user) return;
 
     if (!startLocation || !endLocation || !miles || !date) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -129,10 +127,7 @@ const MileageTracker = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success!",
-        description: "Trip recorded successfully",
-      });
+      toast.success("Trip recorded successfully");
 
       // Reset form
       setStartLocation('');
@@ -143,11 +138,89 @@ const MileageTracker = () => {
       // Refresh trips
       fetchTrips();
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startEdit = (trip: TripRecord) => {
+    setEditingTrip(trip.id);
+    setEditForm({
+      start_location: trip.start_location,
+      end_location: trip.end_location,
+      miles: trip.miles.toString(),
+      date: new Date(trip.date),
+      purpose: trip.purpose,
+      notes: trip.notes || ''
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingTrip(null);
+    setEditForm({
+      start_location: '',
+      end_location: '',
+      miles: '',
+      date: new Date(),
+      purpose: 'business',
+      notes: ''
+    });
+  };
+
+  const saveEdit = async (tripId: string) => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await (supabase as any)
+        .from('trip_logs')
+        .update({
+          start_location: editForm.start_location,
+          end_location: editForm.end_location,
+          miles: parseFloat(editForm.miles),
+          date: format(editForm.date, 'yyyy-MM-dd'),
+          purpose: editForm.purpose,
+          notes: editForm.notes || null
+        })
+        .eq('id', tripId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast.success("Trip updated successfully");
+
+      setEditingTrip(null);
+      fetchTrips();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteTrip = async (tripId: string) => {
+    if (!user) return;
+    
+    if (!confirm('Are you sure you want to delete this trip? This action cannot be undone.')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await (supabase as any)
+        .from('trip_logs')
+        .delete()
+        .eq('id', tripId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast.success("Trip deleted successfully");
+
+      fetchTrips();
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -169,7 +242,7 @@ const MileageTracker = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Mileage Tracker</h1>
-                <p className="text-sm text-muted-foreground">Record your business trips</p>
+                <p className="text-sm text-muted-foreground">Record and manage your business trips</p>
               </div>
             </div>
           </div>
@@ -290,7 +363,7 @@ const MileageTracker = () => {
                 Recent Trips
               </CardTitle>
               <CardDescription>
-                Your last 10 recorded trips
+                Your last 10 recorded trips - Edit or delete as needed
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -304,16 +377,155 @@ const MileageTracker = () => {
                 <div className="space-y-4">
                   {trips.map((trip) => (
                     <div key={trip.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-medium">{trip.start_location} → {trip.end_location}</p>
-                          <p className="text-sm text-muted-foreground">{trip.date}</p>
+                      {editingTrip === trip.id ? (
+                        // Edit Mode
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-xs">Start Location</Label>
+                              <Input
+                                value={editForm.start_location}
+                                onChange={(e) => setEditForm({...editForm, start_location: e.target.value})}
+                                placeholder="Starting location"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">End Location</Label>
+                              <Input
+                                value={editForm.end_location}
+                                onChange={(e) => setEditForm({...editForm, end_location: e.target.value})}
+                                placeholder="Destination"
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <Label className="text-xs">Miles</Label>
+                              <Input
+                                type="number"
+                                value={editForm.miles}
+                                onChange={(e) => setEditForm({...editForm, miles: e.target.value})}
+                                placeholder="Miles driven"
+                                className="mt-1"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label className="text-xs">Date</Label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full mt-1 justify-start text-left font-normal",
+                                      !editForm.date && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {editForm.date ? format(editForm.date, "MMM dd, yyyy") : "Pick a date"}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <CalendarComponent
+                                    mode="single"
+                                    selected={editForm.date}
+                                    onSelect={(date) => date && setEditForm({...editForm, date})}
+                                    initialFocus
+                                    className="p-3 pointer-events-auto"
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-xs">Purpose</Label>
+                              <Select value={editForm.purpose} onValueChange={(value) => setEditForm({...editForm, purpose: value})}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="business">Business</SelectItem>
+                                  <SelectItem value="personal">Personal</SelectItem>
+                                  <SelectItem value="commute">Commute</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label className="text-xs">Notes</Label>
+                            <Textarea
+                              value={editForm.notes}
+                              onChange={(e) => setEditForm({...editForm, notes: e.target.value})}
+                              placeholder="Additional notes (optional)"
+                              className="mt-1"
+                              rows={2}
+                            />
+                          </div>
+                          
+                          <div className="flex gap-2 justify-end">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={cancelEdit}
+                              disabled={loading}
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Cancel
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => saveEdit(trip.id)}
+                              disabled={loading || !editForm.start_location || !editForm.end_location || !editForm.miles}
+                            >
+                              <Save className="h-4 w-4 mr-1" />
+                              Save Changes
+                            </Button>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold">{trip.miles} mi</p>
-                          <p className="text-sm text-muted-foreground capitalize">{trip.purpose}</p>
-                        </div>
-                      </div>
+                      ) : (
+                        // View Mode
+                        <>
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <p className="font-medium">{trip.start_location} → {trip.end_location}</p>
+                              <p className="text-sm text-muted-foreground">{format(new Date(trip.date), "MMM dd, yyyy")}</p>
+                              {trip.notes && (
+                                <p className="text-xs text-muted-foreground mt-1 italic">"{trip.notes}"</p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold">{trip.miles} mi</p>
+                              <p className="text-sm text-muted-foreground capitalize">{trip.purpose}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 justify-end mt-3">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => startEdit(trip)}
+                              disabled={loading || editingTrip !== null}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => deleteTrip(trip.id)}
+                              disabled={loading || editingTrip !== null}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
