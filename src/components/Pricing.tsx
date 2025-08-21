@@ -31,7 +31,7 @@ const Pricing = () => {
             <span className="block text-primary">Pricing</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            No hidden fees, no surprises. Just one low monthly price that gives you everything you need.
+            Professional IFTA tools with smart location auto-complete, trip editing, and Kentucky KYU compliance. Everything active drivers need.
           </p>
         </div>
 
@@ -103,6 +103,9 @@ const Pricing = () => {
                 <td className="p-4 text-center">Unlimited</td>
               </tr>
               {[
+                'Smart Location Auto-Complete',
+                'Professional Trip Editing',
+                'Kentucky KYU Compliance',
                 'Mobile Trip Entry',
                 'Generate Trip Sheets',
                 'IFTA Quarterly Returns',
@@ -218,14 +221,18 @@ const Pricing = () => {
                 question: "Do you support all IFTA jurisdictions?",
                 answer: "Yes! We support all 48 contiguous U.S. states plus the 10 Canadian provinces that participate in IFTA."
               },
-              {
-                question: "Can I use this for multiple trucks?",
-                answer: "Absolutely! Our fleet management tools let you track multiple vehicles and drivers from a single account."
-              },
-              {
-                question: "Is my data secure?",
-                answer: "Yes, we use bank-level encryption and security measures. Your data is backed up daily and stored securely in the cloud."
-              }
+               {
+                 question: "What makes this different from basic mileage trackers?",
+                 answer: "Our professional tools include smart location auto-complete with 100+ trucking destinations, full trip editing capabilities, Kentucky KYU compliance, and advanced IFTA calculations. Built specifically for active drivers, not casual users."
+               },
+               {
+                 question: "Can I use this for multiple trucks?",
+                 answer: "Absolutely! Our fleet management tools let you track multiple vehicles and drivers from a single account with individual trip tracking and consolidated reporting."
+               },
+               {
+                 question: "Is my data secure?",
+                 answer: "Yes, we use bank-level encryption and security measures. Your data is backed up daily and stored securely in the cloud."
+               }
             ].map((faq, index) => (
               <Card key={index} className="border-border">
                 <CardContent className="p-6">

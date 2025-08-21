@@ -25,64 +25,64 @@ const Features = () => {
   const navigate = useNavigate();
   const features = [
     {
-      icon: Calculator,
-      title: "Smart IFTA Calculations",
-      description: "Automatically calculate fuel taxes for all IFTA states with precision and accuracy."
+      icon: MapPin,
+      title: "Smart Location System",
+      description: "Auto-complete pickup/delivery locations with 100+ trucking destinations. Instant state detection for IFTA compliance."
     },
     {
-      icon: MapPin,
-      title: "State-by-State Tracking",
-      description: "Track mileage and fuel purchases across all 48 contiguous states and Canadian provinces."
+      icon: Calculator,
+      title: "Advanced IFTA Calculator",
+      description: "Includes Kentucky KYU Weight Distance Tax calculation. Complete state-by-state breakdown with tax rates and multi-state route detection."
     },
     {
       icon: Receipt,
-      title: "Receipt Scanning",
-      description: "Scan and digitize fuel receipts instantly with advanced OCR technology."
+      title: "Professional Trip Management", 
+      description: "Edit trips, modify dates, delete entries. Perfect for drivers running 2-7+ loads per week with complete trip control."
     },
     {
       icon: Calendar,
-      title: "Quarterly Returns",
-      description: "Generate and submit quarterly IFTA returns with automated calculations and due date reminders."
+      title: "Enhanced Date Management",
+      description: "Interactive calendar picker for easy date corrections. Log trips after the fact with flexible date editing capabilities."
     },
     {
       icon: Smartphone,
-      title: "Mobile & Desktop",
-      description: "Access your data anywhere - optimized for mobile, tablet, and desktop use."
+      title: "Mobile & Desktop Optimized",
+      description: "Access your data anywhere - optimized for mobile, tablet, and desktop use with real-time synchronization."
     },
     {
       icon: Shield,
-      title: "Secure & Compliant",
-      description: "Bank-level security with full IFTA compliance and audit-ready reports."
+      title: "Kentucky KYU Compliance",
+      description: "Automatic Weight Distance Tax calculation for Kentucky routes. Separate tracking and reporting for KYU requirements."
     },
     {
       icon: Clock,
-      title: "Real-Time Sync",
-      description: "All your data syncs across devices in real-time, so you're always up to date."
+      title: "Real-Time Location Intelligence", 
+      description: "Auto-complete from 100+ truck stops, ports, and distribution centers. Instant state detection and multi-state route alerts."
     },
     {
       icon: FileText,
-      title: "Detailed Reports",
-      description: "Generate comprehensive reports for accounting, tax preparation, and record keeping."
+      title: "Complete Trip Editing",
+      description: "Edit any trip detail after logging. Change dates, locations, mileage - perfect for drivers logging trips after delivery."
     },
     {
       icon: TrendingUp,
-      title: "Fuel Analytics",
-      description: "Track fuel efficiency, costs, and trends to optimize your operations."
+      title: "Advanced Route Analytics",
+      description: "Track pickup/delivery patterns, multi-state routes, and fuel efficiency across your regular routes and customers."
     },
     {
       icon: Zap,
-      title: "Quick Entry",
-      description: "Log trips and fuel purchases in seconds with our streamlined interface."
+      title: "Professional Driver Tools",
+      description: "Built for drivers running 2-7+ loads per week. Bulk editing, date management, and trucking-specific location database."
     },
     {
       icon: Users,
-      title: "Fleet Management",
-      description: "Manage multiple trucks and drivers from a single, unified dashboard."
+      title: "Fleet & Multi-Vehicle",
+      description: "Manage multiple trucks with individual trip tracking, vehicle-specific reporting, and consolidated IFTA calculations."
     },
     {
       icon: Award,
-      title: "Expert Support",
-      description: "Get help from IFTA experts and fellow truckers in our community."
+      title: "Trucker-First Design",
+      description: "Designed by truckers, for truckers. Every feature built for real-world trucking workflows and IFTA compliance needs."
     }
   ];
 
@@ -98,11 +98,11 @@ const Features = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Everything You Need for
-            <span className="block text-primary">IFTA Success</span>
+            Professional Trucking Tools for
+            <span className="block text-primary">Real Drivers</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Built specifically for professional truckers who need reliable, accurate, and easy-to-use IFTA management.
+            Smart location auto-complete, trip editing, Kentucky KYU compliance, and professional-grade IFTA management tools designed for active drivers.
           </p>
         </motion.div>
 
@@ -115,8 +115,8 @@ const Features = () => {
           className="mb-20"
         >
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-foreground mb-2">Origin to Destination Tracking</h3>
-            <p className="text-muted-foreground">Visualize your routes with real-time mileage and fuel stop tracking across IFTA states</p>
+            <h3 className="text-2xl font-bold text-foreground mb-2">Smart Pickup & Delivery Tracking</h3>
+            <p className="text-muted-foreground">Auto-complete trucking locations, detect multi-state routes, and track Kentucky KYU compliance automatically</p>
           </div>
           <RouteMap />
         </motion.div>

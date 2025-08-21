@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import { TrialBanner } from "@/components/TrialBanner";
 import SimpleHero from "@/components/SimpleHero";
 import Features from "@/components/Features";
+import ProfessionalFeatures from "@/components/ProfessionalFeatures";
 import { CompetitiveAdvantages } from "@/components/CompetitiveAdvantages";
 import TrustBuilders from "@/components/TrustBuilders";
 import Pricing from "@/components/Pricing";
@@ -18,6 +19,7 @@ const Index = () => {
       <TrialBanner />
       <SimpleHero />
       <Features />
+      <ProfessionalFeatures />
       <CompetitiveAdvantages />
       <TrustBuilders />
       <Pricing />

@@ -48,20 +48,20 @@ const SimpleHero = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-foreground leading-tight">
-            IFTA Made
-            <span className="block text-primary">Simple & Smart</span>
+            Professional IFTA
+            <span className="block text-primary">Built for Real Drivers</span>
           </h1>
 
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto px-4 leading-relaxed">
-            Track mileage, calculate taxes, and manage quarterly returns with ease. 
-            Built by truckers, for truckers. Your road to IFTA compliance starts here.
+            Smart location auto-complete, trip editing, Kentucky KYU compliance, and advanced IFTA management. 
+            Professional trucking tools designed for drivers running 2-7+ loads per week.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mb-10 px-4">
             {[
-              "State-by-State Calculations",
-              "Receipt Scanning", 
-              "Quarterly Returns"
+              "Smart Location System",
+              "Trip Editing & Management", 
+              "Kentucky KYU Tracking"
             ].map((feature) => (
               <div key={feature} className="flex items-center text-sm md:text-base">
                 <CheckCircle className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-500 flex-shrink-0" />
@@ -90,7 +90,7 @@ const SimpleHero = () => {
           <div className="flex flex-col items-center justify-center gap-6 mb-8">
             <div className="text-center">
               <p className="text-muted-foreground mb-6 text-lg font-medium">
-                See Our Professional IFTA App in Action
+                Professional Tools for Active Drivers
               </p>
               
               {/* App Screenshots Preview */}
