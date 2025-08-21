@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Calculator, FileText, TrendingUp, TrendingDown, DollarSign, Fuel, MapPin, Clock, AlertTriangle } from 'lucide-react';
+import { Calculator, FileText, TrendingUp, TrendingDown, DollarSign, Fuel, MapPin, Clock, AlertTriangle, Printer, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -17,6 +17,8 @@ import {
   STATE_TAX_RATES,
   type IFTACalculationResult
 } from '@/lib/iftaCalculations';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const IFTACalculator = () => {
   const { user } = useAuth();
@@ -118,6 +120,87 @@ const IFTACalculator = () => {
     return 'No Tax Due';
   };
 
+  const handlePrint = () => {
+    const printContent = document.getElementById('ifta-report');
+    if (!printContent) return;
+    
+    const originalContents = document.body.innerHTML;
+    const printContents = printContent.innerHTML;
+    
+    document.body.innerHTML = `
+      <div style="font-family: Arial, sans-serif; max-width: 210mm; margin: 0 auto; padding: 20mm;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+          <h1 style="margin: 0; color: #333; font-size: 24px;">TrueTrucker IFTA Pro</h1>
+          <h2 style="margin: 10px 0 0 0; color: #666; font-size: 18px;">IFTA Quarterly Report</h2>
+          <p style="margin: 5px 0 0 0; color: #666;">Q${calculation?.quarter} ${calculation?.year} • Generated: ${new Date().toLocaleDateString()}</p>
+        </div>
+        ${printContents}
+      </div>
+    `;
+    
+    window.print();
+    document.body.innerHTML = originalContents;
+    window.location.reload(); // Reload to restore React functionality
+  };
+
+  const handleExportPDF = async () => {
+    const element = document.getElementById('ifta-report');
+    if (!element || !calculation) return;
+
+    try {
+      // Create a canvas from the HTML element
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add header
+      pdf.setFontSize(20);
+      pdf.text('TrueTrucker IFTA Pro', 105, 20, { align: 'center' });
+      pdf.setFontSize(14);
+      pdf.text('IFTA Quarterly Report', 105, 30, { align: 'center' });
+      pdf.setFontSize(12);
+      pdf.text(`Q${calculation.quarter} ${calculation.year} • Generated: ${new Date().toLocaleDateString()}`, 105, 38, { align: 'center' });
+      
+      // Add line separator
+      pdf.line(20, 42, 190, 42);
+
+      position = 50;
+      
+      // Add the canvas image
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add new pages if content is longer than one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save the PDF
+      const filename = `IFTA_Report_Q${calculation.quarter}_${calculation.year}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(filename);
+      
+      toast.success('PDF exported successfully!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to export PDF');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,147 +259,171 @@ const IFTACalculator = () => {
       {/* Results */}
       {calculation && (
         <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Total Miles</p>
-                </div>
-                <p className="text-2xl font-bold">{formatMiles(calculation.totalMiles)}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Fuel className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Fuel Purchased</p>
-                </div>
-                <p className="text-2xl font-bold">{calculation.totalFuelPurchased} gal</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Average MPG</p>
-                </div>
-                <p className="text-2xl font-bold">{calculation.averageMPG}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(calculation.netAmount)}
-                  <p className="text-sm text-muted-foreground">{getStatusText(calculation.netAmount)}</p>
-                </div>
-                <p className={`text-2xl font-bold ${getStatusColor(calculation.netAmount)}`}>
-                  {formatCurrency(Math.abs(calculation.netAmount))}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Kentucky KYU Warning */}
-          {calculation.hasKentuckyMiles && (
-            <Alert className="border-warning bg-warning/5">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Kentucky Weight Distance Tax (KYU) Notice:</strong> Kentucky requires a separate Weight Distance Tax of <strong>${formatCurrency(calculation.totalKyuTax || 0)}</strong> for your {calculation.stateBreakdown.find(s => s.state === 'KY')?.miles || 0} miles driven in Kentucky this quarter. This cannot be paid through IFTA and requires separate registration and quarterly reporting through Kentucky's KYU system. Visit <a href="https://drive.ky.gov/Motor-Carriers/Pages/KYU.aspx" target="_blank" rel="noopener noreferrer" className="text-primary underline">drive.ky.gov</a> for more information.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Net Amount Alert */}
-          <Alert className={calculation.netAmount !== 0 ? 'border-primary' : ''}>
-            <Clock className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Q{calculation.quarter} {calculation.year} IFTA Summary:</strong>
-              {calculation.netAmount > 0 && (
-                <span className="text-destructive font-medium">
-                  {' '}You owe {formatCurrency(calculation.netAmount)} in fuel taxes.
-                </span>
-              )}
-              {calculation.netAmount < 0 && (
-                <span className="text-success font-medium">
-                  {' '}You are due a refund of {formatCurrency(Math.abs(calculation.netAmount))}.
-                </span>
-              )}
-              {calculation.netAmount === 0 && (
-                <span className="text-muted-foreground font-medium">
-                  {' '}Your fuel taxes are balanced - no payment or refund due.
-                </span>
-              )}
-            </AlertDescription>
-          </Alert>
-
-          {/* State Breakdown Table */}
+          {/* Export Controls */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                State-by-State Breakdown
-              </CardTitle>
-              <CardDescription>
-                Detailed fuel tax calculations for each state
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>State</TableHead>
-                      <TableHead className="text-right">Miles</TableHead>
-                      <TableHead className="text-right">Fuel Used (gal)</TableHead>
-                      <TableHead className="text-right">Fuel Purchased (gal)</TableHead>
-                      <TableHead className="text-right">Tax Rate</TableHead>
-                      <TableHead className="text-right">Tax Owed</TableHead>
-                      <TableHead className="text-right">Net Tax</TableHead>
-                      <TableHead className="text-right">KY KYU Tax</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {calculation.stateBreakdown.map((state) => (
-                      <TableRow key={state.state}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            {STATE_TAX_RATES[state.state]?.name || state.state}
-                            <Badge variant="outline" className="text-xs">
-                              {state.state}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">{formatMiles(state.miles)}</TableCell>
-                        <TableCell className="text-right">{state.fuelUsed}</TableCell>
-                        <TableCell className="text-right">{state.fuelPurchased}</TableCell>
-                        <TableCell className="text-right">
-                          {formatCurrency(STATE_TAX_RATES[state.state]?.taxRate || 0)}
-                        </TableCell>
-                        <TableCell className="text-right">{formatCurrency(state.taxOwed)}</TableCell>
-                        <TableCell className={`text-right font-medium ${getStatusColor(state.netTax)}`}>
-                          {formatCurrency(state.netTax)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {state.kyuTax ? (
-                            <span className="font-medium text-warning">
-                              {formatCurrency(state.kyuTax)}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">Export Your IFTA Report</h3>
+                  <p className="text-sm text-muted-foreground">Save or print your quarterly calculations</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2">
+                    <Printer className="h-4 w-4" />
+                    Print Report
+                  </Button>
+                  <Button onClick={handleExportPDF} className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Export PDF
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          <div id="ifta-report" className="space-y-6 print:space-y-4">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Total Miles</p>
+                  </div>
+                  <p className="text-2xl font-bold">{formatMiles(calculation.totalMiles)}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Fuel className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Fuel Purchased</p>
+                  </div>
+                  <p className="text-2xl font-bold">{calculation.totalFuelPurchased} gal</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Average MPG</p>
+                  </div>
+                  <p className="text-2xl font-bold">{calculation.averageMPG}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(calculation.netAmount)}
+                    <p className="text-sm text-muted-foreground">{getStatusText(calculation.netAmount)}</p>
+                  </div>
+                  <p className={`text-2xl font-bold ${getStatusColor(calculation.netAmount)}`}>
+                    {formatCurrency(Math.abs(calculation.netAmount))}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Kentucky KYU Warning */}
+            {calculation.hasKentuckyMiles && (
+              <Alert className="border-warning bg-warning/5">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Kentucky Weight Distance Tax (KYU) Notice:</strong> Kentucky requires a separate Weight Distance Tax of <strong>${formatCurrency(calculation.totalKyuTax || 0)}</strong> for your {calculation.stateBreakdown.find(s => s.state === 'KY')?.miles || 0} miles driven in Kentucky this quarter. This cannot be paid through IFTA and requires separate registration and quarterly reporting through Kentucky's KYU system. Visit <a href="https://drive.ky.gov/Motor-Carriers/Pages/KYU.aspx" target="_blank" rel="noopener noreferrer" className="text-primary underline">drive.ky.gov</a> for more information.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Net Amount Alert */}
+            <Alert className={calculation.netAmount !== 0 ? 'border-primary' : ''}>
+              <Clock className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Q{calculation.quarter} {calculation.year} IFTA Summary:</strong>
+                {calculation.netAmount > 0 && (
+                  <span className="text-destructive font-medium">
+                    {' '}You owe {formatCurrency(calculation.netAmount)} in fuel taxes.
+                  </span>
+                )}
+                {calculation.netAmount < 0 && (
+                  <span className="text-success font-medium">
+                    {' '}You are due a refund of {formatCurrency(Math.abs(calculation.netAmount))}.
+                  </span>
+                )}
+                {calculation.netAmount === 0 && (
+                  <span className="text-muted-foreground font-medium">
+                    {' '}Your fuel taxes are balanced - no payment or refund due.
+                  </span>
+                )}
+              </AlertDescription>
+            </Alert>
+
+            {/* State Breakdown Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  State-by-State Breakdown
+                </CardTitle>
+                <CardDescription>
+                  Detailed fuel tax calculations for each state
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>State</TableHead>
+                        <TableHead className="text-right">Miles</TableHead>
+                        <TableHead className="text-right">Fuel Used (gal)</TableHead>
+                        <TableHead className="text-right">Fuel Purchased (gal)</TableHead>
+                        <TableHead className="text-right">Tax Rate</TableHead>
+                        <TableHead className="text-right">Tax Owed</TableHead>
+                        <TableHead className="text-right">Net Tax</TableHead>
+                        <TableHead className="text-right">KY KYU Tax</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {calculation.stateBreakdown.map((state) => (
+                        <TableRow key={state.state}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {STATE_TAX_RATES[state.state]?.name || state.state}
+                              <Badge variant="outline" className="text-xs">
+                                {state.state}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">{formatMiles(state.miles)}</TableCell>
+                          <TableCell className="text-right">{state.fuelUsed}</TableCell>
+                          <TableCell className="text-right">{state.fuelPurchased}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(STATE_TAX_RATES[state.state]?.taxRate || 0)}
+                          </TableCell>
+                          <TableCell className="text-right">{formatCurrency(state.taxOwed)}</TableCell>
+                          <TableCell className={`text-right font-medium ${getStatusColor(state.netTax)}`}>
+                            {formatCurrency(state.netTax)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {state.kyuTax ? (
+                              <span className="font-medium text-warning">
+                                {formatCurrency(state.kyuTax)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </>
       )}
 
