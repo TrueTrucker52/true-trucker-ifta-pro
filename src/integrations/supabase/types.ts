@@ -236,6 +236,166 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_miles: {
+        Row: {
+          created_at: string
+          id: string
+          miles: number
+          state_code: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          miles?: number
+          state_code: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          miles?: number
+          state_code?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_miles_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          created_at: string
+          destination_city: string
+          destination_state: string
+          destination_zip: string | null
+          end_date: string | null
+          fuel_cost: number | null
+          fuel_gallons: number | null
+          id: string
+          notes: string | null
+          origin_city: string
+          origin_state: string
+          origin_zip: string | null
+          start_date: string
+          status: string | null
+          total_miles: number | null
+          trip_number: string | null
+          truck_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          destination_city: string
+          destination_state: string
+          destination_zip?: string | null
+          end_date?: string | null
+          fuel_cost?: number | null
+          fuel_gallons?: number | null
+          id?: string
+          notes?: string | null
+          origin_city: string
+          origin_state: string
+          origin_zip?: string | null
+          start_date: string
+          status?: string | null
+          total_miles?: number | null
+          trip_number?: string | null
+          truck_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          destination_city?: string
+          destination_state?: string
+          destination_zip?: string | null
+          end_date?: string | null
+          fuel_cost?: number | null
+          fuel_gallons?: number | null
+          id?: string
+          notes?: string | null
+          origin_city?: string
+          origin_state?: string
+          origin_zip?: string | null
+          start_date?: string
+          status?: string | null
+          total_miles?: number | null
+          trip_number?: string | null
+          truck_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trucks: {
+        Row: {
+          created_at: string
+          fuel_type: string | null
+          id: string
+          ifta_account_number: string | null
+          is_active: boolean
+          license_plate: string | null
+          make: string | null
+          model: string | null
+          registration_state: string | null
+          unit_number: string
+          updated_at: string
+          user_id: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          ifta_account_number?: string | null
+          is_active?: boolean
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          registration_state?: string | null
+          unit_number: string
+          updated_at?: string
+          user_id: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          fuel_type?: string | null
+          id?: string
+          ifta_account_number?: string | null
+          is_active?: boolean
+          license_plate?: string | null
+          make?: string | null
+          model?: string | null
+          registration_state?: string | null
+          unit_number?: string
+          updated_at?: string
+          user_id?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           active: boolean | null
