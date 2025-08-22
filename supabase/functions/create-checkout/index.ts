@@ -85,16 +85,35 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
+      customer_update: customerId ? {
+        metadata: {
+          source: "truetrucker-ifta-app",
+          app_name: "TrueTrucker IFTA Pro",
+          user_id: user.id,
+          last_purchase_date: new Date().toISOString()
+        }
+      } : undefined,
+      customer_creation: customerId ? undefined : "always",
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: { 
-              name: selectedPlan.name,
-              description: `IFTA Pro ${selectedPlan.name} Subscription`
+              name: `TrueTrucker IFTA Pro - ${selectedPlan.name}`,
+              description: `IFTA Pro ${selectedPlan.name} Subscription`,
+              metadata: {
+                source: "truetrucker-ifta-app",
+                app_name: "TrueTrucker IFTA Pro",
+                category: "ifta-compliance"
+              }
             },
             unit_amount: selectedPlan.amount,
             recurring: { interval: "month" },
+            metadata: {
+              source: "truetrucker-ifta-app",
+              app_name: "TrueTrucker IFTA Pro",
+              plan_type: validatedPlan
+            }
           },
           quantity: 1,
         },
@@ -103,9 +122,24 @@ serve(async (req) => {
       success_url: `${req.headers.get("origin")}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/?canceled=true`,
       metadata: {
+        source: "truetrucker-ifta-app",
+        app_name: "TrueTrucker IFTA Pro",
+        app_version: "1.0",
         user_id: user.id,
         plan: validatedPlan,
+        purchase_type: "subscription",
+        purchase_date: new Date().toISOString(),
+        user_email: user.email
       },
+      subscription_data: {
+        metadata: {
+          source: "truetrucker-ifta-app",
+          app_name: "TrueTrucker IFTA Pro",
+          user_id: user.id,
+          plan: validatedPlan,
+          created_from: "app-checkout"
+        }
+      }
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
