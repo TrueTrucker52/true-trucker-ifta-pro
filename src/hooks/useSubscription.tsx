@@ -46,13 +46,66 @@ export const useSubscription = () => {
     try {
       setSubscription(prev => ({ ...prev, loading: true }));
       
+      // Try to refresh the session if it's close to expiring
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at && session.expires_at - now < 300) { // Less than 5 minutes
+        console.log('🔄 Refreshing session before subscription check...');
+        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('❌ Failed to refresh session:', refreshError);
+          toast({
+            title: "Session Expired",
+            description: "Please sign in again to check your subscription status.",
+            variant: "destructive"
+          });
+          return;
+        }
+        console.log('✅ Session refreshed successfully');
+      }
+      
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's an authentication error
+        if (error.message?.includes('Authentication error') || error.message?.includes('Session')) {
+          console.log('🔄 Authentication error, attempting session refresh...');
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) {
+            toast({
+              title: "Authentication Error",
+              description: "Please sign out and sign back in to refresh your session.",
+              variant: "destructive"
+            });
+            throw refreshError;
+          }
+          
+          // Retry with refreshed session
+          const retryResponse = await supabase.functions.invoke('check-subscription', {
+            headers: {
+              Authorization: `Bearer ${refreshData.session?.access_token}`,
+            },
+          });
+          
+          if (retryResponse.error) throw retryResponse.error;
+          
+          setSubscription({
+            subscribed: retryResponse.data.subscribed || false,
+            subscription_tier: retryResponse.data.subscription_tier || 'free',
+            subscription_end: retryResponse.data.subscription_end,
+            trial_active: retryResponse.data.trial_active || false,
+            trial_days_remaining: retryResponse.data.trial_days_remaining || 0,
+            trial_end_date: retryResponse.data.trial_end_date,
+            subscription_status: retryResponse.data.subscription_status || 'trial',
+            loading: false,
+          });
+          return;
+        }
+        throw error;
+      }
 
       setSubscription({
         subscribed: data.subscribed || false,
