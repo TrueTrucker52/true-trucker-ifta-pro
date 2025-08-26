@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const Account = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { subscribed, subscription_tier, loading: subscriptionLoading } = useSubscription();
   const [loading, setLoading] = useState(false);
   const [copyPhysicalAddress, setCopyPhysicalAddress] = useState(false);
 
@@ -126,8 +128,14 @@ const Account = () => {
       // Here you would submit the form data to your backend
       console.log('Submitting account information:', formData);
       
-      // Navigate to billing/checkout step
-      navigate('/pricing');
+      // Check if user already has an active subscription
+      if (subscribed && subscription_tier && subscription_tier !== 'free') {
+        console.log('User already has active subscription, redirecting to dashboard');
+        navigate('/dashboard');
+      } else {
+        // Navigate to billing/checkout step for free users or trial users
+        navigate('/pricing');
+      }
     } catch (error) {
       console.error('Error submitting account information:', error);
       alert('There was an error submitting your information. Please try again.');
