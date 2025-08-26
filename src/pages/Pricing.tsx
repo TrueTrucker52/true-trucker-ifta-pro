@@ -17,7 +17,7 @@ const Pricing = () => {
     {
       id: 'small',
       name: 'Solo Driver',
-      price: 25,
+      price: 29,
       period: 'month',
       description: '⚠️ Limited to 2 trucks only',
       popular: false,
@@ -51,7 +51,7 @@ const Pricing = () => {
     {
       id: 'medium',
       name: 'Fleet Manager',
-      price: 49,
+      price: 59,
       period: 'month',
       description: '🚛 Scale to 10 trucks + Premium BOL Management',
       popular: true,
@@ -84,7 +84,7 @@ const Pricing = () => {
     {
       id: 'large',
       name: 'Fleet Empire',
-      price: 99,
+      price: 129,
       period: 'month',
       description: '🏢 Unlimited trucks + White-label solutions',
       popular: false,
@@ -301,9 +301,9 @@ const Pricing = () => {
                   disabled={loading === plan.id}
                 >
                   {loading === plan.id ? 'Setting up...' : 
-                    plan.id === 'small' ? 'START SOLO ($25)' :
-                    plan.id === 'medium' ? '🚀 SCALE TO FLEET ($49)' : 
-                    '💎 BUILD EMPIRE ($99)'
+                    plan.id === 'small' ? 'START SOLO ($29)' :
+                    plan.id === 'medium' ? '🚀 SCALE TO FLEET ($59)' : 
+                    '💎 BUILD EMPIRE ($129)'
                   }
                 </Button>
                 

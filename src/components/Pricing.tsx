@@ -55,9 +55,9 @@ const Pricing = () => {
           {/* Mobile Card Layout */}
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {[
-              { name: 'SOLO DRIVER', price: '$25', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
-              { name: 'FLEET MANAGER', price: '$49', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
-              { name: 'FLEET EMPIRE', price: '$99', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
+              { name: 'SOLO DRIVER', price: '$29', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
+              { name: 'FLEET MANAGER', price: '$59', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
+              { name: 'FLEET EMPIRE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
             ].map((plan) => (
               <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary scale-105 shadow-xl' : ''} hover:shadow-lg transition-all duration-300`}>
                 {plan.popular && (
@@ -177,15 +177,15 @@ const Pricing = () => {
                 <tr className="border-b bg-muted/20">
                   <td className="p-4 font-semibold">Monthly Fee:</td>
                   <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$25</div>
+                    <div className="font-bold text-2xl text-primary">$29</div>
                     <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
                   </td>
                   <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$49</div>
+                    <div className="font-bold text-2xl text-primary">$59</div>
                     <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
                   </td>
                   <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$99</div>
+                    <div className="font-bold text-2xl text-primary">$129</div>
                     <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
                   </td>
                 </tr>
@@ -295,7 +295,7 @@ const Pricing = () => {
             {[
               {
                  question: "How does billing work?",
-                 answer: "7-day free trial, then $25/month for Starter (2 trucks), $49/month for Professional (10 trucks), or $99/month for Enterprise (unlimited trucks). You can cancel anytime with no penalty."
+                 answer: "7-day free trial, then $29/month for Starter (2 trucks), $59/month for Professional (10 trucks), or $129/month for Enterprise (unlimited trucks). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",

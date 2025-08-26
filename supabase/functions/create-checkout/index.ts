@@ -79,9 +79,9 @@ serve(async (req) => {
 
     // Define pricing based on plan
     const priceMapping = {
-      "small": { amount: 2500, name: "Starter Plan" }, // $25.00
-      "medium": { amount: 4900, name: "Professional Plan" }, // $49.00
-      "large": { amount: 9900, name: "Enterprise Plan" }, // $99.00
+      "small": { amount: 2900, name: "Starter Plan" }, // $29.00
+      "medium": { amount: 5900, name: "Professional Plan" }, // $59.00
+      "large": { amount: 12900, name: "Enterprise Plan" }, // $129.00
     };
 
     const selectedPlan = priceMapping[validatedPlan as keyof typeof priceMapping];

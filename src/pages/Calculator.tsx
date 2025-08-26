@@ -87,7 +87,7 @@ const Calculator = () => {
     // Calculate savings with TrueTrucker
     const newTimeCost = timeHours * 0.2 * hourlyRate * 4; // 80% time reduction
     const newPenaltyCost = penaltyCost * 0.05; // 95% error reduction
-    const subscriptionCost = 300; // Annual subscription ($25/month)
+    const subscriptionCost = 348; // Annual subscription ($29/month)
     const totalNewCost = newTimeCost + newPenaltyCost + subscriptionCost;
 
     const annualSavings = Math.max(0, totalCurrentCost - totalNewCost);
