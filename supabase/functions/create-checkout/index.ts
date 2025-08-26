@@ -65,6 +65,8 @@ serve(async (req) => {
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
       logStep("Found existing customer", { customerId });
+    } else {
+      logStep("No existing customer found, will create new one");
     }
 
     // Define pricing based on plan
@@ -90,7 +92,7 @@ serve(async (req) => {
           last_purchase_date: new Date().toISOString()
         }
       } : undefined,
-      customer_creation: customerId ? undefined : "always",
+      
       line_items: [
         {
           price_data: {
