@@ -150,13 +150,32 @@ serve(async (req) => {
             }
           } catch (stripeError) {
             logStep("Stripe check failed", { error: stripeError.message });
+            
+            // If Stripe check failed due to invalid customer ID, clean up the profile
+            if (stripeError.message.includes("No such customer")) {
+              await supabaseClient
+                .from("profiles")
+                .update({ 
+                  stripe_customer_id: null,
+                  subscription_status: userStatus.trial_active ? 'trial' : 'trial_expired',
+                  subscription_tier: 'free',
+                  subscription_end: null,
+                  updated_at: now.toISOString()
+                })
+                .eq("user_id", user.id);
+              
+              userStatus.subscription_tier = 'free';
+              userStatus.subscription_status = userStatus.trial_active ? 'trial' : 'trial_expired';
+              logStep("Cleaned up invalid Stripe customer ID");
+            }
           }
         }
       }
 
       // Set subscription tier from profile if not overridden by Stripe
       if (!userStatus.subscribed) {
-        userStatus.subscription_tier = profile.subscription_tier || 'free';
+        // If user is not subscribed, they should have 'free' tier unless they have an active trial
+        userStatus.subscription_tier = userStatus.trial_active ? (profile.subscription_tier || 'free') : 'free';
       }
     } else {
       // No profile found - this shouldn't happen with our trigger, but handle gracefully
