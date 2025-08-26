@@ -26,6 +26,7 @@ const Pricing = () => {
         'Fuel Receipt Scanning',
         'Basic Mileage Tracking',
         'Tax Calculator',
+        'BOL Management & Scanning',
         'Email Support',
         '1 Vehicle',
       ],
@@ -43,6 +44,7 @@ const Pricing = () => {
         'Advanced Route Planning',
         'Multiple Vehicle Management',
         'Automated Tax Calculations',
+        'Advanced BOL Document Management',
         'Priority Support',
         'Up to 5 Vehicles',
         'Fleet Analytics',
@@ -59,6 +61,7 @@ const Pricing = () => {
       features: [
         'Everything in Professional',
         'Unlimited Vehicles',
+        'Enterprise BOL Management Suite',
         'API Access',
         'Custom Integrations',
         'Dedicated Account Manager',

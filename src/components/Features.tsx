@@ -83,6 +83,11 @@ const Features = () => {
       icon: Award,
       title: "Trucker-First Design",
       description: "Designed by truckers, for truckers. Every feature built for real-world trucking workflows and IFTA compliance needs."
+    },
+    {
+      icon: FileText,
+      title: "BOL Management & Scanning",
+      description: "Scan Bills of Lading with OCR, track pickup/delivery dates, print professional BOL reports, and manage load documents digitally."
     }
   ];
 
