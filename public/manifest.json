@@ -24,13 +24,13 @@
   ],
   "screenshots": [
     {
-      "src": "/src/assets/app-screenshot-1.jpg",
+      "src": "src/assets/app-screenshot-1.jpg",
       "sizes": "1280x720",
       "type": "image/jpeg",
       "form_factor": "wide"
     },
     {
-      "src": "/src/assets/app-screenshot-2.jpg", 
+      "src": "src/assets/app-screenshot-2.jpg", 
       "sizes": "390x844",
       "type": "image/jpeg",
       "form_factor": "narrow"
