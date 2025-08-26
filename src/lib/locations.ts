@@ -118,18 +118,36 @@ export const COMMON_LOCATIONS: LocationData[] = [
 export function searchLocations(query: string): LocationData[] {
   if (!query || query.length < 2) return [];
   
-  const lowerQuery = query.toLowerCase();
+  const lowerQuery = query.toLowerCase().trim();
+  
+  // Handle comma-separated input (e.g., "atlanta,georgia" or "atlanta, ga")
+  const parts = lowerQuery.split(',').map(part => part.trim());
+  
   return COMMON_LOCATIONS
-    .filter(location => 
-      location.city.toLowerCase().includes(lowerQuery) ||
-      location.state.toLowerCase().includes(lowerQuery) ||
-      location.stateCode.toLowerCase().includes(lowerQuery) ||
-      location.displayName.toLowerCase().includes(lowerQuery)
-    )
+    .filter(location => {
+      const cityMatch = location.city.toLowerCase().includes(parts[0]);
+      
+      // If there's a second part after comma, check state/state code
+      if (parts.length > 1 && parts[1]) {
+        const stateMatch = 
+          location.state.toLowerCase().includes(parts[1]) ||
+          location.stateCode.toLowerCase().includes(parts[1]);
+        return cityMatch && stateMatch;
+      }
+      
+      // Single search term - check all fields
+      return (
+        location.city.toLowerCase().includes(lowerQuery) ||
+        location.state.toLowerCase().includes(lowerQuery) ||
+        location.stateCode.toLowerCase().includes(lowerQuery) ||
+        location.displayName.toLowerCase().includes(lowerQuery)
+      );
+    })
     .sort((a, b) => {
       // Prioritize exact city matches
-      if (a.city.toLowerCase().startsWith(lowerQuery)) return -1;
-      if (b.city.toLowerCase().startsWith(lowerQuery)) return 1;
+      const queryStart = parts[0] || lowerQuery;
+      if (a.city.toLowerCase().startsWith(queryStart)) return -1;
+      if (b.city.toLowerCase().startsWith(queryStart)) return 1;
       return a.displayName.localeCompare(b.displayName);
     })
     .slice(0, 10); // Limit results
