@@ -92,14 +92,6 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      customer_update: customerId ? {
-        metadata: {
-          source: "truetrucker-ifta-app",
-          app_name: "TrueTrucker IFTA Pro",
-          user_id: user.id,
-          last_purchase_date: new Date().toISOString()
-        }
-      } : undefined,
       
       line_items: [
         {
