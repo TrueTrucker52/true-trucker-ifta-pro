@@ -79,9 +79,9 @@ serve(async (req) => {
 
     // Define pricing based on plan
     const priceMapping = {
-      "small": { amount: 2900, name: "Starter Plan" }, // $29.00
-      "medium": { amount: 5900, name: "Professional Plan" }, // $59.00
-      "large": { amount: 12900, name: "Enterprise Plan" }, // $129.00
+      "small": { amount: 2500, name: "Starter Plan" }, // $25.00
+      "medium": { amount: 4900, name: "Professional Plan" }, // $49.00
+      "large": { amount: 9900, name: "Enterprise Plan" }, // $99.00
     };
 
     const selectedPlan = priceMapping[validatedPlan as keyof typeof priceMapping];
@@ -116,6 +116,16 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: {
+          source: "truetrucker-ifta-app",
+          app_name: "TrueTrucker IFTA Pro",
+          user_id: user.id,
+          plan: validatedPlan,
+          created_from: "app-checkout"
+        }
+      },
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/?canceled=true`,
       metadata: {
@@ -127,15 +137,6 @@ serve(async (req) => {
         purchase_type: "subscription",
         purchase_date: new Date().toISOString(),
         user_email: user.email
-      },
-      subscription_data: {
-        metadata: {
-          source: "truetrucker-ifta-app",
-          app_name: "TrueTrucker IFTA Pro",
-          user_id: user.id,
-          plan: validatedPlan,
-          created_from: "app-checkout"
-        }
       }
     });
 

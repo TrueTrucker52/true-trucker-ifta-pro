@@ -32,7 +32,7 @@ const SupportBot = () => {
   const botResponses: { [key: string]: string } = {
     "what is ifta": "IFTA (International Fuel Tax Agreement) is a cooperative agreement between U.S. states and Canadian provinces to simplify fuel tax reporting for interstate motor carriers. Our platform calculates taxes by state and generates quarterly reports automatically!",
     "mileage tracking": "Our system tracks miles driven in each IFTA jurisdiction and calculates fuel taxes owed. You can manually enter trips or use GPS tracking when available.",
-    "pricing": "We offer three plans: Starter ($29/month for 1-3 trucks), Professional ($59/month for 4-10 trucks), and Enterprise ($129/month for 10+ trucks). All plans include quarterly IFTA reporting and audit defense tools!",
+    "pricing": "We offer three plans: 7-day free trial, then $25/month for Starter (2 trucks), $49/month for Professional (10 trucks), and $99/month for Enterprise (unlimited trucks). All plans include quarterly IFTA reporting and audit defense tools!",
     "quarterly": "IFTA quarterly returns are due by the last day of the month following each quarter (April 30, July 31, October 31, January 31). Our system generates these reports automatically with state-by-state breakdowns.",
     "tax calculation": "We calculate IFTA taxes by tracking miles driven and gallons purchased in each jurisdiction. The system applies each state's tax rate and determines if you owe money or are due a refund.",
     "audit": "Our audit defense tools help you maintain proper records and respond to IFTA audits. We provide detailed trip logs, receipts management, and compliance documentation.",

@@ -55,9 +55,9 @@ const Pricing = () => {
           {/* Mobile Card Layout */}
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {[
-              { name: 'SOLO DRIVER', price: '$29', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
-              { name: 'FLEET MANAGER', price: '$59', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
-              { name: 'FLEET EMPIRE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
+              { name: 'SOLO DRIVER', price: '$25', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
+              { name: 'FLEET MANAGER', price: '$49', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
+              { name: 'FLEET EMPIRE', price: '$99', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
             ].map((plan) => (
               <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary scale-105 shadow-xl' : ''} hover:shadow-lg transition-all duration-300`}>
                 {plan.popular && (
@@ -84,9 +84,7 @@ const Pricing = () => {
                   </CardDescription>
                   <div className="text-3xl font-bold text-primary mt-2">{plan.price}</div>
                   <div className="text-sm text-muted-foreground">per month</div>
-                  {plan.popular && (
-                    <div className="text-xs text-green-600 font-semibold mt-1">ROI: 340% in 6 months</div>
-                  )}
+                  <div className="text-xs text-green-600 font-semibold mt-1">7-day free trial</div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -178,9 +176,18 @@ const Pricing = () => {
               <tbody>
                 <tr className="border-b bg-muted/20">
                   <td className="p-4 font-semibold">Monthly Fee:</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$29</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$59</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$129</td>
+                  <td className="p-4 text-center">
+                    <div className="font-bold text-2xl text-primary">$25</div>
+                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
+                  </td>
+                  <td className="p-4 text-center">
+                    <div className="font-bold text-2xl text-primary">$49</div>
+                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
+                  </td>
+                  <td className="p-4 text-center">
+                    <div className="font-bold text-2xl text-primary">$99</div>
+                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
+                  </td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-4 font-semibold">Number of Trucks:</td>
@@ -288,7 +295,7 @@ const Pricing = () => {
             {[
               {
                  question: "How does billing work?",
-                 answer: "You'll be charged monthly based on your selected plan: Starter ($29/month), Professional ($59/month), or Enterprise ($129/month). You can cancel anytime with no penalty."
+                 answer: "7-day free trial, then $25/month for Starter (2 trucks), $49/month for Professional (10 trucks), or $99/month for Enterprise (unlimited trucks). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",

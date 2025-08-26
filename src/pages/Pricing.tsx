@@ -17,7 +17,7 @@ const Pricing = () => {
     {
       id: 'small',
       name: 'Solo Driver',
-      price: 29,
+      price: 25,
       period: 'month',
       description: '⚠️ Limited to 2 trucks only',
       popular: false,
@@ -51,7 +51,7 @@ const Pricing = () => {
     {
       id: 'medium',
       name: 'Fleet Manager',
-      price: 59,
+      price: 49,
       period: 'month',
       description: '🚛 Scale to 10 trucks + Premium BOL Management',
       popular: true,
@@ -84,7 +84,7 @@ const Pricing = () => {
     {
       id: 'large',
       name: 'Fleet Empire',
-      price: 129,
+      price: 99,
       period: 'month',
       description: '🏢 Unlimited trucks + White-label solutions',
       popular: false,
@@ -262,8 +262,9 @@ const Pricing = () => {
                 <div className="mt-4">
                   <span className="text-4xl font-bold">${plan.price}</span>
                   <span className="text-muted-foreground">/{plan.period}</span>
+                  <div className="text-sm text-green-600 font-semibold mt-1">7-day free trial</div>
                   {plan.popular && (
-                    <div className="text-sm text-green-600 font-semibold mt-1">Pays for itself in 2 weeks</div>
+                    <div className="text-xs text-blue-600 font-semibold">Pays for itself in 2 weeks</div>
                   )}
                 </div>
               </CardHeader>
@@ -300,15 +301,15 @@ const Pricing = () => {
                   disabled={loading === plan.id}
                 >
                   {loading === plan.id ? 'Setting up...' : 
-                    plan.id === 'small' ? 'START SOLO ($29)' :
-                    plan.id === 'medium' ? '🚀 SCALE TO FLEET ($59)' : 
-                    '💎 BUILD EMPIRE ($129)'
+                    plan.id === 'small' ? 'START SOLO ($25)' :
+                    plan.id === 'medium' ? '🚀 SCALE TO FLEET ($49)' : 
+                    '💎 BUILD EMPIRE ($99)'
                   }
                 </Button>
                 
                 <div className="text-center mt-3 space-y-1">
                   <p className="text-xs text-muted-foreground">
-                    7-day free trial • No setup fees
+                    7-day free trial, then ${plan.price}/month • No setup fees
                   </p>
                   {plan.popular && (
                     <p className="text-xs text-green-600 font-semibold">
