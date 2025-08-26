@@ -51,7 +51,7 @@ const PaymentSuccess = () => {
   }, [user, navigate, checkSubscription, toast]);
 
   const handleContinue = () => {
-    navigate('/dashboard');
+    navigate('/account');
   };
 
   if (!user) {
@@ -75,7 +75,7 @@ const PaymentSuccess = () => {
           <CardDescription>
             {isVerifying 
               ? "We're activating your subscription. Please wait a moment."
-              : "Your payment was successful and your account has been upgraded."
+              : "Your payment was successful! Please complete your business information to get started."
             }
           </CardDescription>
         </CardHeader>
@@ -97,7 +97,7 @@ const PaymentSuccess = () => {
                 className="w-full"
                 size="lg"
               >
-                Continue to Dashboard
+                Complete Business Setup
               </Button>
             </>
           )}
