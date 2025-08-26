@@ -1,0 +1,42 @@
+{
+  "name": "TrueTrucker IFTA Pro",
+  "short_name": "TrueTrucker",
+  "description": "Professional IFTA compliance and mileage tracking for truckers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "/lovable-uploads/truetrucker-app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/truetrucker-app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/src/assets/app-screenshot-1.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/src/assets/app-screenshot-2.jpg", 
+      "sizes": "390x844",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
+  "lang": "en",
+  "scope": "/",
+  "prefer_related_applications": false
+}

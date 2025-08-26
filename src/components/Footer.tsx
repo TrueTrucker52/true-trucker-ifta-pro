@@ -67,7 +67,7 @@ const Footer = () => {
           <div className="flex space-x-6 text-white/90 text-sm mt-4 md:mt-0 font-medium">
             <a href="/privacy-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Privacy Policy</a>
             <a href="/terms-of-service" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Terms of Service</a>
-            <a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">IFTA Compliance</a>
+            <a href="/refund-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Refund Policy</a>
           </div>
         </div>
       </div>
