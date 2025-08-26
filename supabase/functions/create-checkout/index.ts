@@ -18,7 +18,7 @@ const validateInput = (plan: string) => {
     throw new Error('Plan is required and must be a string');
   }
   if (!validPlans.includes(plan)) {
-    throw new Error('Invalid plan selected');
+    throw new Error(`Invalid plan selected. Valid plans are: ${validPlans.join(', ')}`);
   }
   if (plan.length > 50) {
     throw new Error('Plan name too long');

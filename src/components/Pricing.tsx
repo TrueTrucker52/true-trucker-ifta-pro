@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Star, Zap, Crown } from "lucide-react";
+import { CheckCircle, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -40,11 +40,9 @@ const Pricing = () => {
           {/* Mobile Card Layout */}
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {[
-              { name: 'OWNER-OPERATOR', price: '$19.99', trucks: '2', popular: false, plan: 'owner-operator' },
-              { name: 'SMALL', price: '$29.99', trucks: '5', popular: false, plan: 'small' },
-              { name: 'INTERMEDIATE', price: '$39.99', trucks: '10', popular: true, plan: 'intermediate' },
-              { name: 'LARGE', price: '$59.99', trucks: '25', popular: false, plan: 'large' },
-              { name: 'ENTERPRISE', price: '$99.99', trucks: 'Unlimited', popular: false, plan: 'enterprise' }
+              { name: 'STARTER', price: '$29', trucks: '2', popular: false, plan: 'small' },
+              { name: 'PROFESSIONAL', price: '$59', trucks: '10', popular: true, plan: 'medium' },
+              { name: 'ENTERPRISE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large' }
             ].map((plan) => (
               <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary scale-105' : ''}`}>
                 {plan.popular && (
@@ -114,16 +112,12 @@ const Pricing = () => {
         {/* Desktop Table Layout */}
         <div className="hidden md:block">
           <div className="overflow-x-auto">
-            <table className="w-full max-w-7xl mx-auto bg-card rounded-lg shadow-lg">
+            <table className="w-full max-w-5xl mx-auto bg-card rounded-lg shadow-lg">
               <thead>
                 <tr className="border-b">
                   <th className="p-4 text-left"></th>
                   <th className="p-4 text-center">
-                    <div className="font-bold text-lg">OWNER-OPERATOR</div>
-                    <div className="text-sm text-muted-foreground">Package</div>
-                  </th>
-                  <th className="p-4 text-center">
-                    <div className="font-bold text-lg">SMALL</div>
+                    <div className="font-bold text-lg">STARTER</div>
                     <div className="text-sm text-muted-foreground">Package</div>
                   </th>
                   <th className="p-4 text-center relative">
@@ -133,11 +127,7 @@ const Pricing = () => {
                         <span className="text-white font-semibold text-xs">Most Popular</span>
                       </div>
                     </div>
-                    <div className="font-bold text-lg pt-4">INTERMEDIATE</div>
-                    <div className="text-sm text-muted-foreground">Package</div>
-                  </th>
-                  <th className="p-4 text-center">
-                    <div className="font-bold text-lg">LARGE</div>
+                    <div className="font-bold text-lg pt-4">PROFESSIONAL</div>
                     <div className="text-sm text-muted-foreground">Package</div>
                   </th>
                   <th className="p-4 text-center">
@@ -149,18 +139,14 @@ const Pricing = () => {
               <tbody>
                 <tr className="border-b bg-muted/20">
                   <td className="p-4 font-semibold">Monthly Fee:</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$19.99</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$29.99</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$39.99</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$59.99</td>
-                  <td className="p-4 text-center font-bold text-2xl text-primary">$99.99</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$29</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$59</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$129</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-4 font-semibold">Number of Trucks:</td>
                   <td className="p-4 text-center">2</td>
-                  <td className="p-4 text-center">5</td>
                   <td className="p-4 text-center">10</td>
-                  <td className="p-4 text-center">25</td>
                   <td className="p-4 text-center">Unlimited</td>
                 </tr>
                 <tr className="border-b">
@@ -168,13 +154,9 @@ const Pricing = () => {
                   <td className="p-4 text-center">Unlimited</td>
                   <td className="p-4 text-center">Unlimited</td>
                   <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-4 font-semibold">Number of Quarters:</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
                   <td className="p-4 text-center">Unlimited</td>
                   <td className="p-4 text-center">Unlimited</td>
                   <td className="p-4 text-center">Unlimited</td>
@@ -203,26 +185,10 @@ const Pricing = () => {
                     <td className="p-4 text-center">
                       <CheckCircle className="h-5 w-5 text-success mx-auto" />
                     </td>
-                    <td className="p-4 text-center">
-                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
-                    </td>
-                    <td className="p-4 text-center">
-                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
-                    </td>
                   </tr>
                 ))}
                 <tr>
                   <td className="p-4"></td>
-                  <td className="p-4 text-center">
-                    <Button 
-                      variant={subscription_tier === 'owner-operator' ? 'default' : 'outline'}
-                      className="w-full"
-                      onClick={() => handlePlanClick('owner-operator')}
-                      disabled={subscription_tier === 'owner-operator'}
-                    >
-                      {subscription_tier === 'owner-operator' ? 'Current Plan' : 'SIGNUP NOW!'}
-                    </Button>
-                  </td>
                   <td className="p-4 text-center">
                     <Button 
                       variant={subscription_tier === 'small' ? 'default' : 'outline'}
@@ -235,12 +201,12 @@ const Pricing = () => {
                   </td>
                   <td className="p-4 text-center">
                     <Button 
-                      variant={subscription_tier === 'intermediate' ? 'default' : 'hero'}
+                      variant={subscription_tier === 'medium' ? 'default' : 'hero'}
                       className="w-full"
-                      onClick={() => handlePlanClick('intermediate')}
-                      disabled={subscription_tier === 'intermediate'}
+                      onClick={() => handlePlanClick('medium')}
+                      disabled={subscription_tier === 'medium'}
                     >
-                      {subscription_tier === 'intermediate' ? 'Current Plan' : 'SIGNUP NOW!'}
+                      {subscription_tier === 'medium' ? 'Current Plan' : 'SIGNUP NOW!'}
                     </Button>
                   </td>
                   <td className="p-4 text-center">
@@ -251,16 +217,6 @@ const Pricing = () => {
                       disabled={subscription_tier === 'large'}
                     >
                       {subscription_tier === 'large' ? 'Current Plan' : 'SIGNUP NOW!'}
-                    </Button>
-                  </td>
-                  <td className="p-4 text-center">
-                    <Button 
-                      variant={subscription_tier === 'enterprise' ? 'default' : 'outline'}
-                      className="w-full"
-                      onClick={() => handlePlanClick('enterprise')}
-                      disabled={subscription_tier === 'enterprise'}
-                    >
-                      {subscription_tier === 'enterprise' ? 'Current Plan' : 'SIGNUP NOW!'}
                     </Button>
                   </td>
                 </tr>
@@ -293,7 +249,7 @@ const Pricing = () => {
             {[
               {
                  question: "How does billing work?",
-                 answer: "You'll be charged monthly based on your selected plan: Owner-Operator ($19.99/month), Small ($29.99/month), Intermediate ($39.99/month), Large ($59.99/month), or Enterprise ($99.99/month). You can cancel anytime with no penalty."
+                 answer: "You'll be charged monthly based on your selected plan: Starter ($29/month), Professional ($59/month), or Enterprise ($129/month). You can cancel anytime with no penalty."
               },
               {
                 question: "Do you support all IFTA jurisdictions?",
