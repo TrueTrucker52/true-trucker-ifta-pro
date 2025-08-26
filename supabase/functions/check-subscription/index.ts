@@ -102,7 +102,7 @@ serve(async (req) => {
 
       // Check for active paid subscription via Stripe if user has a customer ID
       if (profile.stripe_customer_id) {
-        const stripeKey = Deno.env.get("STRIPE_SECRET_KEY_LIVE");
+        const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
         if (stripeKey) {
           try {
             const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
