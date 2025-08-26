@@ -26,6 +26,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import BOLManagement from "./pages/BOLManagement";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +91,11 @@ const App = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/site-test" element={<SiteTest />} />
+            <Route path="/bol-management" element={
+              <ProtectedRoute>
+                <BOLManagement />
+              </ProtectedRoute>
+            } />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <Admin />

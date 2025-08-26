@@ -14,6 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
+      bills_of_lading: {
+        Row: {
+          bol_image_url: string | null
+          bol_number: string
+          commodity_description: string | null
+          consignee_address: string | null
+          consignee_city: string | null
+          consignee_name: string
+          consignee_state: string | null
+          consignee_zip: string | null
+          created_at: string
+          delivery_date: string | null
+          freight_charges: number | null
+          id: string
+          notes: string | null
+          pickup_date: string
+          pieces: number | null
+          shipper_address: string | null
+          shipper_city: string | null
+          shipper_name: string
+          shipper_state: string | null
+          shipper_zip: string | null
+          status: string
+          trip_id: string | null
+          updated_at: string
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          bol_image_url?: string | null
+          bol_number: string
+          commodity_description?: string | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_name: string
+          consignee_state?: string | null
+          consignee_zip?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          freight_charges?: number | null
+          id?: string
+          notes?: string | null
+          pickup_date: string
+          pieces?: number | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_name: string
+          shipper_state?: string | null
+          shipper_zip?: string | null
+          status?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          bol_image_url?: string | null
+          bol_number?: string
+          commodity_description?: string | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_name?: string
+          consignee_state?: string | null
+          consignee_zip?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          freight_charges?: number | null
+          id?: string
+          notes?: string | null
+          pickup_date?: string
+          pieces?: number | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_name?: string
+          shipper_state?: string | null
+          shipper_zip?: string | null
+          status?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bills_of_lading_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
