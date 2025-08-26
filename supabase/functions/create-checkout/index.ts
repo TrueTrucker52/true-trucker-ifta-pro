@@ -14,16 +14,24 @@ const logStep = (step: string, details?: any) => {
 
 const validateInput = (plan: string) => {
   const validPlans = ['small', 'medium', 'large'];
+  logStep("Validating plan input", { received: plan, type: typeof plan });
+  
   if (!plan || typeof plan !== 'string') {
-    throw new Error('Plan is required and must be a string');
+    throw new Error(`Plan is required and must be a string. Received: ${plan} (type: ${typeof plan})`);
   }
-  if (!validPlans.includes(plan)) {
-    throw new Error(`Invalid plan selected. Valid plans are: ${validPlans.join(', ')}`);
+  
+  const trimmedPlan = plan.trim().toLowerCase();
+  logStep("Plan after trimming", { original: plan, trimmed: trimmedPlan });
+  
+  if (!validPlans.includes(trimmedPlan)) {
+    throw new Error(`Invalid plan selected. Received: "${trimmedPlan}". Valid plans are: ${validPlans.join(', ')}`);
   }
-  if (plan.length > 50) {
+  
+  if (trimmedPlan.length > 50) {
     throw new Error('Plan name too long');
   }
-  return plan.trim().toLowerCase();
+  
+  return trimmedPlan;
 };
 
 serve(async (req) => {
