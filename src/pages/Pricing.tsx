@@ -26,7 +26,7 @@ const Pricing = () => {
         'Fuel Receipt Scanning',
         'Basic Mileage Tracking',
         'Tax Calculator',
-        'BOL Management & Scanning',
+        '📋 Basic BOL Management & Scanning',
         'Email Support',
         'Up to 2 Vehicles',
         'Smart Location Auto-Complete',
@@ -41,6 +41,11 @@ const Pricing = () => {
         'Data Exporting'
       ],
       cta: 'Start 7-Day Free Trial',
+      bolFeatures: [
+        'Basic BOL scanning and storage',
+        'Simple load tracking',
+        'Basic document management'
+      ]
     },
     {
       id: 'medium',
@@ -54,7 +59,9 @@ const Pricing = () => {
         'Advanced Route Planning',
         'Multiple Vehicle Management',
         'Automated Tax Calculations',
-        'Advanced BOL Document Management',
+        '🚛 Advanced Fleet BOL Management',
+        '📊 BOL Analytics & Reporting',
+        '🔄 Automated BOL Processing',
         'Priority Support',
         'Up to 10 Vehicles',
         'Fleet Analytics',
@@ -62,6 +69,14 @@ const Pricing = () => {
         'Enhanced Customer Support'
       ],
       cta: 'Start 7-Day Free Trial',
+      bolFeatures: [
+        'Advanced BOL scanning with AI recognition',
+        'Multi-vehicle load coordination',
+        'Fleet-wide BOL analytics',
+        'Automated compliance tracking',
+        'Load optimization recommendations',
+        'Customer portal integration'
+      ]
     },
     {
       id: 'large',
@@ -73,17 +88,28 @@ const Pricing = () => {
       features: [
         'Everything in Professional',
         'Unlimited Vehicles',
-        'Enterprise BOL Management Suite',
+        '🏢 Enterprise BOL Management Suite',
+        '🔗 BOL API & Custom Integrations',
+        '📈 Advanced BOL Analytics Dashboard',
+        '🎯 White-label BOL Solutions',
         'API Access',
         'Custom Integrations',
         'Dedicated Account Manager',
-        'White-label Options',
-        'Advanced Reporting',
         'Phone Support',
         'Custom Training Sessions',
         'Priority Feature Requests'
       ],
       cta: 'Start 7-Day Free Trial',
+      bolFeatures: [
+        'Complete BOL lifecycle management',
+        'Custom BOL templates and branding',
+        'Real-time fleet visibility',
+        'Advanced compliance automation',
+        'Integration with TMS/ERP systems',
+        'Dedicated BOL support specialist',
+        'Custom BOL workflow automation',
+        'Enterprise-grade security & compliance'
+      ]
     },
   ];
 
@@ -142,6 +168,41 @@ const Pricing = () => {
           </div>
         </div>
 
+        {/* BOL Management Showcase */}
+        <div className="mb-12 bg-gradient-to-r from-primary/5 to-secondary/5 p-8 rounded-xl">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold mb-4">🚛 Professional BOL Management</h3>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Transform your freight operations with our intelligent Bill of Lading management system. 
+              Scan, track, and manage all your loads with AI-powered automation.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center p-6 bg-card rounded-lg border">
+              <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h4 className="font-semibold mb-2">Smart BOL Scanning</h4>
+              <p className="text-sm text-muted-foreground">
+                AI-powered OCR extracts all data from your BOL documents instantly
+              </p>
+            </div>
+            <div className="text-center p-6 bg-card rounded-lg border">
+              <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h4 className="font-semibold mb-2">Fleet Coordination</h4>
+              <p className="text-sm text-muted-foreground">
+                Coordinate multiple vehicles and drivers with centralized load management
+              </p>
+            </div>
+            <div className="text-center p-6 bg-card rounded-lg border">
+              <CreditCard className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h4 className="font-semibold mb-2">Revenue Tracking</h4>
+              <p className="text-sm text-muted-foreground">
+                Track freight charges and analyze profitability per load automatically
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {plans.map((plan) => (
@@ -170,6 +231,21 @@ const Pricing = () => {
                     </li>
                   ))}
                 </ul>
+
+                {/* BOL Features Highlight */}
+                {plan.bolFeatures && (
+                  <div className="mb-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <h4 className="font-semibold text-sm mb-3 text-primary">🚛 BOL Management Features:</h4>
+                    <ul className="space-y-2">
+                      {plan.bolFeatures.map((bolFeature, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                          <span className="text-xs text-muted-foreground">{bolFeature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 
                 <Button
                   className="w-full"
@@ -208,6 +284,18 @@ const Pricing = () => {
               <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
               <p className="text-sm text-muted-foreground">
                 Yes, you can cancel your subscription at any time through your account dashboard or customer portal.
+              </p>
+            </div>
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="font-semibold mb-2">What makes your BOL management special?</h3>
+              <p className="text-sm text-muted-foreground">
+                Our AI-powered BOL system automatically extracts data from documents, tracks freight revenue, and provides fleet-wide visibility. Professional and Enterprise plans include advanced coordination tools and compliance automation.
+              </p>
+            </div>
+            <div className="bg-card p-6 rounded-lg border">
+              <h3 className="font-semibold mb-2">Can I upgrade my plan later?</h3>
+              <p className="text-sm text-muted-foreground">
+                Absolutely! You can upgrade your plan at any time through your customer portal. The upgrade takes effect immediately and you'll only pay the prorated difference.
               </p>
             </div>
           </div>

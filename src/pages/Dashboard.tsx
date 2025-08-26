@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TrialGuard } from "@/components/TrialGuard";
+import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -208,6 +209,9 @@ const Dashboard = () => {
             </Card>
           </div>
         </TrialGuard>
+
+        {/* BOL Upgrade Incentive */}
+        <BOLUpgradeIncentive showIf="starter" />
 
         {/* Quick Actions */}
         <Card>

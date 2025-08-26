@@ -124,7 +124,9 @@ export const useSubscription = () => {
   };
 
   const openCustomerPortal = async () => {
+    console.log('🚀 Opening customer portal');
     if (!user || !session) {
+      console.log('❌ No user or session for customer portal');
       toast({
         title: "Authentication Required",
         description: "Please sign in to manage your subscription",
@@ -134,19 +136,28 @@ export const useSubscription = () => {
     }
 
     try {
+      console.log('📡 Invoking customer-portal function');
       const { data, error } = await supabase.functions.invoke('customer-portal', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Customer portal error:', error);
+        throw error;
+      }
 
+      console.log('✅ Customer portal response:', data);
       if (data.url) {
+        console.log('🔗 Opening customer portal URL:', data.url);
         window.open(data.url, '_blank');
+      } else {
+        console.error('❌ No customer portal URL received');
+        throw new Error('No customer portal URL received');
       }
     } catch (error) {
-      console.error('Error opening customer portal:', error);
+      console.error('💥 Error opening customer portal:', error);
       toast({
         title: "Error",
         description: "Failed to open customer portal. Please try again.",

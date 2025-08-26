@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { BOLManager } from '@/components/BOLManager';
 import { TrialGuard } from '@/components/TrialGuard';
+import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 
 const BOLManagement = () => {
   const navigate = useNavigate();
@@ -29,7 +30,8 @@ const BOLManagement = () => {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 space-y-6">
+          <BOLUpgradeIncentive variant="banner" showIf="starter" />
           <BOLManager />
         </main>
       </div>
