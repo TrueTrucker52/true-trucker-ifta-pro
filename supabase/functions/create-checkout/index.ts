@@ -100,20 +100,10 @@ serve(async (req) => {
             currency: "usd",
             product_data: { 
               name: `TrueTrucker IFTA Pro - ${selectedPlan.name}`,
-              description: `IFTA Pro ${selectedPlan.name} Subscription`,
-              metadata: {
-                source: "truetrucker-ifta-app",
-                app_name: "TrueTrucker IFTA Pro",
-                category: "ifta-compliance"
-              }
+              description: `IFTA Pro ${selectedPlan.name} Subscription`
             },
             unit_amount: selectedPlan.amount,
-            recurring: { interval: "month" },
-            metadata: {
-              source: "truetrucker-ifta-app",
-              app_name: "TrueTrucker IFTA Pro",
-              plan_type: validatedPlan
-            }
+            recurring: { interval: "month" }
           },
           quantity: 1,
         },
