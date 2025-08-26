@@ -100,14 +100,38 @@ serve(async (req) => {
         }
       }
 
-      // Check for active paid subscription via Stripe if user has a customer ID
-      if (profile.stripe_customer_id) {
-        const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-        if (stripeKey) {
-          try {
-            const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+      // Check for active paid subscription via Stripe
+      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+      if (stripeKey) {
+        try {
+          const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+          
+          // First, find or verify the Stripe customer
+          let customerId = profile.stripe_customer_id;
+          if (!customerId) {
+            // Look for customer by email
+            const customers = await stripe.customers.list({ 
+              email: user.email, 
+              limit: 1 
+            });
+            if (customers.data.length > 0) {
+              customerId = customers.data[0].id;
+              // Update profile with the found customer ID
+              await supabaseClient
+                .from("profiles")
+                .update({ 
+                  stripe_customer_id: customerId,
+                  updated_at: now.toISOString()
+                })
+                .eq("user_id", user.id);
+              logStep("Found and saved Stripe customer ID", { customerId });
+            }
+          }
+          
+          // Check for active subscriptions
+          if (customerId) {
             const subscriptions = await stripe.subscriptions.list({
-              customer: profile.stripe_customer_id,
+              customer: customerId,
               status: "active",
               limit: 1,
             });
@@ -146,9 +170,10 @@ serve(async (req) => {
                 })
                 .eq("user_id", user.id);
 
-              logStep("Updated active subscription status", { subscriptionTier, subscriptionEnd });
+               logStep("Updated active subscription status", { subscriptionTier, subscriptionEnd });
             }
-          } catch (stripeError) {
+          }
+        } catch (stripeError) {
             logStep("Stripe check failed", { error: stripeError.message });
             
             // If Stripe check failed due to invalid customer ID, clean up the profile
