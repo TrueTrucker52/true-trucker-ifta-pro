@@ -20,7 +20,9 @@ const Dashboard = () => {
     subscription_status, 
     subscribed,
     subscription_tier,
-    createCheckout 
+    createCheckout,
+    checkSubscription,
+    loading
   } = useSubscription();
 
   const quickStats = [
@@ -143,6 +145,18 @@ const Dashboard = () => {
                         </Button>
                       </>
                     )}
+                    {/* Add refresh button for cached subscription issues */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        await checkSubscription();
+                        window.location.reload();
+                      }}
+                      className="text-xs"
+                    >
+                      🔄 Refresh Status
+                    </Button>
                   </div>
                 </div>
               </CardContent>
