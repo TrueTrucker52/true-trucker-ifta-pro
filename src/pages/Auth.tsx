@@ -8,12 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Truck, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import Recaptcha from '@/components/Recaptcha';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
@@ -38,6 +40,15 @@ const Auth = () => {
       toast({
         title: "Error",
         description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the reCAPTCHA verification",
         variant: "destructive"
       });
       return;
@@ -97,6 +108,15 @@ const Auth = () => {
       toast({
         title: "Error",
         description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast({
+        title: "Verification Required", 
+        description: "Please complete the reCAPTCHA verification",
         variant: "destructive"
       });
       return;
@@ -197,7 +217,13 @@ const Auth = () => {
                       </button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  
+                  <Recaptcha 
+                    onVerify={setRecaptchaToken}
+                    className="flex justify-center"
+                  />
+                  
+                  <Button type="submit" className="w-full" disabled={loading || !recaptchaToken}>
                     {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
@@ -250,9 +276,15 @@ const Auth = () => {
             </p>
             <p className="text-xs text-success font-medium mt-2">
               ✅ Try everything risk-free for 7 days
-            </p>
-          </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
+             </p>
+           </div>
+                  
+                  <Recaptcha 
+                    onVerify={setRecaptchaToken}
+                    className="flex justify-center"
+                  />
+                  
+                  <Button type="submit" className="w-full" disabled={loading || !recaptchaToken}>
                     {loading ? "Creating account..." : "Start Free Trial"}
                   </Button>
                 </form>
