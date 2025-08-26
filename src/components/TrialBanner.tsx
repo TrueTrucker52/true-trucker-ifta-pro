@@ -79,7 +79,7 @@ export const TrialBanner = () => {
             <Button
               variant={getVariant()}
               size="sm"
-              onClick={() => createCheckout('intermediate')}
+              onClick={() => createCheckout('medium')}
               className="font-semibold"
             >
               <Star className="h-4 w-4 mr-2" />

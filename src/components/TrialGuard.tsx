@@ -9,13 +9,13 @@ import { useNavigate } from 'react-router-dom';
 interface TrialGuardProps {
   children: React.ReactNode;
   feature: string;
-  requiredTier?: 'owner-operator' | 'small' | 'intermediate' | 'large' | 'enterprise';
+  requiredTier?: 'small' | 'medium' | 'large';
 }
 
 export const TrialGuard: React.FC<TrialGuardProps> = ({ 
   children, 
   feature, 
-  requiredTier = 'owner-operator' 
+  requiredTier = 'small'
 }) => {
   const { 
     trial_active, 
@@ -29,7 +29,7 @@ export const TrialGuard: React.FC<TrialGuardProps> = ({
 
   // Allow access if user has active subscription of required tier or higher
   if (subscribed) {
-    const tierHierarchy = ['owner-operator', 'small', 'intermediate', 'large', 'enterprise'];
+    const tierHierarchy = ['small', 'medium', 'large'];
     const userTierIndex = tierHierarchy.indexOf(subscription_tier || '');
     const requiredTierIndex = tierHierarchy.indexOf(requiredTier);
     

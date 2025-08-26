@@ -99,7 +99,7 @@ const Dashboard = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => createCheckout('intermediate')}
+                        onClick={() => createCheckout('medium')}
                       >
                         <Star className="h-4 w-4 mr-2" />
                         Upgrade Now
@@ -109,7 +109,7 @@ const Dashboard = () => {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => createCheckout('intermediate')}
+                        onClick={() => createCheckout('medium')}
                       >
                         <Star className="h-4 w-4 mr-2" />
                         Subscribe Now
@@ -252,7 +252,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Management & Settings */}
-        <TrialGuard feature="Fleet Management" requiredTier="intermediate">
+        <TrialGuard feature="Fleet Management" requiredTier="medium">
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Management & Settings</CardTitle>

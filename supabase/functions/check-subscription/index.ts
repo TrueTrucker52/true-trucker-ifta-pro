@@ -120,18 +120,14 @@ serve(async (req) => {
               const priceId = subscription.items.data[0].price.id;
               const price = await stripe.prices.retrieve(priceId);
               const amount = price.unit_amount || 0;
-              let subscriptionTier = 'owner-operator';
+              let subscriptionTier = 'small';
               
-              if (amount >= 9999) {
-                subscriptionTier = 'enterprise';
-              } else if (amount >= 5999) {
+              if (amount >= 12900) {
                 subscriptionTier = 'large';
-              } else if (amount >= 3999) {
-                subscriptionTier = 'intermediate';
-              } else if (amount >= 2999) {
+              } else if (amount >= 5900) {
+                subscriptionTier = 'medium';
+              } else if (amount >= 2900) {
                 subscriptionTier = 'small';
-              } else if (amount >= 1999) {
-                subscriptionTier = 'owner-operator';
               }
 
               userStatus.subscribed = true;
