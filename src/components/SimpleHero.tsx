@@ -153,7 +153,7 @@ const SimpleHero = () => {
                 <Button 
                   variant="secondary" 
                   size="lg"
-                  className="h-14 px-6 bg-black text-white hover:bg-gray-800 transition-all duration-200"
+                  className="h-14 px-6"
                   onClick={() => window.open('https://apps.apple.com/search?term=trucking%20IFTA', '_blank')}
                 >
                   <span className="text-lg">📱 App Store</span>
@@ -167,9 +167,9 @@ const SimpleHero = () => {
                   <span className="text-lg">🎥 Watch Demo</span>
                 </Button>
                 <Button 
-                  variant="secondary" 
+                  variant="success" 
                   size="lg"
-                  className="h-14 px-6 bg-green-600 text-white hover:bg-green-700 transition-all duration-200"
+                  className="h-14 px-6"
                   onClick={() => window.open('https://play.google.com/store/search?q=trucking%20IFTA', '_blank')}
                 >
                   <span className="text-lg">📱 Google Play</span>
@@ -189,7 +189,7 @@ const SimpleHero = () => {
             <Button 
               variant="outline"
               size="lg" 
-              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white transition-all duration-300 w-full sm:w-auto font-bold shadow-lg"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-12 sm:h-14 w-full sm:w-auto font-bold"
               onClick={() => {
                 console.log('🛒 View Pricing button clicked - scrolling to pricing');
                 const pricingElement = document.getElementById('pricing');
