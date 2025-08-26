@@ -1,4 +1,3 @@
-import { AnimatedDashboard } from "@/components/AnimatedDashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TrialGuard } from "@/components/TrialGuard";
 import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
+import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -45,6 +45,14 @@ const Dashboard = () => {
     miles: { label: "Miles", color: "hsl(var(--primary))" },
     fuel: { label: "Fuel ($)", color: "hsl(var(--secondary))" }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <OptimizedLoadingState size="lg" message="Loading dashboard..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-6">

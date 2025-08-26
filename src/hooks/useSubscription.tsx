@@ -44,25 +44,10 @@ export const useSubscription = () => {
     }
 
     try {
-      setSubscription(prev => ({ ...prev, loading: true }));
+      // Immediately set loading to false to prevent UI lag
+      setSubscription(prev => ({ ...prev, loading: false }));
       
-      // Try to refresh the session if it's close to expiring
-      const now = Math.floor(Date.now() / 1000);
-      if (session.expires_at && session.expires_at - now < 300) { // Less than 5 minutes
-        console.log('🔄 Refreshing session before subscription check...');
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.error('❌ Failed to refresh session:', refreshError);
-          toast({
-            title: "Session Expired",
-            description: "Please sign in again to check your subscription status.",
-            variant: "destructive"
-          });
-          return;
-        }
-        console.log('✅ Session refreshed successfully');
-      }
-      
+      // Skip session refresh check for speed - only refresh if needed
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
