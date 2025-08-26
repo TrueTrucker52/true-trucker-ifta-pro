@@ -97,24 +97,51 @@ const Dashboard = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     {trial_active && trial_days_remaining <= 3 && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate('/pricing')}
+                        >
+                          View All Plans
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => createCheckout('medium')}
+                        >
+                          <Star className="h-4 w-4 mr-2" />
+                          Upgrade Now
+                        </Button>
+                      </>
+                    )}
+                    {trial_active && trial_days_remaining > 3 && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => createCheckout('medium')}
+                        onClick={() => navigate('/pricing')}
                       >
-                        <Star className="h-4 w-4 mr-2" />
-                        Upgrade Now
+                        Upgrade Early
                       </Button>
                     )}
                     {subscription_status === 'trial_expired' && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => createCheckout('medium')}
-                      >
-                        <Star className="h-4 w-4 mr-2" />
-                        Subscribe Now
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate('/pricing')}
+                        >
+                          View All Plans
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => createCheckout('medium')}
+                        >
+                          <Star className="h-4 w-4 mr-2" />
+                          Subscribe Now
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
