@@ -129,10 +129,13 @@ const Account = () => {
       console.log('Submitting account information:', formData);
       
       // Check if user already has an active subscription
-      if (subscribed && subscription_tier && subscription_tier !== 'free') {
+      console.log('Subscription status:', { subscribed, subscription_tier, subscriptionLoading });
+      
+      if (subscribed && subscription_tier && ['Starter', 'Professional', 'Enterprise'].includes(subscription_tier)) {
         console.log('User already has active subscription, redirecting to dashboard');
         navigate('/dashboard');
       } else {
+        console.log('User does not have active subscription, redirecting to pricing');
         // Navigate to billing/checkout step for free users or trial users
         navigate('/pricing');
       }
