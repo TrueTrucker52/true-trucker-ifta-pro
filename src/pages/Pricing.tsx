@@ -16,11 +16,12 @@ const Pricing = () => {
   const plans = [
     {
       id: 'small',
-      name: 'Starter',
+      name: 'Solo Driver',
       price: 29,
       period: 'month',
-      description: 'Perfect for individual truckers',
+      description: '⚠️ Limited to 2 trucks only',
       popular: false,
+      limitation: '2 Truck Limit',
       features: [
         'IFTA Quarterly Reports',
         'Fuel Receipt Scanning',
@@ -49,11 +50,13 @@ const Pricing = () => {
     },
     {
       id: 'medium',
-      name: 'Professional',
+      name: 'Fleet Manager',
       price: 59,
       period: 'month',
-      description: 'Ideal for small fleet operators',
+      description: '🚛 Scale to 10 trucks + Premium BOL Management',
       popular: true,
+      badge: 'MOST POPULAR',
+      savings: 'Save $450/month vs competitors',
       features: [
         'Everything in Starter',
         'Advanced Route Planning',
@@ -80,11 +83,13 @@ const Pricing = () => {
     },
     {
       id: 'large',
-      name: 'Enterprise',
+      name: 'Fleet Empire',
       price: 129,
       period: 'month',
-      description: 'For large fleets and corporations',
+      description: '🏢 Unlimited trucks + White-label solutions',
       popular: false,
+      badge: 'BEST VALUE',
+      roi: 'ROI: 340% within 6 months',
       features: [
         'Everything in Professional',
         'Unlimited Vehicles',
@@ -137,10 +142,29 @@ const Pricing = () => {
               <Truck className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with a 7-day free trial. No credit card required, but credit card trials offer better consumer protection.
+          
+          {/* Urgency & Social Proof */}
+          <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-red-600 font-semibold text-sm">LIMITED TIME: SCALE YOUR FLEET</span>
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            </div>
+            <p className="text-sm text-red-700">Join 10,000+ truckers who've automated their operations • 89% upgrade to fleet management</p>
+          </div>
+
+          <h1 className="text-4xl font-bold mb-4">
+            Stop Running 1-Truck Operations
+            <span className="block text-primary">Upgrade to Fleet Management</span>
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
+            From solo driver to fleet operator in 7 days. Manage unlimited trucks, automate BOL processing, and scale your revenue.
           </p>
+          
+          {/* Value Proposition */}
+          <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-lg p-4 max-w-2xl mx-auto">
+            <p className="text-green-700 font-semibold">💰 Average customers add 3-5 trucks within 90 days • $2,500+ monthly revenue increase</p>
+          </div>
         </div>
 
         {/* Trust Indicators */}
@@ -206,19 +230,41 @@ const Pricing = () => {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {plans.map((plan) => (
-            <Card key={plan.id} className={`relative ${plan.popular ? 'border-primary shadow-lg scale-105' : 'border-border'}`}>
+            <Card key={plan.id} className={`relative ${plan.popular ? 'border-primary shadow-lg scale-105 ring-2 ring-primary/50' : 'border-border'} hover:shadow-xl transition-all duration-300`}>
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
-                  Most Popular
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-500 to-blue-500 text-white animate-pulse">
+                  🔥 {plan.badge || 'Most Popular'}
                 </Badge>
               )}
               
+              {plan.limitation && (
+                <div className="absolute top-4 right-4 bg-red-500/10 border border-red-500/30 rounded-lg px-2 py-1">
+                  <span className="text-red-600 text-xs font-semibold">{plan.limitation}</span>
+                </div>
+              )}
+              
               <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardTitle className={`text-2xl ${plan.popular ? 'text-primary' : ''}`}>{plan.name}</CardTitle>
+                <CardDescription className="min-h-[40px]">{plan.description}</CardDescription>
+                
+                {plan.savings && (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-2 mb-2">
+                    <span className="text-green-600 text-sm font-semibold">{plan.savings}</span>
+                  </div>
+                )}
+                
+                {plan.roi && (
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-2 mb-2">
+                    <span className="text-blue-600 text-sm font-semibold">{plan.roi}</span>
+                  </div>
+                )}
+                
                 <div className="mt-4">
                   <span className="text-4xl font-bold">${plan.price}</span>
                   <span className="text-muted-foreground">/{plan.period}</span>
+                  {plan.popular && (
+                    <div className="text-sm text-green-600 font-semibold mt-1">Pays for itself in 2 weeks</div>
+                  )}
                 </div>
               </CardHeader>
               
@@ -248,17 +294,28 @@ const Pricing = () => {
                 )}
                 
                 <Button
-                  className="w-full"
-                  variant={plan.popular ? "default" : "outline"}
+                  className={`w-full ${plan.popular ? 'animate-pulse' : ''}`}
+                  variant={plan.popular ? "hero" : "outline"}
                   onClick={() => handlePlanSelect(plan.id)}
                   disabled={loading === plan.id}
                 >
-                  {loading === plan.id ? 'Setting up...' : plan.cta}
+                  {loading === plan.id ? 'Setting up...' : 
+                    plan.id === 'small' ? 'START SOLO ($29)' :
+                    plan.id === 'medium' ? '🚀 SCALE TO FLEET ($59)' : 
+                    '💎 BUILD EMPIRE ($129)'
+                  }
                 </Button>
                 
-                <p className="text-xs text-center text-muted-foreground mt-3">
-                  7-day free trial • Cancel anytime
-                </p>
+                <div className="text-center mt-3 space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    7-day free trial • No setup fees
+                  </p>
+                  {plan.popular && (
+                    <p className="text-xs text-green-600 font-semibold">
+                      ⚡ Setup in 5 minutes • Start earning today
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
