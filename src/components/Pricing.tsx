@@ -35,160 +35,238 @@ const Pricing = () => {
           </p>
         </div>
 
-        {/* Pricing Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-7xl mx-auto bg-card rounded-lg shadow-lg">
-            <thead>
-              <tr className="border-b">
-                <th className="p-4 text-left"></th>
-                <th className="p-4 text-center">
-                  <div className="font-bold text-lg">OWNER-OPERATOR</div>
-                  <div className="text-sm text-muted-foreground">Package</div>
-                </th>
-                <th className="p-4 text-center">
-                  <div className="font-bold text-lg">SMALL</div>
-                  <div className="text-sm text-muted-foreground">Package</div>
-                </th>
-                <th className="p-4 text-center relative">
+        {/* Mobile-First Responsive Pricing */}
+        <div className="block md:hidden">
+          {/* Mobile Card Layout */}
+          <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
+            {[
+              { name: 'OWNER-OPERATOR', price: '$19.99', trucks: '2', popular: false, plan: 'owner-operator' },
+              { name: 'SMALL', price: '$29.99', trucks: '5', popular: false, plan: 'small' },
+              { name: 'INTERMEDIATE', price: '$39.99', trucks: '10', popular: true, plan: 'intermediate' },
+              { name: 'LARGE', price: '$59.99', trucks: '25', popular: false, plan: 'large' },
+              { name: 'ENTERPRISE', price: '$99.99', trucks: 'Unlimited', popular: false, plan: 'enterprise' }
+            ].map((plan) => (
+              <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary scale-105' : ''}`}>
+                {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <div className="bg-gradient-sunset px-4 py-1 rounded-full">
                       <Star className="inline h-4 w-4 text-white mr-1" />
                       <span className="text-white font-semibold text-xs">Most Popular</span>
                     </div>
                   </div>
-                  <div className="font-bold text-lg pt-4">INTERMEDIATE</div>
-                  <div className="text-sm text-muted-foreground">Package</div>
-                </th>
-                <th className="p-4 text-center">
-                  <div className="font-bold text-lg">LARGE</div>
-                  <div className="text-sm text-muted-foreground">Package</div>
-                </th>
-                <th className="p-4 text-center">
-                  <div className="font-bold text-lg">ENTERPRISE</div>
-                  <div className="text-sm text-muted-foreground">Package</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b bg-muted/20">
-                <td className="p-4 font-semibold">Monthly Fee:</td>
-                <td className="p-4 text-center font-bold text-2xl text-primary">$19.99</td>
-                <td className="p-4 text-center font-bold text-2xl text-primary">$29.99</td>
-                <td className="p-4 text-center font-bold text-2xl text-primary">$39.99</td>
-                <td className="p-4 text-center font-bold text-2xl text-primary">$59.99</td>
-                <td className="p-4 text-center font-bold text-2xl text-primary">$99.99</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-semibold">Number of Trucks:</td>
-                <td className="p-4 text-center">2</td>
-                <td className="p-4 text-center">5</td>
-                <td className="p-4 text-center">10</td>
-                <td className="p-4 text-center">25</td>
-                <td className="p-4 text-center">Unlimited</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-semibold">Number of Trips:</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-4 font-semibold">Number of Quarters:</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-                <td className="p-4 text-center">Unlimited</td>
-              </tr>
-              {[
-                'Smart Location Auto-Complete',
-                'Professional Trip Editing',
-                'Kentucky KYU Compliance',
-                'Mobile Trip Entry',
-                'Generate Trip Sheets',
-                'IFTA Quarterly Returns',
-                'Quarterly Mileage Returns',
-                'Recap Reports',
-                'Truck Reports',
-                'Auto Routing & Calculations',
-                'Data Exporting'
-              ].map((feature) => (
-                <tr key={feature} className="border-b">
-                  <td className="p-4 font-semibold">{feature}:</td>
+                )}
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-lg">{plan.name}</CardTitle>
+                  <CardDescription>Package</CardDescription>
+                  <div className="text-3xl font-bold text-primary mt-2">{plan.price}</div>
+                  <div className="text-sm text-muted-foreground">per month</div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Number of Trucks:</span>
+                      <span className="font-semibold">{plan.trucks}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Number of Trips:</span>
+                      <span className="font-semibold">Unlimited</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Number of Quarters:</span>
+                      <span className="font-semibold">Unlimited</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="text-sm font-semibold mb-2">All Features Included:</div>
+                    {[
+                      'Smart Location Auto-Complete',
+                      'Professional Trip Editing',
+                      'Kentucky KYU Compliance',
+                      'Mobile Trip Entry',
+                      'Generate Trip Sheets',
+                      'IFTA Quarterly Returns',
+                      'Quarterly Mileage Returns',
+                      'Recap Reports',
+                      'Truck Reports',
+                      'Auto Routing & Calculations',
+                      'Data Exporting'
+                    ].map((feature) => (
+                      <div key={feature} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button 
+                    variant={subscription_tier === plan.plan ? 'default' : plan.popular ? 'hero' : 'outline'}
+                    className="w-full mt-4"
+                    onClick={() => handlePlanClick(plan.plan)}
+                    disabled={subscription_tier === plan.plan}
+                  >
+                    {subscription_tier === plan.plan ? 'Current Plan' : 'SIGNUP NOW!'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full max-w-7xl mx-auto bg-card rounded-lg shadow-lg">
+              <thead>
+                <tr className="border-b">
+                  <th className="p-4 text-left"></th>
+                  <th className="p-4 text-center">
+                    <div className="font-bold text-lg">OWNER-OPERATOR</div>
+                    <div className="text-sm text-muted-foreground">Package</div>
+                  </th>
+                  <th className="p-4 text-center">
+                    <div className="font-bold text-lg">SMALL</div>
+                    <div className="text-sm text-muted-foreground">Package</div>
+                  </th>
+                  <th className="p-4 text-center relative">
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-gradient-sunset px-4 py-1 rounded-full">
+                        <Star className="inline h-4 w-4 text-white mr-1" />
+                        <span className="text-white font-semibold text-xs">Most Popular</span>
+                      </div>
+                    </div>
+                    <div className="font-bold text-lg pt-4">INTERMEDIATE</div>
+                    <div className="text-sm text-muted-foreground">Package</div>
+                  </th>
+                  <th className="p-4 text-center">
+                    <div className="font-bold text-lg">LARGE</div>
+                    <div className="text-sm text-muted-foreground">Package</div>
+                  </th>
+                  <th className="p-4 text-center">
+                    <div className="font-bold text-lg">ENTERPRISE</div>
+                    <div className="text-sm text-muted-foreground">Package</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b bg-muted/20">
+                  <td className="p-4 font-semibold">Monthly Fee:</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$19.99</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$29.99</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$39.99</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$59.99</td>
+                  <td className="p-4 text-center font-bold text-2xl text-primary">$99.99</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-4 font-semibold">Number of Trucks:</td>
+                  <td className="p-4 text-center">2</td>
+                  <td className="p-4 text-center">5</td>
+                  <td className="p-4 text-center">10</td>
+                  <td className="p-4 text-center">25</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-4 font-semibold">Number of Trips:</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-4 font-semibold">Number of Quarters:</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                  <td className="p-4 text-center">Unlimited</td>
+                </tr>
+                {[
+                  'Smart Location Auto-Complete',
+                  'Professional Trip Editing',
+                  'Kentucky KYU Compliance',
+                  'Mobile Trip Entry',
+                  'Generate Trip Sheets',
+                  'IFTA Quarterly Returns',
+                  'Quarterly Mileage Returns',
+                  'Recap Reports',
+                  'Truck Reports',
+                  'Auto Routing & Calculations',
+                  'Data Exporting'
+                ].map((feature) => (
+                  <tr key={feature} className="border-b">
+                    <td className="p-4 font-semibold">{feature}:</td>
+                    <td className="p-4 text-center">
+                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    </td>
+                    <td className="p-4 text-center">
+                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    </td>
+                    <td className="p-4 text-center">
+                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    </td>
+                    <td className="p-4 text-center">
+                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    </td>
+                    <td className="p-4 text-center">
+                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="p-4"></td>
                   <td className="p-4 text-center">
-                    <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    <Button 
+                      variant={subscription_tier === 'owner-operator' ? 'default' : 'outline'}
+                      className="w-full"
+                      onClick={() => handlePlanClick('owner-operator')}
+                      disabled={subscription_tier === 'owner-operator'}
+                    >
+                      {subscription_tier === 'owner-operator' ? 'Current Plan' : 'SIGNUP NOW!'}
+                    </Button>
                   </td>
                   <td className="p-4 text-center">
-                    <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    <Button 
+                      variant={subscription_tier === 'small' ? 'default' : 'outline'}
+                      className="w-full"
+                      onClick={() => handlePlanClick('small')}
+                      disabled={subscription_tier === 'small'}
+                    >
+                      {subscription_tier === 'small' ? 'Current Plan' : 'SIGNUP NOW!'}
+                    </Button>
                   </td>
                   <td className="p-4 text-center">
-                    <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    <Button 
+                      variant={subscription_tier === 'intermediate' ? 'default' : 'hero'}
+                      className="w-full"
+                      onClick={() => handlePlanClick('intermediate')}
+                      disabled={subscription_tier === 'intermediate'}
+                    >
+                      {subscription_tier === 'intermediate' ? 'Current Plan' : 'SIGNUP NOW!'}
+                    </Button>
                   </td>
                   <td className="p-4 text-center">
-                    <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    <Button 
+                      variant={subscription_tier === 'large' ? 'default' : 'outline'}
+                      className="w-full"
+                      onClick={() => handlePlanClick('large')}
+                      disabled={subscription_tier === 'large'}
+                    >
+                      {subscription_tier === 'large' ? 'Current Plan' : 'SIGNUP NOW!'}
+                    </Button>
                   </td>
                   <td className="p-4 text-center">
-                    <CheckCircle className="h-5 w-5 text-success mx-auto" />
+                    <Button 
+                      variant={subscription_tier === 'enterprise' ? 'default' : 'outline'}
+                      className="w-full"
+                      onClick={() => handlePlanClick('enterprise')}
+                      disabled={subscription_tier === 'enterprise'}
+                    >
+                      {subscription_tier === 'enterprise' ? 'Current Plan' : 'SIGNUP NOW!'}
+                    </Button>
                   </td>
                 </tr>
-              ))}
-              <tr>
-                <td className="p-4"></td>
-                <td className="p-4 text-center">
-                  <Button 
-                    variant={subscription_tier === 'owner-operator' ? 'default' : 'outline'}
-                    className="w-full"
-                    onClick={() => handlePlanClick('owner-operator')}
-                    disabled={subscription_tier === 'owner-operator'}
-                  >
-                    {subscription_tier === 'owner-operator' ? 'Current Plan' : 'SIGNUP NOW!'}
-                  </Button>
-                </td>
-                <td className="p-4 text-center">
-                  <Button 
-                    variant={subscription_tier === 'small' ? 'default' : 'outline'}
-                    className="w-full"
-                    onClick={() => handlePlanClick('small')}
-                    disabled={subscription_tier === 'small'}
-                  >
-                    {subscription_tier === 'small' ? 'Current Plan' : 'SIGNUP NOW!'}
-                  </Button>
-                </td>
-                <td className="p-4 text-center">
-                  <Button 
-                    variant={subscription_tier === 'intermediate' ? 'default' : 'hero'}
-                    className="w-full"
-                    onClick={() => handlePlanClick('intermediate')}
-                    disabled={subscription_tier === 'intermediate'}
-                  >
-                    {subscription_tier === 'intermediate' ? 'Current Plan' : 'SIGNUP NOW!'}
-                  </Button>
-                </td>
-                <td className="p-4 text-center">
-                  <Button 
-                    variant={subscription_tier === 'large' ? 'default' : 'outline'}
-                    className="w-full"
-                    onClick={() => handlePlanClick('large')}
-                    disabled={subscription_tier === 'large'}
-                  >
-                    {subscription_tier === 'large' ? 'Current Plan' : 'SIGNUP NOW!'}
-                  </Button>
-                </td>
-                <td className="p-4 text-center">
-                  <Button 
-                    variant={subscription_tier === 'enterprise' ? 'default' : 'outline'}
-                    className="w-full"
-                    onClick={() => handlePlanClick('enterprise')}
-                    disabled={subscription_tier === 'enterprise'}
-                  >
-                    {subscription_tier === 'enterprise' ? 'Current Plan' : 'SIGNUP NOW!'}
-                  </Button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Security Notice */}
