@@ -1,4 +1,4 @@
-const CACHE_NAME = 'truetrucker-ifta-v1';
+const CACHE_NAME = 'truetrucker-ifta-v2';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
