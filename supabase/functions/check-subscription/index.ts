@@ -101,19 +101,36 @@ serve(async (req) => {
       }
 
       // Check for active paid subscription via Stripe
-      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY_LIVE");
+      logStep("Checking Stripe key availability", { 
+        hasTestKey: !!Deno.env.get("STRIPE_SECRET_KEY"),
+        hasLiveKey: !!Deno.env.get("STRIPE_SECRET_KEY_LIVE"),
+        usingKey: stripeKey ? `${stripeKey.substring(0, 7)}...` : 'none'
+      });
+      
       if (stripeKey) {
         try {
           const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
           
           // First, find or verify the Stripe customer
           let customerId = profile.stripe_customer_id;
+          logStep("Starting customer lookup", { 
+            existingCustomerId: customerId,
+            userEmail: user.email 
+          });
+          
           if (!customerId) {
             // Look for customer by email
+            logStep("Searching for customer by email in Stripe");
             const customers = await stripe.customers.list({ 
               email: user.email, 
               limit: 1 
             });
+            logStep("Stripe customer search result", { 
+              foundCustomers: customers.data.length,
+              customers: customers.data.map(c => ({ id: c.id, email: c.email }))
+            });
+            
             if (customers.data.length > 0) {
               customerId = customers.data[0].id;
               // Update profile with the found customer ID
@@ -125,15 +142,28 @@ serve(async (req) => {
                 })
                 .eq("user_id", user.id);
               logStep("Found and saved Stripe customer ID", { customerId });
+            } else {
+              logStep("No Stripe customer found for email", { email: user.email });
             }
           }
           
           // Check for active subscriptions
           if (customerId) {
+            logStep("Checking for active subscriptions", { customerId });
             const subscriptions = await stripe.subscriptions.list({
               customer: customerId,
               status: "active",
-              limit: 1,
+              limit: 10, // Increase limit to see more subscriptions
+            });
+            
+            logStep("Stripe subscription search result", { 
+              activeSubscriptions: subscriptions.data.length,
+              subscriptions: subscriptions.data.map(s => ({
+                id: s.id,
+                status: s.status,
+                current_period_end: s.current_period_end,
+                price_id: s.items.data[0]?.price.id
+              }))
             });
 
             if (subscriptions.data.length > 0) {
@@ -171,10 +201,14 @@ serve(async (req) => {
                 .eq("user_id", user.id);
 
                logStep("Updated active subscription status", { subscriptionTier, subscriptionEnd });
+            } else {
+              logStep("No active subscriptions found for customer", { customerId });
             }
+          } else {
+            logStep("No customer ID available - skipping subscription check");
           }
         } catch (stripeError) {
-            logStep("Stripe check failed", { error: stripeError.message });
+            logStep("Stripe check failed", { error: stripeError.message, stack: stripeError.stack });
             
             // If Stripe check failed due to invalid customer ID, clean up the profile
             if (stripeError.message.includes("No such customer")) {
@@ -193,9 +227,11 @@ serve(async (req) => {
               userStatus.subscription_status = userStatus.trial_active ? 'trial' : 'trial_expired';
               logStep("Cleaned up invalid Stripe customer ID");
             }
+            }
           }
+        } else {
+          logStep("No Stripe secret key available");
         }
-      }
 
       // Set subscription tier from profile if not overridden by Stripe
       if (!userStatus.subscribed) {
