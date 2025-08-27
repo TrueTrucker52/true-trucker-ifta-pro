@@ -271,18 +271,21 @@ const Auth = () => {
                   </Button>
                 </form>
                 
-                <div className="text-center mt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const tabs = document.querySelector('[role="tablist"]');
-                      const resetTab = tabs?.querySelector('[value="reset"]') as HTMLElement;
-                      resetTab?.click();
-                    }}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot your password?
-                  </button>
+                <div className="text-center mt-4 space-y-2">
+                  <div className="p-3 bg-muted/50 rounded-lg border">
+                    <p className="text-sm font-medium text-foreground">Having trouble signing in?</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tabs = document.querySelector('[role="tablist"]');
+                        const resetTab = tabs?.querySelector('[value="reset"]') as HTMLElement;
+                        resetTab?.click();
+                      }}
+                      className="text-sm text-primary hover:underline font-medium mt-1"
+                    >
+                      Reset your password here →
+                    </button>
+                  </div>
                 </div>
               </TabsContent>
               
