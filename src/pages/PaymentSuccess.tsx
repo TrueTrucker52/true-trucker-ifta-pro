@@ -51,7 +51,8 @@ const PaymentSuccess = () => {
   }, [user, navigate, checkSubscription, toast]);
 
   const handleContinue = () => {
-    navigate('/account');
+    // Always redirect to account setup after payment
+    navigate('/account?flow=setup');
   };
 
   if (!user) {
@@ -75,7 +76,7 @@ const PaymentSuccess = () => {
           <CardDescription>
             {isVerifying 
               ? "We're activating your subscription. Please wait a moment."
-              : "Your payment was successful! Please complete your business information to get started."
+              : "Your subscription is active! Please complete your business information to begin your IFTA journey."
             }
           </CardDescription>
         </CardHeader>
@@ -97,7 +98,7 @@ const PaymentSuccess = () => {
                 className="w-full"
                 size="lg"
               >
-                Complete Business Setup
+                Complete Company Setup
               </Button>
             </>
           )}
