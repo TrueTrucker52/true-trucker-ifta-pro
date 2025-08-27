@@ -44,15 +44,17 @@ export const useSubscription = () => {
     }
 
     try {
-      // Immediately set loading to false to prevent UI lag
-      setSubscription(prev => ({ ...prev, loading: false }));
+      // Set loading while checking
+      setSubscription(prev => ({ ...prev, loading: true }));
       
-      // Skip session refresh check for speed - only refresh if needed
+      console.log('🔍 Checking subscription status...');
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+      
+      console.log('📊 Subscription check result:', { data, error });
 
       if (error) {
         // Check if it's an authentication error
