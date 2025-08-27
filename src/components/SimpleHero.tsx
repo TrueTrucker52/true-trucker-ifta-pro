@@ -104,6 +104,7 @@ const SimpleHero = () => {
                     src={appScreenshot1} 
                     alt="IFTA Dashboard - Professional fuel tax calculations and mileage tracking interface"
                     className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
@@ -121,6 +122,7 @@ const SimpleHero = () => {
                     src={appScreenshot2} 
                     alt="Route Tracking - Interactive state-by-state mileage breakdown for IFTA compliance"
                     className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
@@ -138,6 +140,7 @@ const SimpleHero = () => {
                     src={appScreenshot3} 
                     alt="Receipt Scanner - AI-powered automatic fuel receipt data extraction"
                     className="h-28 sm:h-40 w-auto rounded-lg shadow-xl border-2 border-white/20"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">

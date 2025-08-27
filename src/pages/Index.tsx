@@ -9,12 +9,14 @@ import Pricing from "@/components/Pricing";
 import ContactSection from "@/components/ContactSection";
 import SupportBot from "@/components/SupportBot";
 import Footer from "@/components/Footer";
+import ImagePreloader from "@/components/ImagePreloader";
 
 const Index = () => {
   console.log('Index page rendering...');
   
   return (
     <>
+      <ImagePreloader />
       <Header />
       <TrialBanner />
       <SimpleHero />
