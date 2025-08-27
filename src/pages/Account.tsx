@@ -128,17 +128,18 @@ const Account = () => {
       // Here you would submit the form data to your backend
       console.log('Submitting account information:', formData);
       
-      // Check if user already has an active subscription
-      console.log('Subscription status:', { subscribed, subscription_tier, subscriptionLoading });
+      // TODO: Save company information to database
+      // This would include updating the profiles table with:
+      // - company_setup_completed: true
+      // - company_name: formData.companyName
+      // - company_address: formData.physicalStreet + ', ' + formData.physicalCity + ', ' + formData.physicalState
+      // - dot_number: formData.dotNumber
+      // - feid_number: formData.feid
       
-      if (subscribed && subscription_tier && ['Starter', 'Professional', 'Enterprise'].includes(subscription_tier)) {
-        console.log('User already has active subscription, redirecting to dashboard');
-        navigate('/dashboard');
-      } else {
-        console.log('User does not have active subscription, redirecting to pricing');
-        // Navigate to billing/checkout step for free users or trial users
-        navigate('/pricing');
-      }
+      console.log('Company setup completed successfully');
+      
+      // Always redirect to dashboard after successful setup
+      navigate('/dashboard');
     } catch (error) {
       console.error('Error submitting account information:', error);
       alert('There was an error submitting your information. Please try again.');

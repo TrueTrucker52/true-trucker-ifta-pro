@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts";
-import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft, Clock, Star } from "lucide-react";
+import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft, Clock, Star, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -172,33 +172,67 @@ const Dashboard = () => {
           )}
 
           {subscribed && (
-            <Card className="mb-6 border-success/50 bg-success/5">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-success/20">
-                      <Star className="h-5 w-5 text-success" />
+            <>
+              <Card className="mb-6 border-success/50 bg-success/5">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-success/20">
+                        <Star className="h-5 w-5 text-success" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">
+                          {subscription_tier?.toUpperCase()} Plan Active
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          Complete company setup to unlock all IFTA features
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">
-                        {subscription_tier?.toUpperCase()} Plan Active
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        You have full access to all IFTA features
-                      </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/account?flow=setup')}
+                        className="bg-primary/10"
+                      >
+                        <Building className="h-4 w-4 mr-2" />
+                        Complete Setup
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openCustomerPortal}
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Manage Subscription
+                      </Button>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={openCustomerPortal}
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Manage Subscription
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+              
+              {/* Company Setup Alert */}
+              <Card className="mb-6 border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Building className="h-6 w-6 text-orange-600" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-orange-800">Complete Your Company Setup</h3>
+                      <p className="text-sm text-orange-700">
+                        Add your company information to begin tracking IFTA miles and generating reports.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => navigate('/account?flow=setup')}
+                      className="bg-orange-600 hover:bg-orange-700"
+                    >
+                      Setup Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
           )}
         </div>
 

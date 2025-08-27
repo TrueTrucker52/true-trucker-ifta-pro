@@ -153,8 +153,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company_address: string | null
+          company_name: string | null
+          company_setup_completed: boolean | null
           created_at: string
+          dot_number: string | null
           email: string
+          feid_number: string | null
           id: string
           phone: string | null
           stripe_customer_id: string | null
@@ -167,8 +172,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_address?: string | null
+          company_name?: string | null
+          company_setup_completed?: boolean | null
           created_at?: string
+          dot_number?: string | null
           email: string
+          feid_number?: string | null
           id?: string
           phone?: string | null
           stripe_customer_id?: string | null
@@ -181,8 +191,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_address?: string | null
+          company_name?: string | null
+          company_setup_completed?: boolean | null
           created_at?: string
+          dot_number?: string | null
           email?: string
+          feid_number?: string | null
           id?: string
           phone?: string | null
           stripe_customer_id?: string | null
