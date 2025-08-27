@@ -17,7 +17,8 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn, user } = useAuth();
+  const [resetEmail, setResetEmail] = useState('');
+  const { signUp, signIn, resetPassword, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -151,6 +152,47 @@ const Auth = () => {
     setLoading(false);
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!resetEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const { error } = await resetPassword(resetEmail);
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Reset Email Sent",
+          description: "Check your email for password reset instructions",
+        });
+        setResetEmail('');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -173,9 +215,10 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue={mode} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="reset">Reset</TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4 mt-6">
@@ -227,6 +270,20 @@ const Auth = () => {
                     {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
+                
+                <div className="text-center mt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const tabs = document.querySelector('[role="tablist"]');
+                      const resetTab = tabs?.querySelector('[value="reset"]') as HTMLElement;
+                      resetTab?.click();
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
               </TabsContent>
               
               <TabsContent value="signup" className="space-y-4 mt-6">
@@ -286,6 +343,37 @@ const Auth = () => {
                   
                   <Button type="submit" className="w-full" disabled={loading || !recaptchaToken}>
                     {loading ? "Creating account..." : "Start Free Trial"}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="reset" className="space-y-4 mt-6">
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-semibold">Reset Password</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your email and we'll send you a reset link
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="reset-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Sending..." : "Send Reset Link"}
                   </Button>
                 </form>
               </TabsContent>
