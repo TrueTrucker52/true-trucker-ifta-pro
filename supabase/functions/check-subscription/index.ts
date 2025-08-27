@@ -227,7 +227,6 @@ serve(async (req) => {
               userStatus.subscription_status = userStatus.trial_active ? 'trial' : 'trial_expired';
               logStep("Cleaned up invalid Stripe customer ID");
             }
-            }
           }
         } else {
           logStep("No Stripe secret key available");
