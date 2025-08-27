@@ -18,7 +18,7 @@ const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   useEffect(() => {
     // Check if reCAPTCHA script is loaded
     const checkRecaptchaLoaded = () => {
-      if (window.grecaptcha) {
+      if ((window as any).grecaptcha) {
         setIsLoaded(true);
       } else {
         setTimeout(checkRecaptchaLoaded, 100);
