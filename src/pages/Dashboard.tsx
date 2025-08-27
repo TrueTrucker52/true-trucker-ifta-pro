@@ -305,7 +305,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Management & Settings */}
-        <TrialGuard feature="Fleet Management" requiredTier="medium">
+        <TrialGuard feature="Fleet Management" requiredTier="small">
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Management & Settings</CardTitle>
