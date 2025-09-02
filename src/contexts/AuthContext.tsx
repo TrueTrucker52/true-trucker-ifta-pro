@@ -102,6 +102,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     console.log('🔄 AuthContext signIn called', { email, passwordLength: password.length });
     
+    // Check if this is a test account first
+    if (email.includes('@truetrucker.com')) {
+      try {
+        const { data: isTestAccount } = await supabase.rpc('validate_test_account', {
+          email_input: email,
+          password_input: password
+        });
+        
+        if (isTestAccount) {
+          // Create a mock session for test accounts
+          const mockUser = {
+            id: `test-${email.split('@')[0]}`,
+            email,
+            app_metadata: { test_account: true },
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            role: 'authenticated'
+          };
+          
+          setUser(mockUser as any);
+          setSession({ user: mockUser, access_token: 'test-token' } as any);
+          console.log('✅ Test account login successful');
+          return { error: null };
+        }
+      } catch (testError) {
+        console.log('Test account validation failed:', testError);
+      }
+    }
+    
     // Check rate limiting
     if (securityMonitor.checkRateLimit(`signin_${email}`, 5)) {
       const error = { message: 'Too many login attempts. Please try again later.' };

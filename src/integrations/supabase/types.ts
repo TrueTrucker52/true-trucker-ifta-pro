@@ -301,6 +301,39 @@ export type Database = {
         }
         Relationships: []
       }
+      test_accounts: {
+        Row: {
+          account_type: string
+          created_at: string
+          email: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          password_hash: string
+        }
+        Insert: {
+          account_type?: string
+          created_at?: string
+          email: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          password_hash: string
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          password_hash?: string
+        }
+        Relationships: []
+      }
       trip_logs: {
         Row: {
           created_at: string
@@ -569,6 +602,10 @@ export type Database = {
           max_attempts?: number
           window_minutes?: number
         }
+        Returns: boolean
+      }
+      validate_test_account: {
+        Args: { email_input: string; password_input: string }
         Returns: boolean
       }
     }
