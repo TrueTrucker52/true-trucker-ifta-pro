@@ -31,6 +31,10 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import BOLManagement from "./pages/BOLManagement";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import StoreListings from "./components/StoreListings";
+import AudienceTargetedLanding from "./components/AudienceTargetedLanding";
+import StorePreview from "./components/StorePreview";
+import MarketingHub from "./components/MarketingHub";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +111,10 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/store-listings" element={<StoreListings />} />
+            <Route path="/audience-landing" element={<AudienceTargetedLanding />} />
+            <Route path="/store-preview" element={<StorePreview />} />
+            <Route path="/marketing-hub" element={<MarketingHub />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
