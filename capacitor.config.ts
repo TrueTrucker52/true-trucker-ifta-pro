@@ -4,10 +4,10 @@ const config: CapacitorConfig = {
   appId: 'app.lovable.ea23f26e83f64710a8b545fb030d3016',
   appName: 'TrueTrucker IFTA Pro',
   webDir: 'dist',
-  // server: {
-  //   url: 'https://ea23f26e-83f6-4710-a8b5-45fb030d3016.lovableproject.com?forceHideBadge=true',
-  //   cleartext: true
-  // },
+  server: {
+    url: 'https://ea23f26e-83f6-4710-a8b5-45fb030d3016.lovableproject.com?forceHideBadge=true',
+    cleartext: true
+  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 3000,
