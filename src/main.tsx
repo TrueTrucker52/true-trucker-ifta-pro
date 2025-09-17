@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { logProductionReadiness } from './utils/productionChecks'
+import { logProductionReadiness } from '@/utils/productionChecks'
 
 // Run production readiness checks
 logProductionReadiness();
