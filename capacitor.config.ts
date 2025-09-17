@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'TrueTrucker IFTA Pro',
   webDir: 'dist',
   server: {
-    url: 'https://truetrucker.com?forceHideBadge=true',
+    url: 'https://ea23f26e-83f6-4710-a8b5-45fb030d3016.lovableproject.com?forceHideBadge=true',
     cleartext: true
   },
   plugins: {
