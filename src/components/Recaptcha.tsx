@@ -12,8 +12,8 @@ const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   
-  // Using test site key for development - should be replaced with actual site key via environment variable
-  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+  // Public site key (safe to ship). Replace with your real reCAPTCHA v2 site key for production.
+  const siteKey = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
   
   useEffect(() => {
     // Check if reCAPTCHA script is loaded
