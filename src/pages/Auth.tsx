@@ -69,7 +69,7 @@ const Auth = () => {
     console.log('📧 Calling signUp function...');
     
     try {
-      const { error } = await signUp(email, password);
+      const { error } = await signUp(email, password, recaptchaToken);
       
       if (error) {
         console.log('❌ Sign up error:', error);
@@ -127,7 +127,7 @@ const Auth = () => {
     console.log('🔑 Calling signIn function...');
     
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(email, password, recaptchaToken);
       
       if (error) {
         console.log('❌ Sign in error:', error);
