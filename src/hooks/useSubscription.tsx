@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 interface SubscriptionData {
   subscribed: boolean;
@@ -17,6 +18,7 @@ interface SubscriptionData {
 export const useSubscription = () => {
   const { user, session } = useAuth();
   const { toast } = useToast();
+  const { isAdmin, loading: adminLoading } = useAdminRole();
   const [subscription, setSubscription] = useState<SubscriptionData>({
     subscribed: false,
     subscription_tier: 'free',
@@ -28,7 +30,26 @@ export const useSubscription = () => {
     loading: true,
   });
 
+  // If user is admin, always return subscribed status
+  useEffect(() => {
+    if (!adminLoading && isAdmin) {
+      setSubscription({
+        subscribed: true,
+        subscription_tier: 'admin',
+        subscription_end: null,
+        trial_active: false,
+        trial_days_remaining: 0,
+        trial_end_date: null,
+        subscription_status: 'admin',
+        loading: false,
+      });
+    }
+  }, [isAdmin, adminLoading]);
+
   const checkSubscription = async () => {
+    // Skip if admin (already handled by useEffect above)
+    if (isAdmin) return;
+    
     if (!user || !session) {
       setSubscription({
         subscribed: false,
@@ -207,11 +228,15 @@ export const useSubscription = () => {
   };
 
   useEffect(() => {
-    checkSubscription();
-  }, [user, session]);
+    // Don't check subscription if user is admin (handled separately)
+    if (!adminLoading && !isAdmin) {
+      checkSubscription();
+    }
+  }, [user, session, isAdmin, adminLoading]);
 
   return {
     ...subscription,
+    isAdmin,
     checkSubscription,
     createCheckout,
     openCustomerPortal,
