@@ -24,6 +24,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { toast } from 'sonner';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 
@@ -50,6 +51,7 @@ interface DashboardStats {
 
 const Admin = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminRole();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -69,11 +71,11 @@ const Admin = () => {
   const [searchEmail, setSearchEmail] = useState('');
 
   useEffect(() => {
-    if (user) {
+    if (user && isAdmin && !adminLoading) {
       fetchUsers();
       setupRealtimeSubscription();
     }
-  }, [user]);
+  }, [user, isAdmin, adminLoading]);
 
   useEffect(() => {
     applyFilters();
@@ -242,12 +244,29 @@ const Admin = () => {
     }
   };
 
-  if (loading) {
+  // Show loading while checking admin status
+  if (adminLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Block access if not admin
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
+          <p className="text-muted-foreground mb-4">You don't have admin privileges to access this page.</p>
+          <Button onClick={() => navigate('/dashboard')}>
+            Go to Dashboard
+          </Button>
         </div>
       </div>
     );
