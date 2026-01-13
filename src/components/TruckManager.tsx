@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Truck, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { Truck, Plus, Edit, Trash2, Save, X, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { maskVIN, maskLicensePlate, maskIFTAAccount } from '@/lib/dataMasking';
 
 interface Truck {
   id: string;
@@ -189,6 +190,7 @@ const TruckManager = () => {
 
   const TruckCard = ({ truck }: { truck: Truck }) => {
     const [editedTruck, setEditedTruck] = useState(truck);
+    const [showSensitiveData, setShowSensitiveData] = useState(false);
     const isEditing = editingTruckId === truck.id;
 
     if (isEditing) {
@@ -246,6 +248,14 @@ const TruckManager = () => {
                 />
               </div>
               <div>
+                <Label>VIN</Label>
+                <Input
+                  value={editedTruck.vin || ''}
+                  onChange={(e) => setEditedTruck({...editedTruck, vin: e.target.value})}
+                  placeholder="Vehicle Identification Number"
+                />
+              </div>
+              <div>
                 <Label>License Plate</Label>
                 <Input
                   value={editedTruck.license_plate || ''}
@@ -287,6 +297,14 @@ const TruckManager = () => {
               </Badge>
             </div>
             <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => setShowSensitiveData(!showSensitiveData)}
+                title={showSensitiveData ? "Hide sensitive data" : "Show sensitive data"}
+              >
+                {showSensitiveData ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </Button>
               <Button size="sm" variant="outline" onClick={() => setEditingTruckId(truck.id)}>
                 <Edit className="w-4 h-4" />
               </Button>
@@ -301,9 +319,22 @@ const TruckManager = () => {
             {truck.make && <div><strong>Make:</strong> {truck.make}</div>}
             {truck.model && <div><strong>Model:</strong> {truck.model}</div>}
             {truck.year && <div><strong>Year:</strong> {truck.year}</div>}
-            {truck.license_plate && <div><strong>License:</strong> {truck.license_plate}</div>}
+            {truck.license_plate && (
+              <div>
+                <strong>License:</strong> {showSensitiveData ? truck.license_plate : maskLicensePlate(truck.license_plate)}
+              </div>
+            )}
+            {truck.vin && (
+              <div>
+                <strong>VIN:</strong> {showSensitiveData ? truck.vin : maskVIN(truck.vin)}
+              </div>
+            )}
             {truck.registration_state && <div><strong>State:</strong> {truck.registration_state}</div>}
-            {truck.ifta_account_number && <div><strong>IFTA:</strong> {truck.ifta_account_number}</div>}
+            {truck.ifta_account_number && (
+              <div>
+                <strong>IFTA:</strong> {showSensitiveData ? truck.ifta_account_number : maskIFTAAccount(truck.ifta_account_number)}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -363,6 +394,14 @@ const TruckManager = () => {
                   value={newTruck.year}
                   onChange={(e) => setNewTruck({...newTruck, year: e.target.value})}
                   placeholder="Year"
+                />
+              </div>
+              <div>
+                <Label>VIN</Label>
+                <Input
+                  value={newTruck.vin}
+                  onChange={(e) => setNewTruck({...newTruck, vin: e.target.value})}
+                  placeholder="Vehicle Identification Number"
                 />
               </div>
               <div>

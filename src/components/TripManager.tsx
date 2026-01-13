@@ -285,7 +285,8 @@ const TripManager = () => {
             stateMiles.map(sm => ({
               trip_id: tripId,
               state_code: sm.state,
-              miles: sm.miles
+              miles: sm.miles,
+              user_id: user?.id
             }))
           );
 
