@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { InteractiveStateMap } from '@/components/InteractiveStateMap';
+import { US_STATES, CANADIAN_PROVINCES } from '@/lib/usStates';
 
 interface Truck {
   id: string;
@@ -488,12 +489,25 @@ const TripManager = () => {
                   </div>
                   <div>
                     <Label>Origin State *</Label>
-                    <Input
-                      value={newTrip.origin_state}
-                      onChange={(e) => setNewTrip({...newTrip, origin_state: e.target.value})}
-                      placeholder="Origin State"
-                      required
-                    />
+                    <Select value={newTrip.origin_state} onValueChange={(value) => setNewTrip({...newTrip, origin_state: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 overflow-y-auto">
+                        <SelectItem value="" disabled>US States</SelectItem>
+                        {US_STATES.map(state => (
+                          <SelectItem key={state.code} value={state.code}>
+                            {state.code} - {state.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="" disabled>Canadian Provinces</SelectItem>
+                        {CANADIAN_PROVINCES.map(province => (
+                          <SelectItem key={province.code} value={province.code}>
+                            {province.code} - {province.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Destination City *</Label>
@@ -506,12 +520,25 @@ const TripManager = () => {
                   </div>
                   <div>
                     <Label>Destination State *</Label>
-                    <Input
-                      value={newTrip.destination_state}
-                      onChange={(e) => setNewTrip({...newTrip, destination_state: e.target.value})}
-                      placeholder="Destination State"
-                      required
-                    />
+                    <Select value={newTrip.destination_state} onValueChange={(value) => setNewTrip({...newTrip, destination_state: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 overflow-y-auto">
+                        <SelectItem value="" disabled>US States</SelectItem>
+                        {US_STATES.map(state => (
+                          <SelectItem key={state.code} value={state.code}>
+                            {state.code} - {state.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="" disabled>Canadian Provinces</SelectItem>
+                        {CANADIAN_PROVINCES.map(province => (
+                          <SelectItem key={province.code} value={province.code}>
+                            {province.code} - {province.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Start Date *</Label>
