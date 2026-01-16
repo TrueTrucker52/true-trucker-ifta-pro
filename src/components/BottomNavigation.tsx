@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MapPin, Camera, FileText, Calculator } from 'lucide-react';
+import { Home, MapPin, Camera, FileText, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -18,7 +18,7 @@ const BottomNavigation = () => {
     { icon: MapPin, label: 'Mileage', path: '/mileage-tracker' },
     { icon: Camera, label: 'Scan', path: '/scan-receipt', highlight: true },
     { icon: FileText, label: 'Reports', path: '/ifta-reports' },
-    { icon: Calculator, label: 'Calculator', path: '/calculator' },
+    { icon: Newspaper, label: 'News', path: '/trucking-news' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
