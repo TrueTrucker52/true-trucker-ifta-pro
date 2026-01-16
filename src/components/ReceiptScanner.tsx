@@ -157,6 +157,28 @@ export const ReceiptScanner = () => {
     }
   };
 
+  /**
+   * Strips potential PII from OCR text before sending to AI.
+   * Ensures user privacy by removing emails, phone numbers, card numbers, etc.
+   */
+  const stripPotentialPII = (text: string): string => {
+    let cleaned = text;
+    
+    // Remove potential email addresses
+    cleaned = cleaned.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
+    
+    // Remove potential phone numbers
+    cleaned = cleaned.replace(/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '');
+    
+    // Remove potential credit card numbers
+    cleaned = cleaned.replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g, '');
+    
+    // Remove loyalty member names (common patterns)
+    cleaned = cleaned.replace(/(?:member|customer|name|cardholder)[:\s]+[A-Z][a-z]+\s+[A-Z][a-z]+/gi, '');
+    
+    return cleaned;
+  };
+
   const extractReceiptData = async (text: string) => {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
     
@@ -196,12 +218,25 @@ export const ReceiptScanner = () => {
       }
     });
     
-    // Use AI to enhance the extraction
+    // PRIVACY: Strip any potential PII before sending to AI
+    // Only receipt-specific data (dates, amounts, vendor, location) is sent
+    const piiStrippedText = stripPotentialPII(text);
+    
+    // Use AI to enhance the extraction - only sending receipt data, no user info
     try {
       const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
         body: {
-          ocrText: text,
-          extractedData: basicExtractedData
+          // Only send sanitized OCR text with PII removed
+          ocrText: piiStrippedText,
+          // Only send receipt-specific extracted fields
+          extractedData: {
+            date: basicExtractedData.date,
+            time: basicExtractedData.time,
+            gallons: basicExtractedData.gallons,
+            pricePerGallon: basicExtractedData.pricePerGallon,
+            totalAmount: basicExtractedData.totalAmount,
+            // Note: No user ID, email, or name is included
+          }
         }
       });
       

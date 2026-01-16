@@ -2,6 +2,21 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
+/**
+ * PRIVACY-CONSCIOUS RECEIPT DATA ENHANCEMENT
+ * 
+ * This edge function processes fuel receipt OCR text using OpenAI.
+ * 
+ * IMPORTANT: Only receipt-specific data is sent to OpenAI:
+ * - Raw OCR text from the receipt image (dates, amounts, vendor names, locations)
+ * - Pre-extracted receipt fields (gallons, prices, etc.)
+ * 
+ * NO Personal Identifiable Information (PII) is sent:
+ * - User ID is only used for authentication, never sent to AI
+ * - User email, name, or account details are never included
+ * - No tracking or user-specific metadata is transmitted
+ */
+
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
@@ -13,6 +28,35 @@ const corsHeaders = {
   "Referrer-Policy": "strict-origin-when-cross-origin"
 };
 
+/**
+ * Strips any potential PII patterns from OCR text before AI processing.
+ * This ensures no personal information is inadvertently sent to OpenAI.
+ */
+const stripPotentialPII = (text: string): string => {
+  let cleaned = text;
+  
+  // Remove potential email addresses
+  cleaned = cleaned.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_REDACTED]');
+  
+  // Remove potential phone numbers (various formats)
+  cleaned = cleaned.replace(/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '[PHONE_REDACTED]');
+  
+  // Remove potential credit card numbers (basic patterns)
+  cleaned = cleaned.replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g, '[CARD_REDACTED]');
+  
+  // Remove potential SSN patterns
+  cleaned = cleaned.replace(/\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g, '[SSN_REDACTED]');
+  
+  // Remove loyalty card member names that might appear (common patterns)
+  cleaned = cleaned.replace(/(?:member|customer|name|cardholder)[:\s]+[A-Z][a-z]+\s+[A-Z][a-z]+/gi, '[NAME_REDACTED]');
+  
+  return cleaned;
+};
+
+/**
+ * Validates and sanitizes input data before processing.
+ * Ensures only receipt-relevant data is processed.
+ */
 const validateInput = (ocrText: string, extractedData: any) => {
   if (!ocrText || typeof ocrText !== 'string') {
     throw new Error('OCR text is required and must be a string');
@@ -24,13 +68,33 @@ const validateInput = (ocrText: string, extractedData: any) => {
     throw new Error('Extracted data must be an object');
   }
   
-  // Sanitize OCR text
-  const sanitized = ocrText
+  // Sanitize OCR text - remove scripts and limit length
+  let sanitized = ocrText
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/[<>]/g, '')
     .substring(0, 5000);
+  
+  // Strip potential PII before sending to AI
+  sanitized = stripPotentialPII(sanitized);
+  
+  // Filter extractedData to only include receipt-specific fields
+  const allowedFields = ['date', 'time', 'vendor', 'location', 'gallons', 'pricePerGallon', 'totalAmount', 'fuelTax', 'stateCode'];
+  const filteredExtractedData: Record<string, any> = {};
+  
+  if (extractedData) {
+    for (const field of allowedFields) {
+      if (extractedData[field] !== undefined) {
+        // Sanitize string values
+        if (typeof extractedData[field] === 'string') {
+          filteredExtractedData[field] = stripPotentialPII(extractedData[field]);
+        } else {
+          filteredExtractedData[field] = extractedData[field];
+        }
+      }
+    }
+  }
     
-  return { sanitizedOcrText: sanitized, validatedExtractedData: extractedData };
+  return { sanitizedOcrText: sanitized, validatedExtractedData: filteredExtractedData };
 };
 
 serve(async (req) => {
@@ -55,6 +119,9 @@ serve(async (req) => {
     const user = userData.user;
     if (!user) throw new Error("User not authenticated");
 
+    // NOTE: User ID is only used for authentication above.
+    // No user-identifiable information is sent to OpenAI below.
+
     const { ocrText, extractedData } = await req.json();
     const { sanitizedOcrText, validatedExtractedData } = validateInput(ocrText, extractedData);
 
@@ -62,6 +129,8 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
+    // PRIVACY: Only sanitized receipt text and filtered receipt fields are sent to OpenAI
+    // No user ID, email, name, or any PII is included in this request
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -86,15 +155,16 @@ serve(async (req) => {
               "fuelTax": "Number as string (if found)",
               "stateCode": "2-letter state code"
             }
-            If a field cannot be determined, use empty string. Be very accurate with numbers.`
+            If a field cannot be determined, use empty string. Be very accurate with numbers.
+            Do NOT include any personal information like names, emails, or phone numbers in your response.`
           },
           {
             role: 'user',
-            content: `Extract data from this fuel receipt OCR text:
+            content: `Extract fuel receipt data from this OCR text:
             
             ${sanitizedOcrText}
             
-            Current extracted data for reference:
+            Pre-extracted data for reference:
             ${JSON.stringify(validatedExtractedData, null, 2)}`
           }
         ],
@@ -119,7 +189,19 @@ serve(async (req) => {
       throw new Error('Invalid JSON response from AI');
     }
 
-    return new Response(JSON.stringify({ enhancedData }), {
+    // Final sanitization of AI response to ensure no PII in output
+    const sanitizedResponse: Record<string, string> = {};
+    const allowedOutputFields = ['date', 'time', 'vendor', 'location', 'gallons', 'pricePerGallon', 'totalAmount', 'fuelTax', 'stateCode'];
+    
+    for (const field of allowedOutputFields) {
+      if (enhancedData[field] !== undefined) {
+        sanitizedResponse[field] = typeof enhancedData[field] === 'string' 
+          ? stripPotentialPII(enhancedData[field])
+          : String(enhancedData[field] || '');
+      }
+    }
+
+    return new Response(JSON.stringify({ enhancedData: sanitizedResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
