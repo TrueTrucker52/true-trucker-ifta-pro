@@ -9,6 +9,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { TrialGuard } from "@/components/TrialGuard";
 import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
+import BottomNavigation from "@/components/BottomNavigation";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -236,18 +237,18 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats - High contrast for truck cab visibility */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {quickStats.map((stat, index) => (
-            <Card key={index}>
+            <Card key={index} className="border-2">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-sm text-success">{stat.trend}</p>
+                    <p className="text-base font-medium text-foreground">{stat.title}</p>
+                    <p className="text-3xl font-black text-foreground tracking-tight">{stat.value}</p>
+                    <p className="text-base font-semibold text-success">{stat.trend}</p>
                   </div>
-                  <stat.icon className="h-8 w-8 text-primary" />
+                  <stat.icon className="h-10 w-10 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -296,28 +297,28 @@ const Dashboard = () => {
         {/* BOL Upgrade Incentive */}
         <BOLUpgradeIncentive showIf="starter" />
 
-        {/* Quick Actions */}
+        {/* Quick Actions - Large touch targets for truck cab use */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-xl">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button onClick={() => navigate('/ifta-reports')} className="h-16">
-                <Calculator className="mr-2 h-5 w-5" />
-                IFTA Tax Calculator
+              <Button onClick={() => navigate('/ifta-reports')} size="xl" className="h-20">
+                <Calculator className="mr-3 h-7 w-7" />
+                <span className="text-lg">IFTA Calculator</span>
               </Button>
-              <Button onClick={() => navigate('/scan-receipt')} variant="outline" className="h-16">
-                <FileText className="mr-2 h-5 w-5" />
-                Scan Receipt
+              <Button onClick={() => navigate('/scan-receipt')} variant="secondary" size="xl" className="h-20">
+                <FileText className="mr-3 h-7 w-7" />
+                <span className="text-lg">Scan Receipt</span>
               </Button>
-              <Button onClick={() => navigate('/mileage-tracker')} variant="outline" className="h-16">
-                <Truck className="mr-2 h-5 w-5" />
-                Track Mileage
+              <Button onClick={() => navigate('/mileage-tracker')} variant="outline" size="xl" className="h-20 border-2">
+                <Truck className="mr-3 h-7 w-7" />
+                <span className="text-lg">Track Mileage</span>
               </Button>
-              <Button onClick={() => navigate('/bol-management')} variant="outline" className="h-16">
-                <FileText className="mr-2 h-5 w-5" />
-                BOL Management
+              <Button onClick={() => navigate('/bol-management')} variant="outline" size="xl" className="h-20 border-2">
+                <FileText className="mr-3 h-7 w-7" />
+                <span className="text-lg">BOL Manager</span>
               </Button>
             </div>
           </CardContent>
@@ -346,22 +347,30 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button onClick={() => navigate('/vehicles')} variant="outline" className="h-16">
+                <Button onClick={() => navigate('/vehicles')} variant="outline" size="lg" className="h-16 border-2">
                   <Users className="mr-2 h-5 w-5" />
                   Fleet Management
                 </Button>
-                <Button onClick={openCustomerPortal} variant="outline" className="h-16">
+                <Button onClick={openCustomerPortal} variant="outline" size="lg" className="h-16 border-2">
                   <CreditCard className="mr-2 h-5 w-5" />
                   Manage Subscription
                 </Button>
-                <Button onClick={() => navigate('/account')} variant="outline" className="h-16">
+                <Button onClick={() => navigate('/account')} variant="outline" size="lg" className="h-16 border-2">
                   <Settings className="mr-2 h-5 w-5" />
-                  Settings / Configure Account
+                  Settings / Account
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TrialGuard>
+        
+        {/* Bottom padding for fixed navigation */}
+        <div className="h-24 md:hidden" />
+      </div>
+      
+      {/* Bottom Navigation - Mobile only */}
+      <div className="md:hidden">
+        <BottomNavigation />
       </div>
     </div>
   );
