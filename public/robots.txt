@@ -1,8 +1,30 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /vehicles
+Disallow: /trips
+Disallow: /reports
+Disallow: /scan-receipt
+Disallow: /invoices
+Disallow: /bol-management
+Disallow: /admin
+Disallow: /ifta-reports
+Disallow: /mileage-tracker
+Disallow: /account
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /vehicles
+Disallow: /trips
+Disallow: /reports
+Disallow: /scan-receipt
+Disallow: /invoices
+Disallow: /bol-management
+Disallow: /admin
+Disallow: /ifta-reports
+Disallow: /mileage-tracker
+Disallow: /account
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +34,17 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /vehicles
+Disallow: /trips
+Disallow: /reports
+Disallow: /scan-receipt
+Disallow: /invoices
+Disallow: /bol-management
+Disallow: /admin
+Disallow: /ifta-reports
+Disallow: /mileage-tracker
+Disallow: /account
+
+# Sitemap
+Sitemap: https://true-trucker-ifta-pro.lovable.app/sitemap.xml
