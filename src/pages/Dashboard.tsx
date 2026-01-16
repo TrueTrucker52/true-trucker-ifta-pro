@@ -13,6 +13,8 @@ import BottomNavigation from "@/components/BottomNavigation";
 import TrackingBanner from "@/components/TrackingBanner";
 import AutoTrackToggle from "@/components/AutoTrackToggle";
 import { useAutoTracking } from "@/hooks/useAutoTracking";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -70,6 +72,9 @@ const Dashboard = () => {
 
   return (
     <>
+      {/* Offline Banner - Fixed at very top */}
+      <OfflineBanner />
+
       {/* Tracking Banner - Fixed at top when active */}
       <TrackingBanner
         isTracking={isTracking}
@@ -89,10 +94,13 @@ const Dashboard = () => {
                 <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.email?.split('@')[0] || 'Driver'}</h1>
                 <p className="text-muted-foreground mt-2">Your IFTA management dashboard</p>
               </div>
-              <Button variant="outline" onClick={() => navigate('/')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Home
-              </Button>
+              <div className="flex items-center gap-3">
+                <SyncStatusIndicator />
+                <Button variant="outline" onClick={() => navigate('/')}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Home
+                </Button>
+              </div>
             </div>
 
             {/* Auto-Track Toggle */}

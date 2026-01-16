@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Route, Plus, Edit, Trash2, Save, X, MapPin } from 'lucide-react';
+import { Route, Plus, Edit, Trash2, Save, X, MapPin, CloudOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { InteractiveStateMap } from '@/components/InteractiveStateMap';
 import { US_STATES, CANADIAN_PROVINCES } from '@/lib/usStates';
 import KYURequirementAlert, { routeIncludesKentucky } from '@/components/KYURequirementAlert';
@@ -54,6 +55,7 @@ const TripManager = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { saveWithOfflineSupport, isOnline } = useOfflineSync();
 
   const [newTrip, setNewTrip] = useState({
     truck_id: '',
@@ -151,25 +153,47 @@ const TripManager = () => {
       return;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('trips')
-        .insert([{
-          ...newTrip,
-          total_miles: newTrip.total_miles ? parseFloat(newTrip.total_miles) : null,
-          fuel_gallons: newTrip.fuel_gallons ? parseFloat(newTrip.fuel_gallons) : null,
-          fuel_cost: newTrip.fuel_cost ? parseFloat(newTrip.fuel_cost) : null,
-          user_id: user?.id
-        }])
-        .select(`
-          *,
-          trucks (id, unit_number)
-        `)
-        .single();
+    const tripData = {
+      ...newTrip,
+      total_miles: newTrip.total_miles ? parseFloat(newTrip.total_miles) : null,
+      fuel_gallons: newTrip.fuel_gallons ? parseFloat(newTrip.fuel_gallons) : null,
+      fuel_cost: newTrip.fuel_cost ? parseFloat(newTrip.fuel_cost) : null,
+      user_id: user?.id
+    };
 
-      if (error) throw error;
+    const result = await saveWithOfflineSupport(
+      'trip',
+      tripData,
+      async () => {
+        const { data, error } = await supabase
+          .from('trips')
+          .insert([tripData])
+          .select(`
+            *,
+            trucks (id, unit_number)
+          `)
+          .single();
 
-      setTrips([data, ...trips]);
+        if (error) throw error;
+        return { success: true, data };
+      }
+    );
+
+    if (result.success) {
+      if (!result.offline && result.data) {
+        setTrips([result.data, ...trips]);
+      } else if (result.offline) {
+        // Add temporary trip to UI for offline mode
+        const tempTrip = {
+          id: result.data?.id || crypto.randomUUID(),
+          ...tripData,
+          status: 'active',
+          truck: trucks.find(t => t.id === tripData.truck_id),
+          _offline: true
+        } as Trip & { _offline?: boolean };
+        setTrips([tempTrip, ...trips]);
+      }
+
       setNewTrip({
         truck_id: '',
         trip_number: '',
@@ -189,15 +213,10 @@ const TripManager = () => {
       setIsAddingTrip(false);
 
       toast({
-        title: "Success",
-        description: "Trip added successfully"
-      });
-    } catch (error) {
-      console.error('Error adding trip:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add trip",
-        variant: "destructive"
+        title: result.offline ? "Saved Offline" : "Success",
+        description: result.offline 
+          ? "Trip saved locally. Will sync when online." 
+          : "Trip added successfully"
       });
     }
   };
