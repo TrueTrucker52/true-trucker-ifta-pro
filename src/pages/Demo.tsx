@@ -38,25 +38,24 @@ const Demo = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Shield className="h-6 w-6 text-primary" />
-                <h2 className="text-xl font-semibold">For Google Play Reviewers</h2>
+                <h2 className="text-xl font-semibold">Interactive Demo</h2>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-2">Demo Account Access</h3>
-                  <div className="bg-background p-4 rounded-lg border text-sm font-mono">
-                    <p><strong>Email:</strong> reviewer@truetrucker.com</p>
-                    <p><strong>Password:</strong> GooglePlayReview2024</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Use these credentials to access the full app with sample data
+                  <h3 className="font-semibold mb-2">Try Before You Sign Up</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Explore all core features below without creating an account. 
+                    All calculations and features are fully functional with sample data.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Interactive Demo Below</h3>
-                  <p className="text-sm text-muted-foreground">
-                    This page demonstrates all core features without requiring login. 
-                    All calculations and features are fully functional with sample data.
+                  <h3 className="font-semibold mb-2">Ready to Get Started?</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Create a free account to save your data and access premium features.
                   </p>
+                  <Button onClick={() => navigate('/auth')} size="sm">
+                    Sign Up Free
+                  </Button>
                 </div>
               </div>
             </CardContent>
