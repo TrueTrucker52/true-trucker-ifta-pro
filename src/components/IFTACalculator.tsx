@@ -314,13 +314,13 @@ const IFTACalculator = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
+              <Card className="border-2 border-primary/30 bg-primary/5">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-1">
                     {getStatusIcon(calculation.netAmount)}
-                    <p className="text-sm text-muted-foreground">{getStatusText(calculation.netAmount)}</p>
+                    <p className="text-base font-medium text-foreground">{getStatusText(calculation.netAmount)}</p>
                   </div>
-                  <p className={`text-2xl font-bold ${getStatusColor(calculation.netAmount)}`}>
+                  <p className={`text-4xl font-black tracking-tight ${getStatusColor(calculation.netAmount)}`}>
                     {formatCurrency(Math.abs(calculation.netAmount))}
                   </p>
                 </CardContent>
@@ -375,41 +375,45 @@ const IFTACalculator = () => {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>State</TableHead>
-                        <TableHead className="text-right">Miles</TableHead>
-                        <TableHead className="text-right">Fuel Used (gal)</TableHead>
-                        <TableHead className="text-right">Fuel Purchased (gal)</TableHead>
-                        <TableHead className="text-right">Tax Rate</TableHead>
-                        <TableHead className="text-right">Tax Owed</TableHead>
-                        <TableHead className="text-right">Net Tax</TableHead>
-                        <TableHead className="text-right">KY KYU Tax</TableHead>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="font-bold text-foreground">State</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Miles</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Fuel Used</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Purchased</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Tax Rate</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Tax Owed</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">Net Tax</TableHead>
+                        <TableHead className="text-right font-bold text-foreground">KY KYU</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {calculation.stateBreakdown.map((state) => (
-                        <TableRow key={state.state}>
-                          <TableCell className="font-medium">
+                        <TableRow key={state.state} className="hover:bg-muted/30">
+                          <TableCell className="font-semibold text-foreground">
                             <div className="flex items-center gap-2">
-                              {STATE_TAX_RATES[state.state]?.name || state.state}
-                              <Badge variant="outline" className="text-xs">
+                              <span className="text-base">{STATE_TAX_RATES[state.state]?.name || state.state}</span>
+                              <Badge variant="secondary" className="text-xs font-bold">
                                 {state.state}
                               </Badge>
                             </div>
                           </TableCell>
-                          <TableCell className="text-right">{formatMiles(state.miles)}</TableCell>
-                          <TableCell className="text-right">{state.fuelUsed}</TableCell>
-                          <TableCell className="text-right">{state.fuelPurchased}</TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right text-base font-bold text-foreground tabular-nums">
+                            {formatMiles(state.miles)}
+                          </TableCell>
+                          <TableCell className="text-right text-base text-foreground tabular-nums">{state.fuelUsed}</TableCell>
+                          <TableCell className="text-right text-base text-foreground tabular-nums">{state.fuelPurchased}</TableCell>
+                          <TableCell className="text-right text-base text-muted-foreground tabular-nums">
                             {formatCurrency(STATE_TAX_RATES[state.state]?.taxRate || 0)}
                           </TableCell>
-                          <TableCell className="text-right">{formatCurrency(state.taxOwed)}</TableCell>
-                          <TableCell className={`text-right font-medium ${getStatusColor(state.netTax)}`}>
+                          <TableCell className="text-right text-base font-medium text-foreground tabular-nums">
+                            {formatCurrency(state.taxOwed)}
+                          </TableCell>
+                          <TableCell className={`text-right text-lg font-bold tabular-nums ${getStatusColor(state.netTax)}`}>
                             {formatCurrency(state.netTax)}
                           </TableCell>
                           <TableCell className="text-right">
                             {state.kyuTax ? (
-                              <span className="font-medium text-warning">
+                              <span className="font-bold text-base text-amber-600 dark:text-amber-400 tabular-nums">
                                 {formatCurrency(state.kyuTax)}
                               </span>
                             ) : (
