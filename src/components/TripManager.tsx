@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { InteractiveStateMap } from '@/components/InteractiveStateMap';
 import { US_STATES, CANADIAN_PROVINCES } from '@/lib/usStates';
+import KYURequirementAlert, { routeIncludesKentucky } from '@/components/KYURequirementAlert';
 
 interface Truck {
   id: string;
@@ -409,10 +410,21 @@ const TripManager = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div><strong>Start:</strong> {new Date(trip.start_date).toLocaleDateString()}</div>
-              <div><strong>Total Miles:</strong> {trip.total_miles || 'N/A'}</div>
-              <div><strong>Fuel Gallons:</strong> {trip.fuel_gallons || 'N/A'}</div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div><strong>Start:</strong> {new Date(trip.start_date).toLocaleDateString()}</div>
+                <div><strong>Total Miles:</strong> {trip.total_miles || 'N/A'}</div>
+                <div><strong>Fuel Gallons:</strong> {trip.fuel_gallons || 'N/A'}</div>
+              </div>
+              
+              {/* Kentucky KYU Alert */}
+              {routeIncludesKentucky(trip.origin_state, trip.destination_state) && (
+                <KYURequirementAlert 
+                  miles={trip.total_miles} 
+                  showCalculation={!!trip.total_miles}
+                  className="mt-3"
+                />
+              )}
             </div>
           )}
         </CardContent>

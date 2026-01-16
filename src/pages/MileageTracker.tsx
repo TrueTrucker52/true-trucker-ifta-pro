@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { searchLocations, extractStateFromLocation, formatLocation, type LocationData } from '@/lib/locations';
 import LocationPermissionOnboarding from '@/components/LocationPermissionOnboarding';
 import { useLocationPermission } from '@/hooks/useLocationPermission';
+import KYURequirementAlert, { routeIncludesKentucky } from '@/components/KYURequirementAlert';
 
 interface TripRecord {
   id: string;
@@ -498,6 +499,17 @@ const MileageTracker = () => {
                     rows={3}
                   />
                 </div>
+
+                {/* Kentucky KYU Alert - shows when route includes KY */}
+                {routeIncludesKentucky(
+                  extractStateFromLocation(startLocation),
+                  extractStateFromLocation(endLocation)
+                ) && (
+                  <KYURequirementAlert 
+                    miles={miles ? parseFloat(miles) : undefined}
+                    showCalculation={!!miles && parseFloat(miles) > 0}
+                  />
+                )}
 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Recording..." : "Record Trip"}
