@@ -10,6 +10,9 @@ import { TrialGuard } from "@/components/TrialGuard";
 import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
 import BottomNavigation from "@/components/BottomNavigation";
+import TrackingBanner from "@/components/TrackingBanner";
+import AutoTrackToggle from "@/components/AutoTrackToggle";
+import { useAutoTracking } from "@/hooks/useAutoTracking";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -25,6 +28,16 @@ const Dashboard = () => {
     checkSubscription,
     loading
   } = useSubscription();
+
+  const {
+    isTracking,
+    currentState,
+    totalMiles,
+    statesCrossed,
+    startTime,
+    startTracking,
+    stopTracking,
+  } = useAutoTracking();
 
   const quickStats = [
     { title: "Total Miles", value: "12,847", icon: MapPin, trend: "+8.2%" },
@@ -56,323 +69,344 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.email?.split('@')[0] || 'Driver'}</h1>
-              <p className="text-muted-foreground mt-2">Your IFTA management dashboard</p>
+    <>
+      {/* Tracking Banner - Fixed at top when active */}
+      <TrackingBanner
+        isTracking={isTracking}
+        currentState={currentState}
+        totalMiles={totalMiles}
+        statesCrossed={statesCrossed}
+        startTime={startTime}
+        onStopTracking={stopTracking}
+      />
+
+      <div className={`min-h-screen bg-background p-6 ${isTracking ? 'pt-20 md:pt-24' : ''}`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.email?.split('@')[0] || 'Driver'}</h1>
+                <p className="text-muted-foreground mt-2">Your IFTA management dashboard</p>
+              </div>
+              <Button variant="outline" onClick={() => navigate('/')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Home
+              </Button>
             </div>
-            <Button variant="outline" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-          </div>
 
-          {/* Trial Status Card */}
-          {!subscribed && (
-            <Card className={`mb-6 ${trial_active ? 'border-primary/50 bg-primary/5' : 'border-destructive/50 bg-destructive/5'}`}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${trial_active ? 'bg-primary/20' : 'bg-destructive/20'}`}>
-                      {trial_active ? (
-                        <Clock className="h-5 w-5 text-primary" />
-                      ) : (
-                        <Star className="h-5 w-5 text-destructive" />
-                      )}
-                    </div>
-                    <div>
-                      {trial_active ? (
-                        <>
-                          <h3 className="font-semibold text-foreground">
-                            Free Trial Active - {trial_days_remaining} day{trial_days_remaining !== 1 ? 's' : ''} remaining
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            You're currently enjoying full access to all IFTA features
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <h3 className="font-semibold text-foreground">
-                            Free Trial Ended
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Subscribe to continue using all IFTA features
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {trial_active && trial_days_remaining <= 3 && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate('/pricing')}
-                        >
-                          View All Plans
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => createCheckout('medium')}
-                        >
-                          <Star className="h-4 w-4 mr-2" />
-                          Upgrade Now
-                        </Button>
-                      </>
-                    )}
-                    {trial_active && trial_days_remaining > 3 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate('/pricing')}
-                      >
-                        Upgrade Early
-                      </Button>
-                    )}
-                    {subscription_status === 'trial_expired' && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate('/pricing')}
-                        >
-                          View All Plans
-                        </Button>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => createCheckout('medium')}
-                        >
-                          <Star className="h-4 w-4 mr-2" />
-                          Subscribe Now
-                        </Button>
-                      </>
-                    )}
-                    {/* Add refresh button for cached subscription issues */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        await checkSubscription();
-                        window.location.reload();
-                      }}
-                      className="text-xs"
-                    >
-                      🔄 Refresh Status
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+            {/* Auto-Track Toggle */}
+            <div className="mb-6">
+              <AutoTrackToggle
+                isTracking={isTracking}
+                onStartTracking={startTracking}
+                onStopTracking={stopTracking}
+              />
+            </div>
 
-          {subscribed && (
-            <>
-              <Card className="mb-6 border-success/50 bg-success/5">
+            {/* Trial Status Card */}
+            {!subscribed && (
+              <Card className={`mb-6 ${trial_active ? 'border-primary/50 bg-primary/5' : 'border-destructive/50 bg-destructive/5'}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-success/20">
-                        <Star className="h-5 w-5 text-success" />
+                      <div className={`p-2 rounded-full ${trial_active ? 'bg-primary/20' : 'bg-destructive/20'}`}>
+                        {trial_active ? (
+                          <Clock className="h-5 w-5 text-primary" />
+                        ) : (
+                          <Star className="h-5 w-5 text-destructive" />
+                        )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">
-                          {subscription_tier?.toUpperCase()} Plan Active
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          Complete company setup to unlock all IFTA features
-                        </p>
+                        {trial_active ? (
+                          <>
+                            <h3 className="font-semibold text-foreground">
+                              Free Trial Active - {trial_days_remaining} day{trial_days_remaining !== 1 ? 's' : ''} remaining
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              You're currently enjoying full access to all IFTA features
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="font-semibold text-foreground">
+                              Free Trial Ended
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Subscribe to continue using all IFTA features
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
+                      {trial_active && trial_days_remaining <= 3 && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate('/pricing')}
+                          >
+                            View All Plans
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => createCheckout('medium')}
+                          >
+                            <Star className="h-4 w-4 mr-2" />
+                            Upgrade Now
+                          </Button>
+                        </>
+                      )}
+                      {trial_active && trial_days_remaining > 3 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate('/pricing')}
+                        >
+                          Upgrade Early
+                        </Button>
+                      )}
+                      {subscription_status === 'trial_expired' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate('/pricing')}
+                          >
+                            View All Plans
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => createCheckout('medium')}
+                          >
+                            <Star className="h-4 w-4 mr-2" />
+                            Subscribe Now
+                          </Button>
+                        </>
+                      )}
+                      {/* Add refresh button for cached subscription issues */}
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
+                        onClick={async () => {
+                          await checkSubscription();
+                          window.location.reload();
+                        }}
+                        className="text-xs"
+                      >
+                        🔄 Refresh Status
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {subscribed && (
+              <>
+                <Card className="mb-6 border-success/50 bg-success/5">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-success/20">
+                          <Star className="h-5 w-5 text-success" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">
+                            {subscription_tier?.toUpperCase()} Plan Active
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Complete company setup to unlock all IFTA features
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate('/account?flow=setup')}
+                          className="bg-primary/10"
+                        >
+                          <Building className="h-4 w-4 mr-2" />
+                          Complete Setup
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={openCustomerPortal}
+                        >
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Manage Subscription
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Company Setup Alert */}
+                <Card className="mb-6 border-orange-200 bg-orange-50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Building className="h-6 w-6 text-orange-600" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-orange-800">Complete Your Company Setup</h3>
+                        <p className="text-sm text-orange-700">
+                          Add your company information to begin tracking IFTA miles and generating reports.
+                        </p>
+                      </div>
+                      <Button
                         onClick={() => navigate('/account?flow=setup')}
-                        className="bg-primary/10"
+                        className="bg-orange-600 hover:bg-orange-700"
                       >
-                        <Building className="h-4 w-4 mr-2" />
-                        Complete Setup
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={openCustomerPortal}
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Manage Subscription
+                        Setup Now
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Company Setup Alert */}
-              <Card className="mb-6 border-orange-200 bg-orange-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <Building className="h-6 w-6 text-orange-600" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-orange-800">Complete Your Company Setup</h3>
-                      <p className="text-sm text-orange-700">
-                        Add your company information to begin tracking IFTA miles and generating reports.
-                      </p>
-                    </div>
-                    <Button
-                      onClick={() => navigate('/account?flow=setup')}
-                      className="bg-orange-600 hover:bg-orange-700"
-                    >
-                      Setup Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </div>
-
-        {/* Quick Stats - High contrast for truck cab visibility */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {quickStats.map((stat, index) => (
-            <Card key={index} className="border-2">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-base font-medium text-foreground">{stat.title}</p>
-                    <p className="text-3xl font-black text-foreground tracking-tight">{stat.value}</p>
-                    <p className="text-base font-semibold text-success">{stat.trend}</p>
-                  </div>
-                  <stat.icon className="h-10 w-10 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Charts Section */}
-        <TrialGuard feature="Advanced Analytics" requiredTier="small">
-          <div className="grid lg:grid-cols-2 gap-6 mb-8">
-            {/* Monthly Miles */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Mileage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig}>
-                  <BarChart data={monthlyData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="miles" fill="var(--color-miles)" />
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            {/* Fuel Spending */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Fuel Spending Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig}>
-                  <LineChart data={monthlyData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="fuel" stroke="var(--color-fuel)" strokeWidth={2} />
-                  </LineChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
-        </TrialGuard>
 
-        {/* BOL Upgrade Incentive */}
-        <BOLUpgradeIncentive showIf="starter" />
+          {/* Quick Stats - High contrast for truck cab visibility */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {quickStats.map((stat, index) => (
+              <Card key={index} className="border-2">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-base font-medium text-foreground">{stat.title}</p>
+                      <p className="text-3xl font-black text-foreground tracking-tight">{stat.value}</p>
+                      <p className="text-base font-semibold text-success">{stat.trend}</p>
+                    </div>
+                    <stat.icon className="h-10 w-10 text-primary" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-        {/* Quick Actions - Large touch targets for truck cab use */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button onClick={() => navigate('/ifta-reports')} size="xl" className="h-20">
-                <Calculator className="mr-3 h-7 w-7" />
-                <span className="text-lg">IFTA Calculator</span>
-              </Button>
-              <Button onClick={() => navigate('/scan-receipt')} variant="secondary" size="xl" className="h-20">
-                <FileText className="mr-3 h-7 w-7" />
-                <span className="text-lg">Scan Receipt</span>
-              </Button>
-              <Button onClick={() => navigate('/mileage-tracker')} variant="outline" size="xl" className="h-20 border-2">
-                <Truck className="mr-3 h-7 w-7" />
-                <span className="text-lg">Track Mileage</span>
-              </Button>
-              <Button onClick={() => navigate('/bol-management')} variant="outline" size="xl" className="h-20 border-2">
-                <FileText className="mr-3 h-7 w-7" />
-                <span className="text-lg">BOL Manager</span>
-              </Button>
+          {/* Charts Section */}
+          <TrialGuard feature="Advanced Analytics" requiredTier="small">
+            <div className="grid lg:grid-cols-2 gap-6 mb-8">
+              {/* Monthly Miles */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Monthly Mileage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={chartConfig}>
+                    <BarChart data={monthlyData}>
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="miles" fill="var(--color-miles)" />
+                    </BarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+
+              {/* Fuel Spending */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Fuel Spending Trend</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={chartConfig}>
+                    <LineChart data={monthlyData}>
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="fuel" stroke="var(--color-fuel)" strokeWidth={2} />
+                    </LineChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </TrialGuard>
 
-        {/* Additional Tools */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Additional Tools</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Button onClick={() => navigate('/calculator')} variant="outline" className="h-16">
-                <Calculator className="mr-2 h-5 w-5" />
-                Savings Calculator
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          {/* BOL Upgrade Incentive */}
+          <BOLUpgradeIncentive showIf="starter" />
 
-        {/* Management & Settings */}
-        <TrialGuard feature="Fleet Management" requiredTier="large">
-          <Card className="mt-6">
+          {/* Quick Actions - Large touch targets for truck cab use */}
+          <Card>
             <CardHeader>
-              <CardTitle>Management & Settings</CardTitle>
+              <CardTitle className="text-xl">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button onClick={() => navigate('/vehicles')} variant="outline" size="lg" className="h-16 border-2">
-                  <Users className="mr-2 h-5 w-5" />
-                  Fleet Management
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Button onClick={() => navigate('/ifta-reports')} size="xl" className="h-20">
+                  <Calculator className="mr-3 h-7 w-7" />
+                  <span className="text-lg">IFTA Calculator</span>
                 </Button>
-                <Button onClick={openCustomerPortal} variant="outline" size="lg" className="h-16 border-2">
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Manage Subscription
+                <Button onClick={() => navigate('/scan-receipt')} variant="secondary" size="xl" className="h-20">
+                  <FileText className="mr-3 h-7 w-7" />
+                  <span className="text-lg">Scan Receipt</span>
                 </Button>
-                <Button onClick={() => navigate('/account')} variant="outline" size="lg" className="h-16 border-2">
-                  <Settings className="mr-2 h-5 w-5" />
-                  Settings / Account
+                <Button onClick={() => navigate('/mileage-tracker')} variant="outline" size="xl" className="h-20 border-2">
+                  <Truck className="mr-3 h-7 w-7" />
+                  <span className="text-lg">Track Mileage</span>
+                </Button>
+                <Button onClick={() => navigate('/bol-management')} variant="outline" size="xl" className="h-20 border-2">
+                  <FileText className="mr-3 h-7 w-7" />
+                  <span className="text-lg">BOL Manager</span>
                 </Button>
               </div>
             </CardContent>
           </Card>
-        </TrialGuard>
+
+          {/* Additional Tools */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Additional Tools</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Button onClick={() => navigate('/calculator')} variant="outline" className="h-16">
+                  <Calculator className="mr-2 h-5 w-5" />
+                  Savings Calculator
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Management & Settings */}
+          <TrialGuard feature="Fleet Management" requiredTier="large">
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Management & Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button onClick={() => navigate('/vehicles')} variant="outline" size="lg" className="h-16 border-2">
+                    <Users className="mr-2 h-5 w-5" />
+                    Fleet Management
+                  </Button>
+                  <Button onClick={openCustomerPortal} variant="outline" size="lg" className="h-16 border-2">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Manage Subscription
+                  </Button>
+                  <Button onClick={() => navigate('/account')} variant="outline" size="lg" className="h-16 border-2">
+                    <Settings className="mr-2 h-5 w-5" />
+                    Settings / Account
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TrialGuard>
+          
+          {/* Bottom padding for fixed navigation */}
+          <div className="h-24 md:hidden" />
+        </div>
         
-        {/* Bottom padding for fixed navigation */}
-        <div className="h-24 md:hidden" />
+        {/* Bottom Navigation - Mobile only */}
+        <div className="md:hidden">
+          <BottomNavigation />
+        </div>
       </div>
-      
-      {/* Bottom Navigation - Mobile only */}
-      <div className="md:hidden">
-        <BottomNavigation />
-      </div>
-    </div>
+    </>
   );
 };
 
