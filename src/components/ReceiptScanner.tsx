@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2 } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
 import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
@@ -44,6 +45,7 @@ const LOW_CONFIDENCE_THRESHOLD = 0.7;
 export const ReceiptScanner = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { saveWithOfflineSupport, isOnline } = useOfflineSync();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -332,46 +334,61 @@ export const ReceiptScanner = () => {
 
     setIsSaving(true);
     
-    try {
-      let imageUrl = '';
-      
-      // Upload image to storage if captured
-      if (capturedImage) {
-        const response = await fetch(capturedImage);
-        const blob = await response.blob();
-        const fileName = `${user.id}/${Date.now()}.jpg`;
+    const receiptDbData = {
+      user_id: user.id,
+      receipt_date: receiptData.date || new Date().toISOString().split('T')[0],
+      receipt_time: receiptData.time || null,
+      location: receiptData.location ? sanitizeInput(receiptData.location) : null,
+      vendor: receiptData.vendor ? sanitizeInput(receiptData.vendor) : null,
+      gallons: receiptData.gallons ? parseFloat(receiptData.gallons) : null,
+      price_per_gallon: receiptData.pricePerGallon ? parseFloat(receiptData.pricePerGallon) : null,
+      total_amount: receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : null,
+      fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
+      state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
+      raw_ocr_text: sanitizeOcrText(ocrText)
+    };
+
+    const result = await saveWithOfflineSupport(
+      'receipt',
+      receiptDbData,
+      async () => {
+        let imageUrl = '';
         
-        const { data, error: uploadError } = await supabase.storage
-          .from('receipts')
-          .upload(fileName, blob);
+        // Upload image to storage if captured (only when online)
+        if (capturedImage) {
+          const response = await fetch(capturedImage);
+          const blob = await response.blob();
+          const fileName = `${user.id}/${Date.now()}.jpg`;
           
-        if (uploadError) throw uploadError;
-        imageUrl = fileName;
+          const { error: uploadError } = await supabase.storage
+            .from('receipts')
+            .upload(fileName, blob);
+            
+          if (uploadError) throw uploadError;
+          imageUrl = fileName;
+        }
+        
+        // Save receipt data to database with sanitized inputs
+        const { error } = await supabase
+          .from('receipts')
+          .insert({
+            ...receiptDbData,
+            receipt_image_url: imageUrl,
+          });
+        
+        if (error) throw error;
+        return { success: true };
       }
-      
-      // Save receipt data to database with sanitized inputs
-      const { error } = await supabase
-        .from('receipts')
-        .insert({
-          user_id: user.id,
-          receipt_date: receiptData.date || new Date().toISOString().split('T')[0],
-          receipt_time: receiptData.time || null,
-          location: receiptData.location ? sanitizeInput(receiptData.location) : null,
-          vendor: receiptData.vendor ? sanitizeInput(receiptData.vendor) : null,
-          gallons: receiptData.gallons ? parseFloat(receiptData.gallons) : null,
-          price_per_gallon: receiptData.pricePerGallon ? parseFloat(receiptData.pricePerGallon) : null,
-          total_amount: receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : null,
-          fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
-          state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
-          receipt_image_url: imageUrl,
-          raw_ocr_text: sanitizeOcrText(ocrText)
-        });
-      
-      if (error) throw error;
-      
+    );
+    
+    setIsSaving(false);
+
+    if (result.success) {
       toast({
-        title: "Receipt Saved",
-        description: "Your fuel receipt has been saved successfully.",
+        title: result.offline ? "Saved Offline" : "Receipt Saved",
+        description: result.offline 
+          ? "Your receipt has been saved locally and will sync when online."
+          : "Your fuel receipt has been saved successfully.",
       });
       
       // Reset form
@@ -401,15 +418,6 @@ export const ReceiptScanner = () => {
       });
       setCapturedImage(null);
       setOcrText('');
-      
-    } catch (error) {
-      toast({
-        title: "Save Failed",
-        description: "Could not save receipt. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -691,6 +699,13 @@ export const ReceiptScanner = () => {
               />
             </div>
             
+            {!isOnline && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-300 text-sm">
+                <CloudOff className="h-4 w-4 flex-shrink-0" />
+                <span>You're offline. Receipt will be saved locally and synced when connection is restored.</span>
+              </div>
+            )}
+            
             <Button 
               onClick={saveReceipt} 
               disabled={isSaving}
@@ -700,6 +715,11 @@ export const ReceiptScanner = () => {
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Saving...
+                </>
+              ) : !isOnline ? (
+                <>
+                  <CloudOff className="h-4 w-4 mr-2" />
+                  Save Offline
                 </>
               ) : (
                 <>
