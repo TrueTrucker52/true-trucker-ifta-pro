@@ -34,35 +34,34 @@ const AccountDeletionDialog = () => {
     try {
       if (!user?.id) throw new Error('No user found');
 
-      // Delete user data from all tables in order (respecting foreign keys)
-      const deleteOperations = [
-        supabase.from('trip_miles').delete().eq('user_id', user.id),
-        supabase.from('bills_of_lading').delete().eq('user_id', user.id),
-        supabase.from('trips').delete().eq('user_id', user.id),
-        supabase.from('receipts').delete().eq('user_id', user.id),
-        supabase.from('trip_logs').delete().eq('user_id', user.id),
-        supabase.from('trucks').delete().eq('user_id', user.id),
-        supabase.from('vehicles').delete().eq('user_id', user.id),
-        supabase.from('invoices').delete().eq('user_id', user.id),
-        supabase.from('user_roles').delete().eq('user_id', user.id),
-        supabase.from('profiles').delete().eq('user_id', user.id),
-      ];
+      // Get the session token for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('No valid session');
 
-      // Execute all deletions
-      for (const operation of deleteOperations) {
-        const { error } = await operation;
-        if (error) {
-          console.error('Delete operation error:', error);
-          // Continue with other deletions even if one fails
+      // Call the secure edge function to delete the account
+      const response = await fetch(
+        'https://tlvngzfoxpjdltbpmzaz.supabase.co/functions/v1/delete-account',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
         }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete account');
       }
 
-      // Sign out the user
+      // Sign out the user (session is already invalidated server-side)
       await signOut();
       
       toast({
-        title: 'Account deletion requested',
-        description: 'Your data has been removed. Your authentication account will be deleted within 24 hours.',
+        title: 'Account deleted',
+        description: 'Your account and all associated data have been permanently removed.',
       });
 
       navigate('/');
@@ -70,7 +69,7 @@ const AccountDeletionDialog = () => {
       console.error('Account deletion error:', error);
       toast({
         title: 'Deletion failed',
-        description: 'Unable to complete account deletion. Please contact support.',
+        description: error.message || 'Unable to complete account deletion. Please contact support.',
         variant: 'destructive',
       });
     } finally {
