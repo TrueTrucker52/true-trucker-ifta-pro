@@ -14,7 +14,7 @@ export const ComingSoon = ({
   title, 
   description, 
   icon: Icon = Clock,
-  expectedDate = "Q1 2025"
+  expectedDate = "Q1 2026"
 }: ComingSoonProps) => {
   const navigate = useNavigate();
 
