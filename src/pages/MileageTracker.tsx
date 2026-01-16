@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { ArrowLeft, MapPin, Plus, Calendar, Truck, Edit, Trash2, Save, X, CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { ArrowLeft, MapPin, Plus, Calendar, Truck, Edit, Trash2, Save, X, CalendarIcon, Check, ChevronsUpDown, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { searchLocations, extractStateFromLocation, formatLocation, type LocationData } from '@/lib/locations';
+import LocationPermissionOnboarding from '@/components/LocationPermissionOnboarding';
+import { useLocationPermission } from '@/hooks/useLocationPermission';
 
 interface TripRecord {
   id: string;
@@ -136,6 +138,14 @@ const LocationSelector = ({
 const MileageTracker = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { 
+    needsOnboarding, 
+    isAutoTracking, 
+    hasChecked, 
+    setPermissionGranted, 
+    setPermissionDenied 
+  } = useLocationPermission();
+  
   const [loading, setLoading] = useState(false);
   const [trips, setTrips] = useState<TripRecord[]>([]);
   const [startLocation, setStartLocation] = useState('');
@@ -156,6 +166,26 @@ const MileageTracker = () => {
     purpose: 'business',
     notes: ''
   });
+
+  // Show location permission onboarding if needed
+  if (!hasChecked) {
+    return null; // Wait for permission check
+  }
+
+  if (needsOnboarding) {
+    return (
+      <LocationPermissionOnboarding
+        onPermissionGranted={() => {
+          setPermissionGranted();
+          toast.success('Location tracking enabled! Miles will be logged automatically.');
+        }}
+        onPermissionDenied={() => {
+          setPermissionDenied();
+          toast.info('Manual entry mode enabled. You can log trips manually.');
+        }}
+      />
+    );
+  }
 
   useEffect(() => {
     if (user) {
@@ -352,6 +382,25 @@ const MileageTracker = () => {
                 <p className="text-sm text-muted-foreground">Record and manage your business trips</p>
               </div>
             </div>
+            {/* Tracking Mode Indicator */}
+            <div className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium",
+              isAutoTracking 
+                ? "bg-success/10 text-success border border-success/20" 
+                : "bg-muted text-muted-foreground"
+            )}>
+              {isAutoTracking ? (
+                <>
+                  <Navigation className="h-3 w-3" />
+                  Auto Tracking
+                </>
+              ) : (
+                <>
+                  <MapPin className="h-3 w-3" />
+                  Manual Entry
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -366,7 +415,10 @@ const MileageTracker = () => {
                 Record New Trip
               </CardTitle>
               <CardDescription>
-                Log your business mileage for IFTA compliance
+                {isAutoTracking 
+                  ? "Trips are logged automatically. You can also add entries manually."
+                  : "Log your business mileage for IFTA compliance"
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
