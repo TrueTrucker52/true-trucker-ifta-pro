@@ -232,7 +232,7 @@ export const BOLScanner = () => {
       if (capturedImage) {
         const response = await fetch(capturedImage);
         const blob = await response.blob();
-        const fileName = `bol_${Date.now()}.jpg`;
+        const fileName = `${user.id}/bol_${crypto.randomUUID()}.jpg`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('receipts')
