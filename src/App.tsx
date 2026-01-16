@@ -36,6 +36,7 @@ import AudienceTargetedLanding from "./components/AudienceTargetedLanding";
 import StorePreview from "./components/StorePreview";
 import MarketingHub from "./components/MarketingHub";
 import TruckingNews from "./pages/TruckingNews";
+import PrivacySummary from "./pages/PrivacySummary";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,7 @@ const App: React.FC = () => {
                 <TruckingNews />
               </ProtectedRoute>
             } />
+            <Route path="/privacy-summary" element={<PrivacySummary />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
