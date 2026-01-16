@@ -496,17 +496,21 @@ const Account = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Additional Information
+                Additional Information (Optional)
               </CardTitle>
-              <CardDescription>Regulatory and account details</CardDescription>
+              <CardDescription>
+                Regulatory and account details. You can operate with just your home state - 
+                multi-state jurisdictions are not required to proceed.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-3 gap-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="irpJurisdiction">IRP Jurisdiction *</Label>
+                  <Label htmlFor="irpJurisdiction">IRP Base Jurisdiction</Label>
+                  <p className="text-xs text-muted-foreground mb-1">Your home state (optional if intrastate only)</p>
                   <Select value={formData.irpJurisdiction} onValueChange={(value) => handleInputChange('irpJurisdiction', value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select jurisdiction" />
+                      <SelectValue placeholder="Select your base state" />
                     </SelectTrigger>
                     <SelectContent>
                       {states.map((state) => (
@@ -552,10 +556,11 @@ const Account = () => {
               </div>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="iftaJurisdiction">IFTA Jurisdiction *</Label>
+                  <Label htmlFor="iftaJurisdiction">IFTA Base Jurisdiction</Label>
+                  <p className="text-xs text-muted-foreground mb-1">Your home state for IFTA reporting</p>
                   <Select value={formData.iftaJurisdiction} onValueChange={(value) => handleInputChange('iftaJurisdiction', value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select jurisdiction" />
+                      <SelectValue placeholder="Select your base state" />
                     </SelectTrigger>
                     <SelectContent>
                       {states.map((state) => (
