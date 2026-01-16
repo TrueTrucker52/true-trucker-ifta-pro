@@ -7,6 +7,7 @@ export type LocationMode = 'auto' | 'manual' | 'unknown';
 export const useLocationPermission = () => {
   const [locationMode, setLocationMode] = useState<LocationMode>('unknown');
   const [hasChecked, setHasChecked] = useState(false);
+  const [showTransparencyModal, setShowTransparencyModal] = useState(false);
 
   const checkStoredPermission = useCallback(() => {
     const stored = localStorage.getItem('location_permission');
@@ -79,6 +80,28 @@ export const useLocationPermission = () => {
     setLocationMode('manual');
   }, []);
 
+  /**
+   * Triggers the Location Transparency modal before requesting permission.
+   * Call this when user attempts to enable "Auto Track" toggle.
+   */
+  const requestAutoTrack = useCallback(() => {
+    // Check if transparency modal was already shown and permission granted
+    const transparencyShown = localStorage.getItem('location_transparency_shown');
+    const currentPermission = localStorage.getItem('location_permission');
+    
+    if (transparencyShown === 'true' && currentPermission === 'granted') {
+      // Already granted, no need to show modal again
+      return;
+    }
+    
+    // Show the transparency modal
+    setShowTransparencyModal(true);
+  }, []);
+
+  const closeTransparencyModal = useCallback(() => {
+    setShowTransparencyModal(false);
+  }, []);
+
   const needsOnboarding = hasChecked && locationMode === 'unknown';
   const isAutoTracking = locationMode === 'auto';
   const isManualEntry = locationMode === 'manual';
@@ -92,5 +115,9 @@ export const useLocationPermission = () => {
     setPermissionGranted,
     setPermissionDenied,
     recheckPermission: checkNativePermission,
+    // New: for transparency modal integration
+    showTransparencyModal,
+    requestAutoTrack,
+    closeTransparencyModal,
   };
 };
