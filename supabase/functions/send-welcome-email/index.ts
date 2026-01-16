@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@4.0.0";
 
 const corsHeaders = {
@@ -121,29 +122,72 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
   try {
-    const { email } = await req.json();
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    if (!email) {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      console.error('Auth error:', claimsError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+    const userEmail = claimsData.claims.email as string;
+    console.log('Authenticated user for welcome email:', userId);
+
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+    const { email } = await req.json();
+    
+    // Security: Only allow sending welcome email to the authenticated user's own email
+    // or if no email is provided, use the authenticated user's email
+    const targetEmail = email || userEmail;
+    
+    if (email && email !== userEmail) {
+      console.warn(`User ${userId} attempted to send welcome email to different address: ${email}`);
+      return new Response(JSON.stringify({ error: "Can only send welcome email to your own address" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
+    if (!targetEmail) {
       return new Response(JSON.stringify({ error: "Email is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
     }
 
-    const { subject, html } = getWelcomeEmail(email);
+    const { subject, html } = getWelcomeEmail(targetEmail);
     
     const emailResult = await resend.emails.send({
       from: "TrueTrucker IFTA Pro <welcome@truetrucker.com>",
-      to: [email],
+      to: [targetEmail],
       subject,
       html,
     });
 
     console.log("Welcome email sent successfully:", { 
-      email, 
+      email: targetEmail, 
+      userId,
       messageId: emailResult.data?.id 
     });
 

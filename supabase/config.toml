@@ -84,3 +84,15 @@ verify_jwt = true
 
 [functions.text-to-speech]
 verify_jwt = false
+
+[functions.calculate-distance]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.get-test-credentials]
+verify_jwt = false
+
+[functions.send-trial-reminders]
+verify_jwt = false
