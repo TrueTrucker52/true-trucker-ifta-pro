@@ -11,6 +11,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
+// HTML escape utility to prevent XSS attacks in document.write contexts
+const escapeHtml = (text: string | null | undefined): string => {
+  if (text == null) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 interface BOL {
   id: string;
   bol_number: string;
@@ -157,10 +168,21 @@ Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}
   const printBOL = (bol: BOL) => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
+      // Escape all user-controlled data to prevent XSS attacks
+      const safeBolNumber = escapeHtml(bol.bol_number);
+      const safeShipperName = escapeHtml(bol.shipper_name);
+      const safeShipperCity = escapeHtml(bol.shipper_city);
+      const safeShipperState = escapeHtml(bol.shipper_state);
+      const safeConsigneeName = escapeHtml(bol.consignee_name);
+      const safeConsigneeCity = escapeHtml(bol.consignee_city);
+      const safeConsigneeState = escapeHtml(bol.consignee_state);
+      const safeCommodity = escapeHtml(bol.commodity_description) || 'Not specified';
+      const safeNotes = escapeHtml(bol.notes);
+
       printWindow.document.write(`
         <html>
           <head>
-            <title>BOL ${bol.bol_number}</title>
+            <title>BOL ${safeBolNumber}</title>
             <style>
               body { font-family: Arial, sans-serif; margin: 20px; }
               .header { text-align: center; margin-bottom: 30px; }
@@ -173,7 +195,7 @@ Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}
           <body>
             <div class="header">
               <h1>BILL OF LADING</h1>
-              <p>BOL Number: ${bol.bol_number}</p>
+              <p>BOL Number: ${safeBolNumber}</p>
             </div>
             
             <div class="section">
@@ -189,28 +211,28 @@ Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}
 
             <div class="section">
               <h3>Shipper Information</h3>
-              <p><span class="label">Name:</span> ${bol.shipper_name}</p>
-              <p><span class="label">Location:</span> ${bol.shipper_city}, ${bol.shipper_state}</p>
+              <p><span class="label">Name:</span> ${safeShipperName}</p>
+              <p><span class="label">Location:</span> ${safeShipperCity}, ${safeShipperState}</p>
             </div>
 
             <div class="section">
               <h3>Consignee Information</h3>
-              <p><span class="label">Name:</span> ${bol.consignee_name}</p>
-              <p><span class="label">Location:</span> ${bol.consignee_city}, ${bol.consignee_state}</p>
+              <p><span class="label">Name:</span> ${safeConsigneeName}</p>
+              <p><span class="label">Location:</span> ${safeConsigneeCity}, ${safeConsigneeState}</p>
             </div>
 
             <div class="section">
               <h3>Load Details</h3>
-              <p><span class="label">Commodity:</span> ${bol.commodity_description || 'Not specified'}</p>
+              <p><span class="label">Commodity:</span> ${safeCommodity}</p>
               <p><span class="label">Weight:</span> ${bol.weight ? `${bol.weight} lbs` : 'Not specified'}</p>
               <p><span class="label">Pieces:</span> ${bol.pieces || 'Not specified'}</p>
               <p><span class="label">Freight Charges:</span> ${bol.freight_charges ? `$${bol.freight_charges.toFixed(2)}` : 'Not specified'}</p>
             </div>
 
-            ${bol.notes ? `
+            ${safeNotes ? `
             <div class="section">
               <h3>Notes</h3>
-              <p>${bol.notes}</p>
+              <p>${safeNotes}</p>
             </div>
             ` : ''}
 
