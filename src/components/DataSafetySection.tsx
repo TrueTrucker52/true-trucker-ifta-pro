@@ -65,6 +65,13 @@ const DataSafetySection = () => {
             <ExternalLink className="h-3 w-3" />
             Terms of Service
           </Link>
+          <Link
+            to="/privacy-summary"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Data Collection Summary
+          </Link>
         </div>
 
         {/* Account Deletion */}

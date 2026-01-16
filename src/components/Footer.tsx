@@ -25,6 +25,9 @@ const Footer = () => {
               <p>📍 GPS used for mileage tracking</p>
               <p>📷 Camera used for receipt scanning</p>
               <p>🔒 Data encrypted & never sold</p>
+              <a href="/privacy-summary" className="text-primary-foreground/80 hover:text-white underline mt-2 inline-block">
+                View Full Data Collection Summary
+              </a>
             </div>
           </div>
 
