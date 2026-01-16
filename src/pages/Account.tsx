@@ -9,11 +9,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { sanitizeInput } from '@/lib/validation';
 
 const Account = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { subscribed, subscription_tier, loading: subscriptionLoading } = useSubscription();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [copyPhysicalAddress, setCopyPhysicalAddress] = useState(false);
 
@@ -110,39 +114,95 @@ const Account = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Validate required fields
-    if (!formData.firstName || !formData.lastName || !formData.email) {
-      alert('Please fill in all required fields');
+
+    if (!user?.id) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in again to save your company information.',
+        variant: 'destructive',
+      });
+      navigate('/auth');
+      setLoading(false);
+      return;
+    }
+
+    // Validate required fields (note: custom Select components won't be enforced by native HTML validation)
+    const requiredFieldsMissing =
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.carrierType ||
+      !formData.feid ||
+      !formData.physicalStreet ||
+      !formData.physicalCity ||
+      !formData.physicalState ||
+      !formData.physicalZip ||
+      !formData.mailingStreet ||
+      !formData.mailingCity ||
+      !formData.mailingState ||
+      !formData.mailingZip;
+
+    if (requiredFieldsMissing) {
+      toast({
+        title: 'Missing information',
+        description: 'Please fill in all required fields before continuing.',
+        variant: 'destructive',
+      });
       setLoading(false);
       return;
     }
 
     if (formData.email !== formData.emailConfirm) {
-      alert('Email addresses do not match');
+      toast({
+        title: 'Email mismatch',
+        description: 'Email addresses do not match.',
+        variant: 'destructive',
+      });
       setLoading(false);
       return;
     }
 
     try {
-      // Here you would submit the form data to your backend
-      console.log('Submitting account information:', formData);
-      
-      // TODO: Save company information to database
-      // This would include updating the profiles table with:
-      // - company_setup_completed: true
-      // - company_name: formData.companyName
-      // - company_address: formData.physicalStreet + ', ' + formData.physicalCity + ', ' + formData.physicalState
-      // - dot_number: formData.dotNumber
-      // - feid_number: formData.feid
-      
-      console.log('Company setup completed successfully');
-      
-      // Always redirect to dashboard after successful setup
+      const companyAddress = [
+        formData.physicalStreet,
+        formData.physicalCity,
+        formData.physicalState,
+        formData.physicalZip,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          company_setup_completed: true,
+          company_name: sanitizeInput(formData.companyName) || null,
+          company_address: sanitizeInput(companyAddress) || null,
+          dot_number: sanitizeInput(formData.dotNumber) || null,
+          feid_number: sanitizeInput(formData.feid) || null,
+          phone: sanitizeInput(formData.phone) || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+
+      toast({
+        title: 'Company setup saved',
+        description: 'Your information was saved successfully.',
+      });
+
       navigate('/dashboard');
-    } catch (error) {
-      console.error('Error submitting account information:', error);
-      alert('There was an error submitting your information. Please try again.');
+    } catch (error: any) {
+      console.error('Error saving account information:', error);
+      toast({
+        title: 'Could not save',
+        description: error?.message || 'There was an error saving your information. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }

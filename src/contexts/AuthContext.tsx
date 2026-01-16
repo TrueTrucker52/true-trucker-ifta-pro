@@ -7,7 +7,9 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  profileLoading: boolean;
   profile: any;
+  refreshProfile: () => Promise<void>;
   signUp: (email: string, password: string, captchaToken?: string | null) => Promise<{ error: any }>;
   signIn: (email: string, password: string, captchaToken?: string | null) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
@@ -29,6 +31,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  const loadProfile = async (userId: string) => {
+    setProfileLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('⚠️ Failed to load profile:', error);
+        setProfile(null);
+        return;
+      }
+
+      setProfile(data ?? null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (!user?.id) {
+      setProfile(null);
+      return;
+    }
+    await loadProfile(user.id);
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -55,6 +87,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setProfile(null);
+      return;
+    }
+
+    // Load profile whenever the signed-in user changes
+    loadProfile(user.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const signUp = async (email: string, password: string, captchaToken?: string | null) => {
     console.log('🔄 AuthContext signUp called', { email, passwordLength: password.length });
@@ -173,7 +216,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    profileLoading,
     profile,
+    refreshProfile,
     signUp,
     signIn,
     signOut,

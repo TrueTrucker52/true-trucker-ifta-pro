@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Building, Clock } from 'lucide-react';
+import { Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { OptimizedLoadingState } from '@/components/OptimizedLoadingState';
 
 interface CompanySetupGuardProps {
   children: React.ReactNode;
@@ -16,13 +17,25 @@ export const CompanySetupGuard: React.FC<CompanySetupGuardProps> = ({
   children, 
   feature
 }) => {
-  const { user } = useAuth();
-  const { subscribed, trial_active } = useSubscription();
+  const { user, profile, profileLoading } = useAuth();
+  const { subscribed, trial_active, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
-  
-  // For now, we'll assume setup is needed if user hasn't completed it
-  // In a real app, you'd check user profile for company_setup_completed
-  const needsSetup = true; // TODO: Check actual profile data
+
+  // Only enforce setup once the user is signed in AND has access to gated features (trial or subscription).
+  const shouldEnforceSetup = !!user && (subscribed || trial_active);
+  const needsSetup = shouldEnforceSetup && !profile?.company_setup_completed;
+
+  if (!shouldEnforceSetup) {
+    return <>{children}</>;
+  }
+
+  if (subscriptionLoading || profileLoading) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center">
+        <OptimizedLoadingState message="Checking company setup..." />
+      </div>
+    );
+  }
 
   // Allow access if no setup needed
   if (!needsSetup) {
