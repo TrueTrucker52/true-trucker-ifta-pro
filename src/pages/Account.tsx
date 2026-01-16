@@ -12,6 +12,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
+import DataSafetySection from '@/components/DataSafetySection';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -676,6 +677,9 @@ const Account = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Security & Privacy Section */}
+          <DataSafetySection />
 
           {/* Submit Buttons */}
           <div className="flex justify-between items-center">

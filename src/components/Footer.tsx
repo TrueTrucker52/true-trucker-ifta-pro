@@ -19,6 +19,13 @@ const Footer = () => {
             <p className="text-primary-foreground/80">
               Built by truckers, for truckers. Simplifying IFTA compliance one mile at a time.
             </p>
+            {/* Data Safety Summary */}
+            <div className="text-xs text-primary-foreground/60 border-t border-primary-foreground/20 pt-3 mt-3">
+              <p className="font-medium text-primary-foreground/80 mb-1">Data Safety</p>
+              <p>📍 GPS used for mileage tracking</p>
+              <p>📷 Camera used for receipt scanning</p>
+              <p>🔒 Data encrypted & never sold</p>
+            </div>
           </div>
 
           {/* Product */}
