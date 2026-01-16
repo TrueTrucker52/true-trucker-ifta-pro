@@ -11,7 +11,7 @@ import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile, profileLoading } = useAuth();
   const navigate = useNavigate();
   const { 
     openCustomerPortal, 
