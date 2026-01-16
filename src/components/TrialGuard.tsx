@@ -23,13 +23,19 @@ export const TrialGuard: React.FC<TrialGuardProps> = ({
     subscription_status, 
     subscribed,
     subscription_tier,
-    createCheckout 
+    createCheckout,
+    isAdmin
   } = useSubscription();
   const navigate = useNavigate();
 
+  // Admins always have full access
+  if (isAdmin) {
+    return <>{children}</>;
+  }
+
   // Allow access if user has active subscription of required tier or higher
   if (subscribed) {
-    const tierHierarchy = ['small', 'medium', 'large'];
+    const tierHierarchy = ['small', 'medium', 'large', 'admin'];
     const userTierIndex = tierHierarchy.indexOf(subscription_tier || '');
     const requiredTierIndex = tierHierarchy.indexOf(requiredTier);
     
