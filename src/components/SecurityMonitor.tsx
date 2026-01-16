@@ -29,7 +29,7 @@ export default function SecurityMonitor() {
 
   if (!isVisible) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 left-4 z-50">
         <button
           onClick={() => setIsVisible(true)}
           className="flex items-center gap-2 bg-card text-card-foreground px-3 py-2 rounded-lg shadow-lg border hover:bg-accent"
@@ -47,7 +47,7 @@ export default function SecurityMonitor() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80">
+    <div className="fixed bottom-4 left-4 z-50 w-80">
       <Card className="max-h-96 overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
