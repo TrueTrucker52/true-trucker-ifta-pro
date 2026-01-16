@@ -636,10 +636,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      validate_test_account: {
-        Args: { email_input: string; password_input: string }
-        Returns: boolean
-      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
