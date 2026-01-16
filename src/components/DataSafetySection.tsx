@@ -1,9 +1,20 @@
-import { Shield, MapPin, Camera, Lock, ExternalLink } from 'lucide-react';
+import { Shield, MapPin, Camera, Lock, ExternalLink, Mail } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import AccountDeletionDialog from './AccountDeletionDialog';
 
 const DataSafetySection = () => {
+  const { user } = useAuth();
+
+  // Generate support email link with user ID in subject line
+  const getSupportEmailHref = () => {
+    const userId = user?.id || 'not-logged-in';
+    const subject = encodeURIComponent(`App Support Request: [${userId}]`);
+    return `mailto:support@true-trucker-ifta-pro.com?subject=${subject}`;
+  };
+
   return (
     <Card className="border-2 border-primary/20">
       <CardHeader>
@@ -72,6 +83,20 @@ const DataSafetySection = () => {
             <ExternalLink className="h-3 w-3" />
             Data Collection Summary
           </Link>
+        </div>
+
+        {/* Support Contact */}
+        <div className="border-t pt-4">
+          <h4 className="font-semibold mb-2">Need Help?</h4>
+          <p className="text-sm text-muted-foreground mb-3">
+            Contact our support team for assistance with your account or IFTA questions.
+          </p>
+          <Button variant="outline" asChild>
+            <a href={getSupportEmailHref()}>
+              <Mail className="h-4 w-4 mr-2" />
+              Contact Support
+            </a>
+          </Button>
         </div>
 
         {/* Account Deletion */}

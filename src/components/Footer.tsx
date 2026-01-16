@@ -1,6 +1,16 @@
-import { Truck, Mail, MapPin } from "lucide-react";
+import { Truck, Mail, MapPin, HelpCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
+  const { user } = useAuth();
+
+  // Generate support email link with user ID in subject line
+  const getSupportEmailHref = () => {
+    const userId = user?.id || 'not-logged-in';
+    const subject = encodeURIComponent(`App Support Request: [${userId}]`);
+    return `mailto:support@true-trucker-ifta-pro.com?subject=${subject}`;
+  };
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12">
@@ -46,10 +56,14 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Support</h4>
             <ul className="space-y-2 text-primary-foreground/80">
-              <li><a href="https://docs.google.com/document/d/help-center" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Help Center</a></li>
               <li><a href="https://www.fmcsa.dot.gov/registration/international-fuel-tax-agreement-ifta" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">IFTA Guide</a></li>
               <li><a href="https://www.reddit.com/r/Truckers/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Community</a></li>
-              <li><a href="mailto:support@true-trucker-ifta-pro.com" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li>
+                <a href={getSupportEmailHref()} className="hover:text-white transition-colors flex items-center gap-1">
+                  <HelpCircle className="h-3 w-3" />
+                  Contact Support
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -59,7 +73,9 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4" />
-                <a href="mailto:support@true-trucker-ifta-pro.com" className="text-primary-foreground/80 hover:text-white transition-colors">support@true-trucker-ifta-pro.com</a>
+                <a href={getSupportEmailHref()} className="text-primary-foreground/80 hover:text-white transition-colors">
+                  support@true-trucker-ifta-pro.com
+                </a>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4" />
@@ -75,9 +91,9 @@ const Footer = () => {
             © 2024 TrueTrucker IFTA Pro. All rights reserved.
           </p>
           <div className="flex space-x-6 text-white/90 text-sm mt-4 md:mt-0 font-medium">
-            <a href="/privacy-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Privacy Policy</a>
-            <a href="/terms-of-service" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Terms of Service</a>
-            <a href="/refund-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Refund Policy</a>
+            <a href="https://true-trucker-ifta-pro.lovable.app/privacy-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Privacy Policy</a>
+            <a href="https://true-trucker-ifta-pro.lovable.app/terms-of-service" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Terms of Service</a>
+            <a href="https://true-trucker-ifta-pro.lovable.app/refund-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Refund Policy</a>
           </div>
         </div>
       </div>
