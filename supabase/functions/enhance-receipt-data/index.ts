@@ -153,9 +153,24 @@ serve(async (req) => {
               "pricePerGallon": "Number as string",
               "totalAmount": "Number as string",
               "fuelTax": "Number as string (if found)",
-              "stateCode": "2-letter state code"
+              "stateCode": "2-letter state code",
+              "fuelType": "Diesel, Regular, Premium, Midgrade, or DEF",
+              "confidence": {
+                "date": 0.0-1.0,
+                "time": 0.0-1.0,
+                "vendor": 0.0-1.0,
+                "location": 0.0-1.0,
+                "gallons": 0.0-1.0,
+                "pricePerGallon": 0.0-1.0,
+                "totalAmount": 0.0-1.0,
+                "fuelTax": 0.0-1.0,
+                "stateCode": 0.0-1.0,
+                "fuelType": 0.0-1.0
+              }
             }
-            If a field cannot be determined, use empty string. Be very accurate with numbers.
+            The confidence object should contain values from 0.0 (not confident/guessed) to 1.0 (very confident) for each field.
+            If a field cannot be determined, use empty string and set confidence to 0.
+            Be very accurate with numbers. Use 0.7 or below for uncertain extractions.
             Do NOT include any personal information like names, emails, or phone numbers in your response.`
           },
           {
@@ -190,14 +205,27 @@ serve(async (req) => {
     }
 
     // Final sanitization of AI response to ensure no PII in output
-    const sanitizedResponse: Record<string, string> = {};
-    const allowedOutputFields = ['date', 'time', 'vendor', 'location', 'gallons', 'pricePerGallon', 'totalAmount', 'fuelTax', 'stateCode'];
+    const sanitizedResponse: Record<string, any> = {};
+    const allowedOutputFields = ['date', 'time', 'vendor', 'location', 'gallons', 'pricePerGallon', 'totalAmount', 'fuelTax', 'stateCode', 'fuelType'];
     
     for (const field of allowedOutputFields) {
       if (enhancedData[field] !== undefined) {
         sanitizedResponse[field] = typeof enhancedData[field] === 'string' 
           ? stripPotentialPII(enhancedData[field])
           : String(enhancedData[field] || '');
+      }
+    }
+    
+    // Include confidence scores in response
+    if (enhancedData.confidence && typeof enhancedData.confidence === 'object') {
+      sanitizedResponse.confidence = {};
+      for (const field of allowedOutputFields) {
+        const score = enhancedData.confidence[field];
+        if (typeof score === 'number' && score >= 0 && score <= 1) {
+          sanitizedResponse.confidence[field] = score;
+        } else {
+          sanitizedResponse.confidence[field] = 0.5; // Default if missing
+        }
       }
     }
 

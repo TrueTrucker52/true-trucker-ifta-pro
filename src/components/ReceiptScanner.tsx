@@ -23,7 +23,23 @@ interface ReceiptData {
   totalAmount: string;
   fuelTax: string;
   stateCode: string;
+  fuelType: string;
 }
+
+interface ConfidenceScores {
+  date: number;
+  time: number;
+  location: number;
+  vendor: number;
+  gallons: number;
+  pricePerGallon: number;
+  totalAmount: number;
+  fuelTax: number;
+  stateCode: number;
+  fuelType: number;
+}
+
+const LOW_CONFIDENCE_THRESHOLD = 0.7;
 
 export const ReceiptScanner = () => {
   const { user } = useAuth();
@@ -48,8 +64,32 @@ export const ReceiptScanner = () => {
     pricePerGallon: '',
     totalAmount: '',
     fuelTax: '',
-    stateCode: ''
+    stateCode: '',
+    fuelType: ''
   });
+  
+  const [confidenceScores, setConfidenceScores] = useState<ConfidenceScores>({
+    date: 1,
+    time: 1,
+    location: 1,
+    vendor: 1,
+    gallons: 1,
+    pricePerGallon: 1,
+    totalAmount: 1,
+    fuelTax: 1,
+    stateCode: 1,
+    fuelType: 1
+  });
+
+  const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
+    return confidenceScores[field] < LOW_CONFIDENCE_THRESHOLD;
+  };
+
+  const getLowConfidenceStyle = (field: keyof ConfidenceScores): string => {
+    return isLowConfidence(field) 
+      ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-600 ring-2 ring-yellow-300 dark:ring-yellow-700' 
+      : '';
+  };
 
   const startCamera = async () => {
     try {
@@ -243,7 +283,13 @@ export const ReceiptScanner = () => {
       if (error) throw error;
       
       if (data?.enhancedData) {
-        setReceiptData(prev => ({ ...prev, ...data.enhancedData }));
+        const { confidence, ...extractedFields } = data.enhancedData;
+        setReceiptData(prev => ({ ...prev, ...extractedFields }));
+        
+        // Set confidence scores if available
+        if (confidence) {
+          setConfidenceScores(prev => ({ ...prev, ...confidence }));
+        }
       } else {
         setReceiptData(prev => ({ ...prev, ...basicExtractedData }));
       }
@@ -338,7 +384,20 @@ export const ReceiptScanner = () => {
         pricePerGallon: '',
         totalAmount: '',
         fuelTax: '',
-        stateCode: ''
+        stateCode: '',
+        fuelType: ''
+      });
+      setConfidenceScores({
+        date: 1,
+        time: 1,
+        location: 1,
+        vendor: 1,
+        gallons: 1,
+        pricePerGallon: 1,
+        totalAmount: 1,
+        fuelTax: 1,
+        stateCode: 1,
+        fuelType: 1
       });
       setCapturedImage(null);
       setOcrText('');
@@ -431,7 +490,20 @@ export const ReceiptScanner = () => {
                     pricePerGallon: '',
                     totalAmount: '',
                     fuelTax: '',
-                    stateCode: ''
+                    stateCode: '',
+                    fuelType: ''
+                  });
+                  setConfidenceScores({
+                    date: 1,
+                    time: 1,
+                    location: 1,
+                    vendor: 1,
+                    gallons: 1,
+                    pricePerGallon: 1,
+                    totalAmount: 1,
+                    fuelTax: 1,
+                    stateCode: 1,
+                    fuelType: 1
                   });
                 }}
               >
@@ -459,49 +531,84 @@ export const ReceiptScanner = () => {
           <CardHeader>
             <CardTitle>Receipt Details</CardTitle>
             <CardDescription>
-              Review and edit the extracted information
+              Review and edit the extracted information. 
+              <span className="text-yellow-600 dark:text-yellow-400 font-medium ml-1">
+                Yellow highlighted fields have low AI confidence — please double-check.
+              </span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date" className="flex items-center gap-1">
+                  Date
+                  {isLowConfidence('date') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="date"
                   type="date"
                   value={receiptData.date}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, date: e.target.value }))}
+                  className={getLowConfidenceStyle('date')}
                 />
               </div>
               <div>
-                <Label htmlFor="time">Time</Label>
+                <Label htmlFor="time" className="flex items-center gap-1">
+                  Time
+                  {isLowConfidence('time') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="time"
                   type="time"
                   value={receiptData.time}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, time: e.target.value }))}
+                  className={getLowConfidenceStyle('time')}
                 />
               </div>
               <div>
-                <Label htmlFor="vendor">Vendor/Station</Label>
+                <Label htmlFor="vendor" className="flex items-center gap-1">
+                  Vendor/Station
+                  {isLowConfidence('vendor') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="vendor"
                   value={receiptData.vendor}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, vendor: e.target.value }))}
                   placeholder="e.g., Shell, BP, Exxon"
+                  className={getLowConfidenceStyle('vendor')}
                 />
               </div>
               <div>
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location" className="flex items-center gap-1">
+                  Location
+                  {isLowConfidence('location') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="location"
                   value={receiptData.location}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, location: e.target.value }))}
                   placeholder="City, State"
+                  className={getLowConfidenceStyle('location')}
                 />
               </div>
               <div>
-                <Label htmlFor="gallons">Gallons</Label>
+                <Label htmlFor="fuelType" className="flex items-center gap-1">
+                  Fuel Type
+                  {isLowConfidence('fuelType') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
+                <Input
+                  id="fuelType"
+                  value={receiptData.fuelType}
+                  onChange={(e) => setReceiptData(prev => ({ ...prev, fuelType: e.target.value }))}
+                  placeholder="Diesel, Regular, Premium..."
+                  className={getLowConfidenceStyle('fuelType')}
+                />
+              </div>
+              <div>
+                <Label htmlFor="gallons" className="flex items-center gap-1">
+                  Gallons
+                  {isLowConfidence('gallons') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="gallons"
                   type="number"
@@ -509,10 +616,14 @@ export const ReceiptScanner = () => {
                   value={receiptData.gallons}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, gallons: e.target.value }))}
                   placeholder="0.000"
+                  className={getLowConfidenceStyle('gallons')}
                 />
               </div>
               <div>
-                <Label htmlFor="pricePerGallon">Price per Gallon</Label>
+                <Label htmlFor="pricePerGallon" className="flex items-center gap-1">
+                  Price per Gallon
+                  {isLowConfidence('pricePerGallon') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="pricePerGallon"
                   type="number"
@@ -520,10 +631,14 @@ export const ReceiptScanner = () => {
                   value={receiptData.pricePerGallon}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, pricePerGallon: e.target.value }))}
                   placeholder="0.000"
+                  className={getLowConfidenceStyle('pricePerGallon')}
                 />
               </div>
               <div>
-                <Label htmlFor="totalAmount">Total Amount</Label>
+                <Label htmlFor="totalAmount" className="flex items-center gap-1">
+                  Total Amount
+                  {isLowConfidence('totalAmount') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="totalAmount"
                   type="number"
@@ -531,10 +646,14 @@ export const ReceiptScanner = () => {
                   value={receiptData.totalAmount}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, totalAmount: e.target.value }))}
                   placeholder="0.00"
+                  className={getLowConfidenceStyle('totalAmount')}
                 />
               </div>
               <div>
-                <Label htmlFor="fuelTax">Fuel Tax</Label>
+                <Label htmlFor="fuelTax" className="flex items-center gap-1">
+                  Fuel Tax
+                  {isLowConfidence('fuelTax') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="fuelTax"
                   type="number"
@@ -542,16 +661,21 @@ export const ReceiptScanner = () => {
                   value={receiptData.fuelTax}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, fuelTax: e.target.value }))}
                   placeholder="0.00"
+                  className={getLowConfidenceStyle('fuelTax')}
                 />
               </div>
               <div>
-                <Label htmlFor="stateCode">State Code</Label>
+                <Label htmlFor="stateCode" className="flex items-center gap-1">
+                  State Code
+                  {isLowConfidence('stateCode') && <span className="text-yellow-600 text-xs">(verify)</span>}
+                </Label>
                 <Input
                   id="stateCode"
                   maxLength={2}
                   value={receiptData.stateCode}
                   onChange={(e) => setReceiptData(prev => ({ ...prev, stateCode: e.target.value.toUpperCase() }))}
                   placeholder="CA, TX, NY..."
+                  className={getLowConfidenceStyle('stateCode')}
                 />
               </div>
             </div>
