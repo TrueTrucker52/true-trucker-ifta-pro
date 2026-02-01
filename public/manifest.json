@@ -35,15 +35,7 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/lovable-uploads/truetrucker-clean-store-graphic.png",
-      "sizes": "1024x500",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "IFTA Tax Calculations Made Easy"
-    }
-  ],
+  "screenshots": [],
   "lang": "en-US",
   "dir": "ltr",
   "scope": "/",
