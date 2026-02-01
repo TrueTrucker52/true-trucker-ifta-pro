@@ -6,6 +6,8 @@ const allowedOrigins = [
   'https://true-trucker-ifta-pro.lovable.app',
   'https://id-preview--ea23f26e-83f6-4710-a8b5-45fb030d3016.lovable.app',
   'https://tlvngzfoxpjdltbpmzaz.supabase.co',
+  'https://true-trucker-ifta-pro.com',
+  'https://www.true-trucker-ifta-pro.com',
 ];
 
 const getCorsHeaders = (req: Request) => {
