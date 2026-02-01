@@ -1,27 +1,31 @@
 // TrueTrucker IFTA Pro Service Worker
 // Version increment forces cache refresh on deploy
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = `truetrucker-ifta-${CACHE_VERSION}`;
 
-// Critical assets to cache for offline/fast loading
+// Only cache actual files that exist - NOT SPA routes
+// SPA routes like /dashboard will be handled by the app shell
 const STATIC_CACHE = [
-  '/',
-  '/dashboard',
-  '/mileage-tracker',
-  '/scan-receipt',
-  '/ifta-reports',
   '/lovable-uploads/truetrucker-app-icon.png',
   '/lovable-uploads/truetrucker-app-icon-512.png',
-  '/lovable-uploads/ifta-favicon.png'
+  '/lovable-uploads/ifta-favicon.png',
+  '/manifest.json'
 ];
 
-// Install event - cache critical assets
+// Install event - cache critical assets with error handling
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[SW] Caching critical assets');
-        return cache.addAll(STATIC_CACHE);
+        // Use individual cache.add with error handling instead of addAll
+        return Promise.allSettled(
+          STATIC_CACHE.map((url) => 
+            cache.add(url).catch((err) => {
+              console.warn(`[SW] Failed to cache ${url}:`, err.message);
+            })
+          )
+        );
       })
       .then(() => self.skipWaiting())
   );

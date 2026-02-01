@@ -38,10 +38,20 @@ export const useSubscription = () => {
   const retryCountRef = useRef(0);
   const isFetchingRef = useRef(false);
   const hasCheckedRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // If user is admin, always return subscribed status
   useEffect(() => {
-    if (!adminLoading && isAdmin) {
+    if (!adminLoading && isAdmin && mountedRef.current) {
       hasCheckedRef.current = true;
       retryCountRef.current = MAX_RETRY_COUNT; // Prevent retries for admin
       setSubscription({
@@ -64,52 +74,55 @@ export const useSubscription = () => {
     
     // Prevent concurrent fetches
     if (isFetchingRef.current) {
-      console.log('🔄 Subscription check already in progress, skipping...');
+      return;
+    }
+    
+    // Skip if already checked for this user
+    if (hasCheckedRef.current && lastUserIdRef.current === user?.id) {
       return;
     }
     
     // Check retry limit
     if (retryCountRef.current >= MAX_RETRY_COUNT && hasCheckedRef.current) {
-      console.log('⚠️ Max retry count reached, not retrying subscription check');
       return;
     }
     
     if (!user || !session) {
-      setSubscription({
-        subscribed: false,
-        subscription_tier: 'free',
-        subscription_end: null,
-        trial_active: false,
-        trial_days_remaining: 0,
-        trial_end_date: null,
-        subscription_status: 'trial',
-        loading: false,
-        error: null,
-      });
+      if (mountedRef.current) {
+        setSubscription({
+          subscribed: false,
+          subscription_tier: 'free',
+          subscription_end: null,
+          trial_active: false,
+          trial_days_remaining: 0,
+          trial_end_date: null,
+          subscription_status: 'trial',
+          loading: false,
+          error: null,
+        });
+      }
       return;
     }
 
     try {
       isFetchingRef.current = true;
+      lastUserIdRef.current = user.id;
       
       // Only set loading on first check, not retries
-      if (!hasCheckedRef.current) {
+      if (!hasCheckedRef.current && mountedRef.current) {
         setSubscription(prev => ({ ...prev, loading: true, error: null }));
       }
-      
-      console.log('🔍 Checking subscription status... (attempt:', retryCountRef.current + 1, ')');
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
-      
-      console.log('📊 Subscription check result:', { data, error });
+
+      if (!mountedRef.current) return;
 
       if (error) {
         // Check if it's an authentication error
         if (error.message?.includes('Authentication error') || error.message?.includes('Session')) {
-          console.log('🔄 Authentication error, attempting session refresh...');
           const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
           if (refreshError) {
             toast({
@@ -128,9 +141,10 @@ export const useSubscription = () => {
           });
           
           if (retryResponse.error) throw retryResponse.error;
+          if (!mountedRef.current) return;
           
           hasCheckedRef.current = true;
-          retryCountRef.current = 0; // Reset on success
+          retryCountRef.current = 0;
           setSubscription({
             subscribed: retryResponse.data.subscribed || false,
             subscription_tier: retryResponse.data.subscription_tier || 'free',
@@ -148,7 +162,7 @@ export const useSubscription = () => {
       }
 
       hasCheckedRef.current = true;
-      retryCountRef.current = 0; // Reset on success
+      retryCountRef.current = 0;
       setSubscription({
         subscribed: data.subscribed || false,
         subscription_tier: data.subscription_tier || 'free',
@@ -162,12 +176,14 @@ export const useSubscription = () => {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error checking subscription:', errorMessage, '(attempt:', retryCountRef.current + 1, ')');
+      console.error('Subscription check failed:', errorMessage);
       
       retryCountRef.current += 1;
       hasCheckedRef.current = true;
       
-      // Set error state but don't spam retries
+      if (!mountedRef.current) return;
+      
+      // Set error state
       setSubscription(prev => ({
         ...prev,
         subscribed: false,
@@ -175,23 +191,24 @@ export const useSubscription = () => {
         subscription_status: 'error',
         loading: false,
         error: retryCountRef.current >= MAX_RETRY_COUNT 
-          ? `Failed after ${MAX_RETRY_COUNT} attempts: ${errorMessage}` 
+          ? `Failed after ${MAX_RETRY_COUNT} attempts` 
           : errorMessage,
       }));
 
       // Only retry if under limit and not a permanent error
       if (retryCountRef.current < MAX_RETRY_COUNT && !errorMessage.includes('Unauthorized')) {
-        console.log(`⏳ Retrying in ${RETRY_DELAY_MS}ms...`);
         setTimeout(() => {
           isFetchingRef.current = false;
-          checkSubscription();
+          if (mountedRef.current) {
+            checkSubscription();
+          }
         }, RETRY_DELAY_MS);
         return;
       }
     } finally {
       isFetchingRef.current = false;
     }
-  }, [user, session, isAdmin, toast]);
+  }, [user?.id, session?.access_token, isAdmin, toast]);
 
   const createCheckout = async (plan: string) => {
     console.log('🚀 Creating checkout for plan:', plan);
@@ -280,19 +297,26 @@ export const useSubscription = () => {
     }
   };
 
-  // Reset retry count when user/session changes
+  // Reset state when user changes
   useEffect(() => {
-    retryCountRef.current = 0;
-    hasCheckedRef.current = false;
-    isFetchingRef.current = false;
-  }, [user?.id, session?.access_token]);
-
-  useEffect(() => {
-    // Don't check subscription if user is admin (handled separately)
-    if (!adminLoading && !isAdmin) {
-      checkSubscription();
+    if (user?.id !== lastUserIdRef.current) {
+      retryCountRef.current = 0;
+      hasCheckedRef.current = false;
+      isFetchingRef.current = false;
     }
-  }, [checkSubscription, adminLoading, isAdmin]);
+  }, [user?.id]);
+
+  // Single effect to trigger subscription check - runs once per user
+  useEffect(() => {
+    // Don't check if still loading admin status
+    if (adminLoading) return;
+    // Don't check if user is admin (handled separately)
+    if (isAdmin) return;
+    // Don't check if already checked for this user
+    if (hasCheckedRef.current && lastUserIdRef.current === user?.id) return;
+    
+    checkSubscription();
+  }, [user?.id, adminLoading, isAdmin, checkSubscription]);
 
   return {
     ...subscription,
