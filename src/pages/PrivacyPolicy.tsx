@@ -1,4 +1,4 @@
-import { Shield, Database, Eye, Lock, Phone, Mail } from "lucide-react";
+import { Shield, Database, Eye, Lock, Phone, Mail, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const PrivacyPolicy = () => {
@@ -43,8 +43,54 @@ const PrivacyPolicy = () => {
                   <li>• Trip mileage and route information</li>
                   <li>• Fuel purchase receipts and records</li>
                   <li>• Tax calculations and reports</li>
-                  <li>• GPS tracking data (when enabled)</li>
                 </ul>
+              </div>
+            </div>
+          </Card>
+
+          {/* GPS Location Tracking Disclosure */}
+          <Card className="p-8 mb-8 border-amber-500/50 bg-amber-500/5">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Phone className="h-6 w-6 text-amber-600" />
+              GPS Location Tracking
+            </h2>
+            <div className="space-y-4">
+              <div className="bg-amber-100 dark:bg-amber-900/30 p-4 rounded-lg">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  <strong>Important:</strong> This app collects location data to enable automatic mileage tracking 
+                  for IFTA compliance <strong>even when the app is closed or not in use</strong>.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Why We Collect Background Location</h3>
+                <p className="text-sm text-muted-foreground">
+                  Accurate IFTA reporting requires continuous mileage tracking across state lines. 
+                  Background location access allows the app to automatically log your trips and 
+                  detect state-line crossings without requiring you to keep the app open while driving.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">How Location Data Is Used</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• <strong>Mileage Calculation:</strong> Track distance traveled in each jurisdiction</li>
+                  <li>• <strong>State Detection:</strong> Automatically detect when you cross state lines</li>
+                  <li>• <strong>Trip Logging:</strong> Create accurate trip records for IFTA reports</li>
+                  <li>• <strong>Route Verification:</strong> Provide audit-ready documentation</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Your Control</h3>
+                <p className="text-sm text-muted-foreground">
+                  You can disable background location tracking at any time in your device settings or 
+                  within the app. If disabled, you can still use manual trip entry for IFTA reporting.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Data Protection</h3>
+                <p className="text-sm text-muted-foreground">
+                  Location data is encrypted, stored securely, and <strong>never shared with third parties 
+                  for advertising</strong>. It is used solely for IFTA mileage tracking and tax compliance purposes.
+                </p>
               </div>
             </div>
           </Card>
@@ -137,6 +183,54 @@ const PrivacyPolicy = () => {
             </div>
           </Card>
 
+          {/* Data Deletion - Google Play Compliance */}
+          <Card className="p-8 mb-8 border-primary/50 bg-primary/5">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Trash2 className="h-6 w-6 text-primary" />
+              Data Deletion
+            </h2>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                You have the right to request deletion of your personal data at any time. 
+                We provide a simple process to permanently delete your account and all associated data.
+              </p>
+              <div>
+                <h3 className="font-semibold mb-2">What Gets Deleted</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Your account credentials and profile information</li>
+                  <li>• All trip records and mileage logs</li>
+                  <li>• Fuel receipts and scanned documents</li>
+                  <li>• Vehicle and truck information</li>
+                  <li>• IFTA reports and tax calculations</li>
+                  <li>• Bills of lading and invoices</li>
+                  <li>• Any files stored in our cloud storage</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">How to Request Deletion</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  You can request account deletion through our dedicated deletion portal. 
+                  Requests are processed within 72 hours, and you will receive email confirmation when complete.
+                </p>
+                <a 
+                  href="/delete-account" 
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Request Account Deletion
+                </a>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Retention Period</h3>
+                <p className="text-sm text-muted-foreground">
+                  After deletion, your data is permanently removed from our active systems. 
+                  Backup copies may be retained for up to 30 days for disaster recovery purposes, 
+                  after which they are also permanently deleted.
+                </p>
+              </div>
+            </div>
+          </Card>
+
           {/* Your Rights */}
           <Card className="p-8 mb-8">
             <h2 className="text-2xl font-semibold mb-4">Your Rights & Controls</h2>
@@ -154,7 +248,7 @@ const PrivacyPolicy = () => {
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Update or correct your information</li>
                   <li>• Delete specific records</li>
-                  <li>• Close your account entirely</li>
+                  <li>• <a href="/delete-account" className="text-primary hover:underline">Close your account entirely</a></li>
                 </ul>
               </div>
             </div>

@@ -37,6 +37,7 @@ import StorePreview from "./components/StorePreview";
 import MarketingHub from "./components/MarketingHub";
 import TruckingNews from "./pages/TruckingNews";
 import PrivacySummary from "./pages/PrivacySummary";
+import DeleteAccount from "./pages/DeleteAccount";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +124,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/privacy-summary" element={<PrivacySummary />} />
+            <Route path="/delete-account" element={<DeleteAccount />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
