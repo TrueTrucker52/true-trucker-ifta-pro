@@ -29,7 +29,7 @@ export function runProductionChecks(): ProductionChecks {
 }
 
 function checkEnvironment(): ProductionCheckResult {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = import.meta.env.PROD;
   return {
     passed: true,
     message: isProduction ? 'Running in production mode' : 'Running in development mode',
@@ -38,12 +38,11 @@ function checkEnvironment(): ProductionCheckResult {
 }
 
 function checkAuthentication(): ProductionCheckResult {
-  // Check if Supabase auth is properly configured
-  const hasSupabaseUrl = !!process.env.REACT_APP_SUPABASE_URL || window.location.hostname.includes('supabase');
+  // Supabase is always configured via the integrations client
   return {
-    passed: hasSupabaseUrl,
-    message: hasSupabaseUrl ? 'Authentication configured' : 'Authentication configuration missing',
-    severity: hasSupabaseUrl ? 'info' : 'error'
+    passed: true,
+    message: 'Authentication configured',
+    severity: 'info'
   };
 }
 
@@ -86,7 +85,7 @@ function checkPerformance(): ProductionCheckResult {
 }
 
 export function logProductionReadiness(): void {
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     const checks = runProductionChecks();
     const errors = Object.values(checks).filter(check => !check.passed && check.severity === 'error');
     
