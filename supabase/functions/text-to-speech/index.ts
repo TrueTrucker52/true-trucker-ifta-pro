@@ -2,13 +2,23 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
-  "X-Frame-Options": "DENY",
-  "X-Content-Type-Options": "nosniff",
-  "Referrer-Policy": "strict-origin-when-cross-origin"
+const allowedOrigins = [
+  'https://true-trucker-ifta-pro.lovable.app',
+  'https://id-preview--ea23f26e-83f6-4710-a8b5-45fb030d3016.lovable.app',
+  'https://tlvngzfoxpjdltbpmzaz.supabase.co',
+];
+
+const getCorsHeaders = (req: Request) => {
+  const origin = req.headers.get('origin') || '';
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  };
 };
 
 const validateInput = (text: string, voice: string = 'alloy') => {
@@ -34,6 +44,8 @@ const validateInput = (text: string, voice: string = 'alloy') => {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -118,6 +130,7 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in text-to-speech function:', error);
+    const corsHeaders = getCorsHeaders(req);
     return new Response(
       JSON.stringify({ error: 'Failed to generate speech' }),
       {

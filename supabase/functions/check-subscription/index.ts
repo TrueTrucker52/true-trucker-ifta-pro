@@ -2,9 +2,19 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+const allowedOrigins = [
+  'https://true-trucker-ifta-pro.lovable.app',
+  'https://id-preview--ea23f26e-83f6-4710-a8b5-45fb030d3016.lovable.app',
+  'https://tlvngzfoxpjdltbpmzaz.supabase.co',
+];
+
+const getCorsHeaders = (req: Request) => {
+  const origin = req.headers.get('origin') || '';
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
 };
 
 const logStep = (step: string, details?: any) => {
@@ -13,6 +23,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
