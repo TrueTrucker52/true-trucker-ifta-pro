@@ -15,6 +15,7 @@ import AutoTrackToggle from "@/components/AutoTrackToggle";
 import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
+import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -72,6 +73,12 @@ const Dashboard = () => {
 
   return (
     <>
+      {/* Google Play Prominent Location Disclosure - Shows on first dashboard visit */}
+      <ProminentLocationDisclosure 
+        onAccepted={() => console.log('Location disclosure accepted')}
+        onDenied={() => console.log('Location disclosure denied - manual mode')}
+      />
+
       {/* Offline Banner - Fixed at very top */}
       <OfflineBanner />
 
