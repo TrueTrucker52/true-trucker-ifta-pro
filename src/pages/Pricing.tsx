@@ -16,12 +16,11 @@ const Pricing = () => {
   const plans = [
     {
       id: 'small',
-      name: 'Solo Driver',
+      name: 'Owner Operator',
       price: 29,
       period: 'month',
-      description: '⚠️ Limited to 2 trucks only',
+      description: 'Perfect for independent owner operators',
       popular: false,
-      limitation: '2 Truck Limit',
       features: [
         'IFTA Quarterly Reports',
         'Fuel Receipt Scanning',
@@ -235,12 +234,6 @@ const Pricing = () => {
                 <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-500 to-blue-500 text-white animate-pulse">
                   🔥 {plan.badge || 'Most Popular'}
                 </Badge>
-              )}
-              
-              {plan.limitation && (
-                <div className="absolute top-4 right-4 bg-red-500/10 border border-red-500/30 rounded-lg px-2 py-1">
-                  <span className="text-red-600 text-xs font-semibold">{plan.limitation}</span>
-                </div>
               )}
               
               <CardHeader className="text-center pb-4">
