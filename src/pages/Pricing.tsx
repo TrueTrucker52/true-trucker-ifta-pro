@@ -16,12 +16,11 @@ const Pricing = () => {
   const plans = [
     {
       id: 'small',
-      name: 'Solo Driver',
+      name: 'Owner Operator',
       price: 29,
       period: 'month',
-      description: '⚠️ Limited to 2 trucks only',
+      description: 'Perfect for independent owner operators',
       popular: false,
-      limitation: '2 Truck Limit',
       features: [
         'IFTA Quarterly Reports',
         'Fuel Receipt Scanning',
