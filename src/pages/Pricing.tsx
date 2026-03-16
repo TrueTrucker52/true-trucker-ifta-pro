@@ -236,12 +236,6 @@ const Pricing = () => {
                 </Badge>
               )}
               
-              {plan.limitation && (
-                <div className="absolute top-4 right-4 bg-red-500/10 border border-red-500/30 rounded-lg px-2 py-1">
-                  <span className="text-red-600 text-xs font-semibold">{plan.limitation}</span>
-                </div>
-              )}
-              
               <CardHeader className="text-center pb-4">
                 <CardTitle className={`text-2xl ${plan.popular ? 'text-primary' : ''}`}>{plan.name}</CardTitle>
                 <CardDescription className="min-h-[40px]">{plan.description}</CardDescription>
