@@ -88,7 +88,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-primary-foreground/60 text-sm">
-            © 2024 TrueTrucker IFTA Pro. All rights reserved.
+            © 2026 TrueTrucker IFTA Pro. All rights reserved.
           </p>
           <div className="flex space-x-6 text-white/90 text-sm mt-4 md:mt-0 font-medium">
             <a href="https://true-trucker-ifta-pro.lovable.app/privacy-policy" className="hover:text-white hover:underline transition-all duration-200 border-b border-transparent hover:border-white">Privacy Policy</a>
