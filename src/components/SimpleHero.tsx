@@ -81,7 +81,7 @@ const SimpleHero = () => {
                 navigate('/auth?mode=signup');
               }}
             >
-              START YOUR SUBSCRIPTION
+              Start Free 7-Day Trial
               <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
           </div>
