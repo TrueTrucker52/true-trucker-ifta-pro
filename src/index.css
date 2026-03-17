@@ -137,3 +137,34 @@ All colors MUST be HSL.
     padding-top: env(safe-area-inset-top, 0px);
   }
 }
+
+/* Print styles for IFTA reports */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #ifta-report,
+  #ifta-report * {
+    visibility: visible;
+  }
+
+  #ifta-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  #ifta-report::before {
+    content: "TrueTrucker IFTA Pro — IFTA Quarterly Report";
+    display: block;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #333;
+    visibility: visible;
+  }
+}

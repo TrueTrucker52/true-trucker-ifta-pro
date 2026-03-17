@@ -121,26 +121,7 @@ const IFTACalculator = () => {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById('ifta-report');
-    if (!printContent) return;
-    
-    const originalContents = document.body.innerHTML;
-    const printContents = printContent.innerHTML;
-    
-    document.body.innerHTML = `
-      <div style="font-family: Arial, sans-serif; max-width: 210mm; margin: 0 auto; padding: 20mm;">
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
-          <h1 style="margin: 0; color: #333; font-size: 24px;">TrueTrucker IFTA Pro</h1>
-          <h2 style="margin: 10px 0 0 0; color: #666; font-size: 18px;">IFTA Quarterly Report</h2>
-          <p style="margin: 5px 0 0 0; color: #666;">Q${calculation?.quarter} ${calculation?.year} • Generated: ${new Date().toLocaleDateString()}</p>
-        </div>
-        ${printContents}
-      </div>
-    `;
-    
     window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload(); // Reload to restore React functionality
   };
 
   const handleExportPDF = async () => {
