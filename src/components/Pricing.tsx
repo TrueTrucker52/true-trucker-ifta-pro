@@ -55,7 +55,7 @@ const Pricing = () => {
           {/* Mobile Card Layout */}
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {[
-              { name: 'SOLO DRIVER', price: '$29', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
+              { name: 'OWNER OPERATOR', price: '$29', trucks: '2 Only', popular: false, plan: 'small' },
               { name: 'FLEET MANAGER', price: '$59', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
               { name: 'FLEET EMPIRE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
             ].map((plan) => (
@@ -69,16 +69,13 @@ const Pricing = () => {
                   </div>
                 )}
                 
-                {plan.warning && (
-                  <div className="absolute top-4 right-4 bg-red-500/10 border border-red-500/30 rounded-lg px-2 py-1">
-                    <span className="text-red-600 text-xs font-semibold">{plan.warning}</span>
-                  </div>
-                )}
+
+
                 
                 <CardHeader className="text-center pb-4">
                   <CardTitle className={`text-lg ${plan.popular ? 'text-primary' : ''}`}>{plan.name}</CardTitle>
                   <CardDescription>
-                    {plan.plan === 'small' ? '⚠️ Growth Limited' : 
+                    {plan.plan === 'small' ? '🚛 Independent Operator' : 
                      plan.plan === 'medium' ? '🚛 Fleet Ready' : 
                      '🏢 Enterprise Level'}
                   </CardDescription>
