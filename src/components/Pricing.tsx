@@ -78,7 +78,7 @@ const Pricing = () => {
                 <CardHeader className="text-center pb-4">
                   <CardTitle className={`text-lg ${plan.popular ? 'text-primary' : ''}`}>{plan.name}</CardTitle>
                   <CardDescription>
-                    {plan.plan === 'small' ? '⚠️ Growth Limited' : 
+                    {plan.plan === 'small' ? '🚛 Independent Operator' : 
                      plan.plan === 'medium' ? '🚛 Fleet Ready' : 
                      '🏢 Enterprise Level'}
                   </CardDescription>
