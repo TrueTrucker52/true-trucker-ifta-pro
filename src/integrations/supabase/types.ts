@@ -610,6 +610,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_demo_user_id: { Args: never; Returns: string }
       grant_reviewer_role: { Args: { user_email: string }; Returns: undefined }
       has_role: {
         Args: {
