@@ -55,7 +55,7 @@ const Pricing = () => {
           {/* Mobile Card Layout */}
           <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {[
-              { name: 'SOLO DRIVER', price: '$29', trucks: '2 Only', popular: false, plan: 'small', warning: '⚠️ Limited Growth' },
+              { name: 'OWNER OPERATOR', price: '$29', trucks: '2 Only', popular: false, plan: 'small' },
               { name: 'FLEET MANAGER', price: '$59', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
               { name: 'FLEET EMPIRE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
             ].map((plan) => (
