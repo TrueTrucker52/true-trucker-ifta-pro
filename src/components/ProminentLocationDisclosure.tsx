@@ -96,6 +96,7 @@ export const ProminentLocationDisclosure = ({
         // Native platform - use Capacitor
         const status = await Geolocation.requestPermissions();
         
+        if (!mountedRef.current) return;
         localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
         
         if (status.location === 'granted' || status.coarseLocation === 'granted') {
@@ -112,10 +113,12 @@ export const ProminentLocationDisclosure = ({
     } catch (error) {
       console.error('Error requesting location permission:', error);
       localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
-      setIsOpen(false);
+      if (mountedRef.current) {
+        setIsOpen(false);
+      }
       onDenied?.();
     } finally {
-      setIsRequesting(false);
+      if (mountedRef.current) setIsRequesting(false);
     }
   };
 
