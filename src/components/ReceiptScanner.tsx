@@ -82,6 +82,20 @@ export const ReceiptScanner = () => {
     stateCode: 1,
     fuelType: 1
   });
+  
+  const mountedRef = useRef(true);
+  
+  // Cleanup camera and mounted ref on unmount
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      // Stop camera stream if active
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
     return confidenceScores[field] < LOW_CONFIDENCE_THRESHOLD;
