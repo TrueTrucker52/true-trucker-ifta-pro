@@ -194,22 +194,27 @@ export const ReceiptScanner = () => {
       );
       
       const sanitizedText = sanitizeOcrText(text);
+      if (!mountedRef.current) return;
       setOcrText(sanitizedText);
       await extractReceiptData(sanitizedText);
       
+      if (!mountedRef.current) return;
       toast({
         title: "Receipt Scanned",
         description: "Text extracted successfully. Please review and edit the details.",
       });
     } catch (error) {
+      if (!mountedRef.current) return;
       toast({
         title: "Scanning Failed",
         description: "Could not process the receipt image. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsScanning(false);
-      setScanProgress(0);
+      if (mountedRef.current) {
+        setIsScanning(false);
+        setScanProgress(0);
+      }
     }
   };
 
