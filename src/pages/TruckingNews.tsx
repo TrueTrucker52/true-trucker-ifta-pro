@@ -342,7 +342,9 @@ const TruckingNews = () => {
 
       {/* Bottom Navigation - Mobile */}
       <div className="md:hidden">
-        <BottomNavigation />
+        <ErrorBoundary fallback={null}>
+          <BottomNavigation />
+        </ErrorBoundary>
       </div>
     </div>
   );
