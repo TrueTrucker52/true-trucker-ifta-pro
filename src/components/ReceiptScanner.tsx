@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -82,6 +82,20 @@ export const ReceiptScanner = () => {
     stateCode: 1,
     fuelType: 1
   });
+  
+  const mountedRef = useRef(true);
+  
+  // Cleanup camera and mounted ref on unmount
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      // Stop camera stream if active
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
     return confidenceScores[field] < LOW_CONFIDENCE_THRESHOLD;
@@ -180,22 +194,27 @@ export const ReceiptScanner = () => {
       );
       
       const sanitizedText = sanitizeOcrText(text);
+      if (!mountedRef.current) return;
       setOcrText(sanitizedText);
       await extractReceiptData(sanitizedText);
       
+      if (!mountedRef.current) return;
       toast({
         title: "Receipt Scanned",
         description: "Text extracted successfully. Please review and edit the details.",
       });
     } catch (error) {
+      if (!mountedRef.current) return;
       toast({
         title: "Scanning Failed",
         description: "Could not process the receipt image. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsScanning(false);
-      setScanProgress(0);
+      if (mountedRef.current) {
+        setIsScanning(false);
+        setScanProgress(0);
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapPin, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,6 +43,11 @@ export const ProminentLocationDisclosure = ({
 }: ProminentLocationDisclosureProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     // Check if user has already accepted or denied the disclosure
@@ -67,6 +72,7 @@ export const ProminentLocationDisclosure = ({
         // Web fallback - request via getCurrentPosition
         navigator.geolocation.getCurrentPosition(
           () => {
+            if (!mountedRef.current) return;
             // Permission granted
             localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
             localStorage.setItem('location_permission', 'granted');
@@ -75,10 +81,10 @@ export const ProminentLocationDisclosure = ({
             onAccepted?.();
           },
           (error) => {
+            if (!mountedRef.current) return;
             console.error('Geolocation error:', error);
             if (error.code === error.PERMISSION_DENIED) {
-              // User denied system permission after accepting disclosure
-              localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true'); // They accepted disclosure
+              localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
               localStorage.setItem('location_permission', 'denied');
             }
             setIsOpen(false);
@@ -90,6 +96,7 @@ export const ProminentLocationDisclosure = ({
         // Native platform - use Capacitor
         const status = await Geolocation.requestPermissions();
         
+        if (!mountedRef.current) return;
         localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
         
         if (status.location === 'granted' || status.coarseLocation === 'granted') {
@@ -106,10 +113,12 @@ export const ProminentLocationDisclosure = ({
     } catch (error) {
       console.error('Error requesting location permission:', error);
       localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
-      setIsOpen(false);
+      if (mountedRef.current) {
+        setIsOpen(false);
+      }
       onDenied?.();
     } finally {
-      setIsRequesting(false);
+      if (mountedRef.current) setIsRequesting(false);
     }
   };
 
