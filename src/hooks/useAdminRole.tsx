@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -6,19 +6,29 @@ export const useAdminRole = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
     const checkAdminRole = async () => {
       if (!user) {
-        setIsAdmin(false);
-        setLoading(false);
+        if (!cancelled) {
+          setIsAdmin(false);
+          setLoading(false);
+        }
         return;
       }
 
       try {
-        // Use the security definer function to check admin role
         const { data, error } = await supabase.rpc('is_admin');
         
+        if (cancelled) return;
+
         if (error) {
           console.error('Error checking admin role:', error);
           setIsAdmin(false);
@@ -27,13 +37,14 @@ export const useAdminRole = () => {
         }
       } catch (error) {
         console.error('Error checking admin role:', error);
-        setIsAdmin(false);
+        if (!cancelled) setIsAdmin(false);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     checkAdminRole();
+    return () => { cancelled = true; };
   }, [user]);
 
   return { isAdmin, loading };
