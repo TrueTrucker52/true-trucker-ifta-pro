@@ -33,6 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<any>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
+
   const loadProfile = async (userId: string) => {
     setProfileLoading(true);
     try {
@@ -42,6 +48,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', userId)
         .maybeSingle();
 
+      if (!mountedRef.current) return;
+
       if (error) {
         console.warn('⚠️ Failed to load profile:', error);
         setProfile(null);
@@ -50,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setProfile(data ?? null);
     } finally {
-      setProfileLoading(false);
+      if (mountedRef.current) setProfileLoading(false);
     }
   };
 
@@ -63,9 +71,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (cancelled) return;
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -74,9 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (cancelled) return;
+
       if (error) {
         console.warn('⚠️ supabase.auth.getSession error:', error);
-        // If a stale/invalid refresh token is present, clear it out.
         supabase.auth.signOut();
       }
 
@@ -85,7 +97,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
