@@ -72,6 +72,7 @@ export const ProminentLocationDisclosure = ({
         // Web fallback - request via getCurrentPosition
         navigator.geolocation.getCurrentPosition(
           () => {
+            if (!mountedRef.current) return;
             // Permission granted
             localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
             localStorage.setItem('location_permission', 'granted');
@@ -80,10 +81,10 @@ export const ProminentLocationDisclosure = ({
             onAccepted?.();
           },
           (error) => {
+            if (!mountedRef.current) return;
             console.error('Geolocation error:', error);
             if (error.code === error.PERMISSION_DENIED) {
-              // User denied system permission after accepting disclosure
-              localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true'); // They accepted disclosure
+              localStorage.setItem(DISCLOSURE_STORAGE_KEY, 'true');
               localStorage.setItem('location_permission', 'denied');
             }
             setIsOpen(false);
