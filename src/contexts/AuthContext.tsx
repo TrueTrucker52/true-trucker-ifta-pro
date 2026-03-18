@@ -32,14 +32,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [profileLoading, setProfileLoading] = useState(false);
-  const mountedRef = React.useRef(true);
-
-  React.useEffect(() => {
-    return () => { mountedRef.current = false; };
-  }, []);
 
   const loadProfile = async (userId: string) => {
-    if (!mountedRef.current) return;
     setProfileLoading(true);
     try {
       const { data, error } = await supabase
@@ -48,7 +42,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (!mountedRef.current) return;
       if (error) {
         console.warn('⚠️ Failed to load profile:', error);
         setProfile(null);
@@ -57,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setProfile(data ?? null);
     } finally {
-      if (mountedRef.current) setProfileLoading(false);
+      setProfileLoading(false);
     }
   };
 
