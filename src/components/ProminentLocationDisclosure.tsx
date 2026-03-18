@@ -43,6 +43,11 @@ export const ProminentLocationDisclosure = ({
 }: ProminentLocationDisclosureProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     // Check if user has already accepted or denied the disclosure
