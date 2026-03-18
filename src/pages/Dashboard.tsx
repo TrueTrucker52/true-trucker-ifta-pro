@@ -419,7 +419,9 @@ const Dashboard = () => {
         
         {/* Bottom Navigation - Mobile only */}
         <div className="md:hidden">
-          <BottomNavigation />
+          <ErrorBoundary fallback={null}>
+            <BottomNavigation />
+          </ErrorBoundary>
         </div>
       </div>
     </>

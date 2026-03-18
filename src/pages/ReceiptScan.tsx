@@ -32,7 +32,14 @@ const ReceiptScan = () => {
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <ReceiptScanner />
+          <ErrorBoundary fallback={
+            <div className="text-center p-8">
+              <p className="text-muted-foreground">Receipt scanner encountered an error. Please try again.</p>
+              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>Reload</Button>
+            </div>
+          }>
+            <ReceiptScanner />
+          </ErrorBoundary>
         </div>
       </main>
     </div>
