@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapPin, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
