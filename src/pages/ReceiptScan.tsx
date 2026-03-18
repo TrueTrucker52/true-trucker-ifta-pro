@@ -2,6 +2,7 @@ import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Camera } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const ReceiptScan = () => {
   const navigate = useNavigate();
