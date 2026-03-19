@@ -67,10 +67,11 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const rawOrigin = req.headers.get("origin") || '';
+    const safeOrigin = allowedOrigins.includes(rawOrigin) ? rawOrigin : 'https://true-trucker-ifta-pro.com';
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${origin}/dashboard`,
+      return_url: `${safeOrigin}/dashboard`,
     });
     logStep("Customer portal session created", { sessionId: portalSession.id, url: portalSession.url });
 
