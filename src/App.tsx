@@ -128,9 +128,14 @@ const App: React.FC = () => {
             <Route path="/privacy-summary" element={<PrivacySummary />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="/driver-dashboard" element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard">
                 <DriverDashboard />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
+            } />
+            <Route path="/fleet-dashboard" element={
+              <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
+                <FleetDashboard />
+              </RoleProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
