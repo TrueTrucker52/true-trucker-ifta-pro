@@ -157,9 +157,11 @@ const App: React.FC = () => {
                 <Analytics />
               </ProtectedRoute>
             } />
+            <Route path="/install" element={<Install />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+              <PWAInstallPrompt />
               <SecurityMonitor />
             </TooltipProvider>
           </AuthProvider>
