@@ -207,6 +207,7 @@ const Account = () => {
 
       if (error) throw error;
 
+      await deleteDraft();
       await refreshProfile();
 
       toast({
