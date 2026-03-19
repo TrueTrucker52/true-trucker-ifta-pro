@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Truck, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Truck, Mail, Lock, Eye, EyeOff, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import Recaptcha from '@/components/Recaptcha';
 
 const Auth = () => {
@@ -15,6 +16,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
@@ -31,6 +33,62 @@ const Auth = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
+
+  const joinFleetWithCode = async (userId: string, code: string) => {
+    const trimmedCode = code.trim().toUpperCase();
+    if (!trimmedCode) return;
+
+    // Validate: alphanumeric, max 10 chars
+    if (!/^[A-Z0-9]{1,10}$/.test(trimmedCode)) {
+      toast({ title: '⚠️ Invalid fleet code', description: 'Code should be letters and numbers only.', variant: 'destructive' });
+      return;
+    }
+
+    // Look up fleet by invite code
+    const { data: fleet, error: fleetError } = await supabase
+      .from('fleets')
+      .select('id, company_name')
+      .eq('invite_code', trimmedCode)
+      .maybeSingle();
+
+    if (fleetError || !fleet) {
+      toast({ title: '⚠️ Invalid fleet code', description: 'Check with your fleet owner for the correct code.', variant: 'destructive' });
+      return;
+    }
+
+    // Check if already in a fleet
+    const { data: existing } = await supabase
+      .from('fleet_members')
+      .select('id')
+      .eq('driver_id', userId)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (existing) {
+      toast({ title: '⚠️ Already in a fleet', description: 'You are already part of a fleet. Leave your current fleet first.', variant: 'destructive' });
+      return;
+    }
+
+    // Join fleet
+    const { error: joinError } = await supabase.from('fleet_members').insert({
+      fleet_id: fleet.id,
+      driver_id: userId,
+      status: 'active',
+    });
+
+    if (joinError) {
+      toast({ title: 'Error', description: 'Failed to join fleet. Please try again.', variant: 'destructive' });
+      return;
+    }
+
+    // Assign driver role
+    await supabase.from('user_roles').upsert({
+      user_id: userId,
+      role: 'driver' as any,
+    }, { onConflict: 'user_id,role' });
+
+    toast({ title: `✅ You have joined ${fleet.company_name}!`, description: 'Welcome to your fleet.' });
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +138,16 @@ const Auth = () => {
         });
       } else {
         console.log('✅ Sign up successful!');
+
+        // If invite code provided, try to join fleet after signup
+        if (inviteCode.trim()) {
+          // Get the newly created user
+          const { data: { user: newUser } } = await supabase.auth.getUser();
+          if (newUser) {
+            await joinFleetWithCode(newUser.id, inviteCode);
+          }
+        }
+
         toast({
           title: "Success!",
           description: "Account created successfully! Please check your email to confirm your account before signing in.",
@@ -87,6 +155,7 @@ const Auth = () => {
         // Clear form
         setEmail('');
         setPassword('');
+        setInviteCode('');
       }
     } catch (error) {
       console.log('💥 Unexpected error during sign up:', error);
@@ -329,6 +398,28 @@ const Auth = () => {
                       </button>
                     </div>
                   </div>
+
+                  {/* Fleet Invite Code */}
+                  <div className="space-y-2">
+                    <Label htmlFor="invite-code" className="flex items-center gap-2 text-muted-foreground">
+                      <Users className="h-3.5 w-3.5" /> Have a Fleet Invite Code? <span className="text-xs">(optional)</span>
+                    </Label>
+                    <Input
+                      id="invite-code"
+                      type="text"
+                      placeholder="e.g. MIKE42"
+                      value={inviteCode}
+                      onChange={(e) => setInviteCode(e.target.value.toUpperCase().slice(0, 10))}
+                      maxLength={10}
+                      className="uppercase tracking-widest font-mono"
+                    />
+                    {inviteCode && (
+                      <p className="text-xs text-muted-foreground">
+                        You'll be linked to your fleet owner's company after signup.
+                      </p>
+                    )}
+                  </div>
+
           <div className="bg-success/10 p-3 rounded-lg">
             <p className="text-sm text-success font-medium">🎉 7-Day FREE Trial</p>
             <p className="text-xs text-muted-foreground mt-1">
