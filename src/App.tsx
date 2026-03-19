@@ -144,6 +144,11 @@ const App: React.FC = () => {
                 <Messages />
               </ProtectedRoute>
             } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
