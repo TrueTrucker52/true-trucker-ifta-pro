@@ -46,6 +46,7 @@ import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
 import Onboarding from "./pages/Onboarding";
+import HelpCenter from "./pages/HelpCenter";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 const queryClient = new QueryClient();
 
@@ -132,6 +133,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/privacy-summary" element={<PrivacySummary />} />
+            <Route path="/help" element={<HelpCenter />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="/driver-dashboard" element={
               <RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard">

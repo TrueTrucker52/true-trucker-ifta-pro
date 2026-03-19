@@ -40,6 +40,9 @@ const Header = () => {
             <a href="mailto:support@true-trucker-ifta-pro.com" className="text-foreground hover:text-primary transition-colors">
               Contact
             </a>
+            <button onClick={() => navigate('/help')} className="text-foreground hover:text-primary transition-colors">
+              ❓ Help
+            </button>
           </nav>
 
           {/* Desktop CTA */}
