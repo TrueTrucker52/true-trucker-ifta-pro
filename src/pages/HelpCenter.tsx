@@ -146,7 +146,11 @@ const HelpCenter: React.FC = () => {
     }
   };
 
-  // Render markdown-like content simply
+  // Escape HTML special characters to prevent XSS
+  const escapeHtml = (str: string) =>
+    str.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+  // Render markdown-like content with sanitized links
   const renderContent = (content: string) => {
     return content.split('\n').map((line, i) => {
       if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-bold text-foreground mb-4">{line.slice(2)}</h1>;
@@ -155,8 +159,15 @@ const HelpCenter: React.FC = () => {
       if (line.startsWith('- ')) return <li key={i} className="ml-4 text-muted-foreground mb-1">{line.slice(2)}</li>;
       if (line.startsWith('|')) return <p key={i} className="text-sm text-muted-foreground font-mono mb-1">{line}</p>;
       if (line.trim() === '') return <br key={i} />;
-      // Handle inline links
-      const withLinks = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline">$1</a>');
+      // Handle inline links with sanitized URLs and escaped labels
+      const withLinks = line.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        (_, label, url) => {
+          const safeUrl = /^https?:\/\//i.test(url) ? escapeHtml(url) : '#';
+          const safeLabel = escapeHtml(label);
+          return `<a href="${safeUrl}" class="text-primary underline" rel="noopener noreferrer">${safeLabel}</a>`;
+        }
+      );
       return <p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: withLinks }} />;
     });
   };
