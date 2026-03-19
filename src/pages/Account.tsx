@@ -265,6 +265,31 @@ const Account = () => {
           />
         </div>
 
+        {/* Resume Draft Banner */}
+        {showResumeBanner && draftMeta && (
+          <div className="max-w-6xl mx-auto mb-6">
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-foreground">
+                  📋 You have an unfinished report from{' '}
+                  {new Date(draftMeta.updatedAt).toLocaleDateString(undefined, {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                  })}
+                </p>
+                <p className="text-sm text-muted-foreground">Resume where you left off?</p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={resumeDraft}>
+                  Resume Draft
+                </Button>
+                <Button size="sm" variant="outline" onClick={dismissBanner}>
+                  Start Fresh
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-8">
           {/* Personal Information */}
           <Card>
