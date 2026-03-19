@@ -240,6 +240,59 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          attachment_name: string | null
+          attachment_url: string | null
+          created_at: string
+          deleted_at: string | null
+          fleet_id: string
+          id: string
+          is_broadcast: boolean
+          is_read: boolean
+          message: string
+          message_type: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          attachment_name?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          fleet_id: string
+          id?: string
+          is_broadcast?: boolean
+          is_read?: boolean
+          message?: string
+          message_type?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          attachment_name?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          fleet_id?: string
+          id?: string
+          is_broadcast?: boolean
+          is_read?: boolean
+          message?: string
+          message_type?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_address: string | null

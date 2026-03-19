@@ -41,6 +41,7 @@ import PrivacySummary from "./pages/PrivacySummary";
 import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
 import FleetDashboard from "./pages/FleetDashboard";
+import Messages from "./pages/Messages";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -136,6 +137,11 @@ const App: React.FC = () => {
               <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
                 <FleetDashboard />
               </RoleProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
