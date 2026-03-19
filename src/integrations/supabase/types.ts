@@ -293,6 +293,56 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          body: string
+          created_at: string
+          expires_at: string | null
+          fleet_id: string | null
+          id: string
+          is_read: boolean
+          priority: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          body?: string
+          created_at?: string
+          expires_at?: string | null
+          fleet_id?: string | null
+          id?: string
+          is_read?: boolean
+          priority?: string
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          body?: string
+          created_at?: string
+          expires_at?: string | null
+          fleet_id?: string | null
+          id?: string
+          is_read?: boolean
+          priority?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_address: string | null

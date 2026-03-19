@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MapPin, Camera, MessageSquare, LayoutDashboard } from 'lucide-react';
-import { useMessages } from '@/hooks/useMessages';
-import { Badge } from '@/components/ui/badge';
+import { Home, MapPin, Camera, Bell, LayoutDashboard } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -15,13 +14,13 @@ const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { unreadCount } = useMessages();
+  const { unreadCount } = useNotifications();
 
   const navItems: NavItem[] = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: MapPin, label: 'Mileage', path: '/mileage-tracker' },
     { icon: Camera, label: 'Scan', path: '/scan-receipt', highlight: true },
-    { icon: MessageSquare, label: 'Messages', path: '/messages' },
+    { icon: Bell, label: 'Alerts', path: '/notifications' },
     { icon: LayoutDashboard, label: 'My Reports', path: '/driver-dashboard' },
   ];
 
@@ -39,12 +38,10 @@ const BottomNavigation = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                // 48dp minimum touch target for trucker-friendly UI
                 "flex flex-col items-center justify-center min-h-[56px] min-w-[56px] px-3 py-2 rounded-lg transition-all duration-200",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 active && !item.highlight && "text-primary bg-primary/10",
                 !active && !item.highlight && "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                // Highlighted Receipt Scanner button
                 item.highlight && [
                   "relative -mt-4",
                   active 
@@ -62,7 +59,7 @@ const BottomNavigation = () => {
               ) : (
                 <div className="relative">
                   <Icon className={cn("h-6 w-6", active && "scale-110")} />
-                  {item.path === '/messages' && unreadCount > 0 && (
+                  {item.path === '/notifications' && unreadCount > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>

@@ -42,6 +42,7 @@ import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
 import FleetDashboard from "./pages/FleetDashboard";
 import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -141,6 +142,11 @@ const App: React.FC = () => {
             <Route path="/messages" element={
               <ProtectedRoute>
                 <Messages />
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Notifications />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
