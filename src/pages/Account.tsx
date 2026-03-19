@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,38 +21,37 @@ const Account = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [copyPhysicalAddress, setCopyPhysicalAddress] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+
+  const requiredFields = [
+    'firstName', 'lastName', 'email', 'emailConfirm', 'phone',
+    'carrierType', 'feid',
+    'physicalStreet', 'physicalCity', 'physicalState', 'physicalZip',
+    'mailingStreet', 'mailingCity', 'mailingState', 'mailingZip',
+  ] as const;
 
   const [formData, setFormData] = useState({
-    // Personal Information
     firstName: '',
     lastName: '',
     email: user?.email || '',
     emailConfirm: '',
     phone: '',
     alternatePhone: '',
-    
-    // Company Information
     companyName: '',
     carrierType: '',
     feid: '',
     motorCarrier: '',
     dotNumber: '',
-    
-    // Physical Address
     physicalStreet: '',
     physicalCity: '',
     physicalCountry: 'United States',
     physicalState: '',
     physicalZip: '',
-    
-    // Mailing Address
     mailingStreet: '',
     mailingCity: '',
     mailingCountry: 'United States',
     mailingState: '',
     mailingZip: '',
-    
-    // Additional Information
     irpJurisdiction: '',
     irpAccount: '',
     irpRenewalMonth: '',
@@ -64,6 +63,9 @@ const Account = () => {
     newYorkHut: '',
     oregonAccount: '',
   });
+
+  const isFieldEmpty = (field: string) => !formData[field as keyof typeof formData];
+  const hasError = (field: string) => showValidation && isFieldEmpty(field);
 
   const states = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
@@ -89,13 +91,14 @@ const Account = () => {
   ];
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Copy physical address to mailing address if checkbox is checked
-    if (copyPhysicalAddress && field.startsWith('physical')) {
-      const mailingField = field.replace('physical', 'mailing');
-      setFormData(prev => ({ ...prev, [mailingField]: value }));
-    }
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      if (copyPhysicalAddress && field.startsWith('physical')) {
+        const mailingField = field.replace('physical', 'mailing');
+        return { ...updated, [mailingField]: value };
+      }
+      return updated;
+    });
   };
 
   const handleCopyAddress = (checked: boolean) => {
@@ -112,6 +115,18 @@ const Account = () => {
     }
   };
 
+  // Helper components for validation styling
+  const FieldError = ({ field }: { field: string }) => {
+    if (!hasError(field)) return null;
+    return <p className="text-sm text-destructive mt-1">This field is required</p>;
+  };
+
+  const fieldLabelClass = (field: string) =>
+    hasError(field) ? 'text-destructive' : '';
+
+  const fieldInputClass = (field: string) =>
+    hasError(field) ? 'border-destructive focus-visible:ring-destructive' : '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -127,29 +142,19 @@ const Account = () => {
       return;
     }
 
-    // Validate required fields (note: custom Select components won't be enforced by native HTML validation)
-    const requiredFieldsMissing =
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.carrierType ||
-      !formData.feid ||
-      !formData.physicalStreet ||
-      !formData.physicalCity ||
-      !formData.physicalState ||
-      !formData.physicalZip ||
-      !formData.mailingStreet ||
-      !formData.mailingCity ||
-      !formData.mailingState ||
-      !formData.mailingZip;
+    const emptyRequired = requiredFields.filter(f => isFieldEmpty(f));
 
-    if (requiredFieldsMissing) {
+    if (emptyRequired.length > 0) {
+      setShowValidation(true);
       toast({
         title: 'Missing information',
         description: 'Please fill in all required fields before continuing.',
         variant: 'destructive',
       });
+      setTimeout(() => {
+        const el = document.getElementById(emptyRequired[0]);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
       setLoading(false);
       return;
     }
@@ -269,54 +274,64 @@ const Account = () => {
             <CardContent className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="firstName">First Name *</Label>
+                  <Label htmlFor="firstName" className={fieldLabelClass('firstName')}>First Name *</Label>
                   <Input
                     id="firstName"
                     required
+                    className={fieldInputClass('firstName')}
                     value={formData.firstName}
                     onChange={(e) => handleInputChange('firstName', e.target.value)}
                   />
+                  <FieldError field="firstName" />
                 </div>
                 <div>
-                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Label htmlFor="lastName" className={fieldLabelClass('lastName')}>Last Name *</Label>
                   <Input
                     id="lastName"
                     required
+                    className={fieldInputClass('lastName')}
                     value={formData.lastName}
                     onChange={(e) => handleInputChange('lastName', e.target.value)}
                   />
+                  <FieldError field="lastName" />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Label htmlFor="phone" className={fieldLabelClass('phone')}>Phone Number *</Label>
                   <Input
                     id="phone"
                     type="tel"
                     required
+                    className={fieldInputClass('phone')}
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                   />
+                  <FieldError field="phone" />
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email Address *</Label>
+                  <Label htmlFor="email" className={fieldLabelClass('email')}>Email Address *</Label>
                   <Input
                     id="email"
                     type="email"
                     required
+                    className={fieldInputClass('email')}
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                   />
+                  <FieldError field="email" />
                 </div>
                 <div>
-                  <Label htmlFor="emailConfirm">Repeat Email Address *</Label>
+                  <Label htmlFor="emailConfirm" className={fieldLabelClass('emailConfirm')}>Repeat Email Address *</Label>
                   <Input
                     id="emailConfirm"
                     type="email"
                     required
+                    className={fieldInputClass('emailConfirm')}
                     value={formData.emailConfirm}
                     onChange={(e) => handleInputChange('emailConfirm', e.target.value)}
                   />
+                  <FieldError field="emailConfirm" />
                 </div>
                 <div>
                   <Label htmlFor="alternatePhone">Alternate Phone Number</Label>
@@ -351,9 +366,9 @@ const Account = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="carrierType">Carrier Type *</Label>
+                  <Label htmlFor="carrierType" className={fieldLabelClass('carrierType')}>Carrier Type *</Label>
                   <Select value={formData.carrierType} onValueChange={(value) => handleInputChange('carrierType', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger id="carrierType" className={fieldInputClass('carrierType')}>
                       <SelectValue placeholder="Select carrier type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -364,15 +379,18 @@ const Account = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FieldError field="carrierType" />
                 </div>
                 <div>
-                  <Label htmlFor="feid">FEID # * (Use SSN if no FEID #)</Label>
+                  <Label htmlFor="feid" className={fieldLabelClass('feid')}>FEID # * (Use SSN if no FEID #)</Label>
                   <Input
                     id="feid"
                     required
+                    className={fieldInputClass('feid')}
                     value={formData.feid}
                     onChange={(e) => handleInputChange('feid', e.target.value)}
                   />
+                  <FieldError field="feid" />
                 </div>
               </div>
               <div className="space-y-4">
@@ -408,22 +426,26 @@ const Account = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="physicalStreet">Street Address *</Label>
+                  <Label htmlFor="physicalStreet" className={fieldLabelClass('physicalStreet')}>Street Address *</Label>
                   <Input
                     id="physicalStreet"
                     required
+                    className={fieldInputClass('physicalStreet')}
                     value={formData.physicalStreet}
                     onChange={(e) => handleInputChange('physicalStreet', e.target.value)}
                   />
+                  <FieldError field="physicalStreet" />
                 </div>
                 <div>
-                  <Label htmlFor="physicalCity">City *</Label>
+                  <Label htmlFor="physicalCity" className={fieldLabelClass('physicalCity')}>City *</Label>
                   <Input
                     id="physicalCity"
                     required
+                    className={fieldInputClass('physicalCity')}
                     value={formData.physicalCity}
                     onChange={(e) => handleInputChange('physicalCity', e.target.value)}
                   />
+                  <FieldError field="physicalCity" />
                 </div>
                 <div>
                   <Label htmlFor="physicalCountry">Country *</Label>
@@ -439,9 +461,9 @@ const Account = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="physicalState">State/Region *</Label>
+                  <Label htmlFor="physicalState" className={fieldLabelClass('physicalState')}>State/Region *</Label>
                   <Select value={formData.physicalState} onValueChange={(value) => handleInputChange('physicalState', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger id="physicalState" className={fieldInputClass('physicalState')}>
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
                     <SelectContent>
@@ -452,15 +474,18 @@ const Account = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FieldError field="physicalState" />
                 </div>
                 <div>
-                  <Label htmlFor="physicalZip">Postal Code *</Label>
+                  <Label htmlFor="physicalZip" className={fieldLabelClass('physicalZip')}>Postal Code *</Label>
                   <Input
                     id="physicalZip"
                     required
+                    className={fieldInputClass('physicalZip')}
                     value={formData.physicalZip}
                     onChange={(e) => handleInputChange('physicalZip', e.target.value)}
                   />
+                  <FieldError field="physicalZip" />
                 </div>
               </CardContent>
             </Card>
@@ -483,24 +508,28 @@ const Account = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="mailingStreet">Street Address *</Label>
+                  <Label htmlFor="mailingStreet" className={fieldLabelClass('mailingStreet')}>Street Address *</Label>
                   <Input
                     id="mailingStreet"
                     required
+                    className={fieldInputClass('mailingStreet')}
                     value={formData.mailingStreet}
                     onChange={(e) => handleInputChange('mailingStreet', e.target.value)}
                     disabled={copyPhysicalAddress}
                   />
+                  <FieldError field="mailingStreet" />
                 </div>
                 <div>
-                  <Label htmlFor="mailingCity">City *</Label>
+                  <Label htmlFor="mailingCity" className={fieldLabelClass('mailingCity')}>City *</Label>
                   <Input
                     id="mailingCity"
                     required
+                    className={fieldInputClass('mailingCity')}
                     value={formData.mailingCity}
                     onChange={(e) => handleInputChange('mailingCity', e.target.value)}
                     disabled={copyPhysicalAddress}
                   />
+                  <FieldError field="mailingCity" />
                 </div>
                 <div>
                   <Label htmlFor="mailingCountry">Country *</Label>
@@ -520,13 +549,13 @@ const Account = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="mailingState">State/Region *</Label>
+                  <Label htmlFor="mailingState" className={fieldLabelClass('mailingState')}>State/Region *</Label>
                   <Select 
                     value={formData.mailingState} 
                     onValueChange={(value) => handleInputChange('mailingState', value)}
                     disabled={copyPhysicalAddress}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mailingState" className={fieldInputClass('mailingState')}>
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
                     <SelectContent>
@@ -537,16 +566,19 @@ const Account = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FieldError field="mailingState" />
                 </div>
                 <div>
-                  <Label htmlFor="mailingZip">Postal Code *</Label>
+                  <Label htmlFor="mailingZip" className={fieldLabelClass('mailingZip')}>Postal Code *</Label>
                   <Input
                     id="mailingZip"
                     required
+                    className={fieldInputClass('mailingZip')}
                     value={formData.mailingZip}
                     onChange={(e) => handleInputChange('mailingZip', e.target.value)}
                     disabled={copyPhysicalAddress}
                   />
+                  <FieldError field="mailingZip" />
                 </div>
               </CardContent>
             </Card>
