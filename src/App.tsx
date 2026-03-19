@@ -43,6 +43,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import FleetDashboard from "./pages/FleetDashboard";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
+import Analytics from "./pages/Analytics";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -147,6 +148,11 @@ const App: React.FC = () => {
             <Route path="/notifications" element={
               <ProtectedRoute>
                 <Notifications />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
