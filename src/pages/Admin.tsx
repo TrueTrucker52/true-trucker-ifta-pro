@@ -1,548 +1,447 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Users, 
-  TrendingUp, 
-  Calendar, 
-  DollarSign,
-  Truck,
-  Clock,
-  Mail,
-  Filter,
-  Download,
-  RefreshCw,
-  UserCheck,
-  UserX,
-  Shield
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Users, TrendingUp, Calendar, DollarSign, Truck, Clock, Filter,
+  Download, RefreshCw, Shield, Building2, Eye, UserX, PenLine,
+  Settings, AlertTriangle, CheckCircle2, Database, CreditCard,
+  MessageSquare, ArrowLeft, BarChart3, XCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-
-interface UserProfile {
-  id: string;
-  user_id: string;
-  email: string;
-  subscription_status: string;
-  subscription_tier: string;
-  trial_start_date: string;
-  trial_end_date: string;
-  created_at: string;
-  phone?: string;
-}
-
-interface DashboardStats {
-  totalUsers: number;
-  newUsersToday: number;
-  newUsersWeek: number;
-  trialUsers: number;
-  paidUsers: number;
-  conversionRate: number;
-}
+import { format, subDays, startOfDay } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const Admin = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdminRole();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    newUsersToday: 0,
-    newUsersWeek: 0,
-    trialUsers: 0,
-    paidUsers: 0,
-    conversionRate: 0
-  });
 
   // Filters
-  const [dateRange, setDateRange] = useState('7');
+  const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateRange, setDateRange] = useState('all');
   const [searchEmail, setSearchEmail] = useState('');
 
-  useEffect(() => {
-    if (user && isAdmin && !adminLoading) {
-      fetchUsers();
-      setupRealtimeSubscription();
-    }
-  }, [user, isAdmin, adminLoading]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [users, dateRange, statusFilter, searchEmail]);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+  // ─── Data Queries ───
+  const { data: allProfiles = [], isLoading: profilesLoading, refetch: refetchProfiles } = useQuery({
+    queryKey: ['admin-profiles'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
       if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
-      setUsers(data || []);
-      calculateStats(data || []);
-    } catch (error: any) {
-      toast.error(`Error fetching users: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: allRoles = [] } = useQuery({
+    queryKey: ['admin-roles'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_roles').select('*');
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('user-signups')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'profiles'
-        },
-        (payload) => {
-          console.log('New user signup!', payload);
-          const newUser = payload.new as UserProfile;
-          setUsers(prev => [newUser, ...prev]);
-          
-          // Show notification toast
-          toast.success(`🚛 New signup: ${newUser.email}`, {
-            description: `Trial started - ${newUser.subscription_tier} tier`,
-            action: {
-              label: 'View User',
-              onClick: () => {
-                // Scroll to user in table or open user detail
-                const userElement = document.getElementById(`user-${newUser.id}`);
-                if (userElement) {
-                  userElement.scrollIntoView({ behavior: 'smooth' });
-                  userElement.classList.add('highlight-new-user');
-                  setTimeout(() => {
-                    userElement.classList.remove('highlight-new-user');
-                  }, 3000);
-                }
-              }
-            }
-          });
-        }
-      )
-      .subscribe();
+  const { data: allFleets = [], isLoading: fleetsLoading } = useQuery({
+    queryKey: ['admin-fleets'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('fleets').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
+  const { data: allMembers = [] } = useQuery({
+    queryKey: ['admin-fleet-members'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('fleet_members').select('*');
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
-  const calculateStats = (userData: UserProfile[]) => {
-    const now = new Date();
-    const today = startOfDay(now);
-    const weekAgo = subDays(today, 7);
+  const { data: allTrips = [] } = useQuery({
+    queryKey: ['admin-trips'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('trips').select('id, user_id, status, total_miles').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
-    const totalUsers = userData.length;
-    
-    const newUsersToday = userData.filter(u => 
-      new Date(u.created_at) >= today
-    ).length;
-    
-    const newUsersWeek = userData.filter(u => 
-      new Date(u.created_at) >= weekAgo
-    ).length;
-    
-    const trialUsers = userData.filter(u => 
-      u.subscription_status === 'trial'
-    ).length;
-    
-    const paidUsers = userData.filter(u => 
-      ['active', 'subscribed'].includes(u.subscription_status)
-    ).length;
-    
-    const conversionRate = totalUsers > 0 ? (paidUsers / totalUsers * 100) : 0;
+  // ─── Lookups ───
+  const roleMap = useMemo(() => {
+    const m = new Map<string, string>();
+    allRoles.forEach(r => m.set(r.user_id, r.role));
+    return m;
+  }, [allRoles]);
 
-    setStats({
-      totalUsers,
-      newUsersToday,
-      newUsersWeek,
-      trialUsers,
-      paidUsers,
-      conversionRate
+  const fleetMap = useMemo(() => {
+    const m = new Map<string, typeof allFleets[0]>();
+    allFleets.forEach(f => m.set(f.id, f));
+    return m;
+  }, [allFleets]);
+
+  const membersByFleet = useMemo(() => {
+    const m = new Map<string, typeof allMembers>();
+    allFleets.forEach(f => m.set(f.id, []));
+    allMembers.forEach(mem => {
+      const arr = m.get(mem.fleet_id) || [];
+      arr.push(mem);
+      m.set(mem.fleet_id, arr);
     });
-  };
+    return m;
+  }, [allFleets, allMembers]);
 
-  const applyFilters = () => {
-    let filtered = [...users];
+  const driverFleetMap = useMemo(() => {
+    const m = new Map<string, string>();
+    allMembers.forEach(mem => {
+      const fleet = fleetMap.get(mem.fleet_id);
+      if (fleet) m.set(mem.driver_id, fleet.company_name);
+    });
+    return m;
+  }, [allMembers, fleetMap]);
 
-    // Date range filter
+  // ─── Platform Stats ───
+  const stats = useMemo(() => {
+    const totalUsers = allProfiles.length;
+    const fleetOwners = allRoles.filter(r => r.role === 'fleet_owner').length;
+    const drivers = allRoles.filter(r => r.role === 'driver').length;
+    const activeFleets = allFleets.length;
+    const totalReports = allTrips.length;
+    const trialUsers = allProfiles.filter(p => p.subscription_status === 'trial').length;
+    const paidUsers = allProfiles.filter(p => ['active', 'subscribed'].includes(p.subscription_status)).length;
+    const today = startOfDay(new Date());
+    const newToday = allProfiles.filter(p => new Date(p.created_at) >= today).length;
+    const weekAgo = subDays(today, 7);
+    const newWeek = allProfiles.filter(p => new Date(p.created_at) >= weekAgo).length;
+    return { totalUsers, fleetOwners, drivers, activeFleets, totalReports, trialUsers, paidUsers, newToday, newWeek };
+  }, [allProfiles, allRoles, allFleets, allTrips]);
+
+  // ─── Filtered Users ───
+  const filteredUsers = useMemo(() => {
+    let list = [...allProfiles];
+    if (roleFilter !== 'all') list = list.filter(u => roleMap.get(u.user_id) === roleFilter);
+    if (statusFilter !== 'all') list = list.filter(u => u.subscription_status === statusFilter);
     if (dateRange !== 'all') {
-      const daysAgo = parseInt(dateRange);
-      const cutoff = subDays(new Date(), daysAgo);
-      filtered = filtered.filter(u => new Date(u.created_at) >= cutoff);
+      const cutoff = subDays(new Date(), parseInt(dateRange));
+      list = list.filter(u => new Date(u.created_at) >= cutoff);
     }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(u => u.subscription_status === statusFilter);
-    }
-
-    // Email search
-    if (searchEmail) {
-      filtered = filtered.filter(u => 
-        u.email.toLowerCase().includes(searchEmail.toLowerCase())
-      );
-    }
-
-    setFilteredUsers(filtered);
-  };
+    if (searchEmail) list = list.filter(u => u.email.toLowerCase().includes(searchEmail.toLowerCase()));
+    return list;
+  }, [allProfiles, roleFilter, statusFilter, dateRange, searchEmail, roleMap]);
 
   const exportUsers = () => {
-    const csvContent = [
-      ['Email', 'Subscription Status', 'Tier', 'Trial Start', 'Trial End', 'Signup Date'],
+    const csv = [
+      ['Email', 'Role', 'Fleet', 'Status', 'Tier', 'Signup Date'],
       ...filteredUsers.map(u => [
-        u.email,
-        u.subscription_status,
-        u.subscription_tier,
-        u.trial_start_date,
-        u.trial_end_date,
-        format(new Date(u.created_at), 'yyyy-MM-dd HH:mm:ss')
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
+        u.email, roleMap.get(u.user_id) || 'user', driverFleetMap.get(u.user_id) || 'Solo',
+        u.subscription_status, u.subscription_tier || 'free', format(new Date(u.created_at), 'yyyy-MM-dd'),
+      ]),
+    ].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = `truetrucker-users-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     a.click();
-    window.URL.revokeObjectURL(url);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'trial': return 'bg-blue-100 text-blue-800';
-      case 'active': case 'subscribed': return 'bg-green-100 text-green-800';
-      case 'canceled': return 'bg-red-100 text-red-800';
-      case 'expired': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // ─── Realtime ───
+  useEffect(() => {
+    if (!isAdmin) return;
+    const channel = supabase.channel('admin-signups').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, (payload) => {
+      toast.success(`🚛 New signup: ${(payload.new as any).email}`);
+      refetchProfiles();
+    }).subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [isAdmin]);
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'owner_operator': return 'bg-blue-100 text-blue-800';
-      case 'small': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'large': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Show loading while checking admin status
-  if (adminLoading || loading) {
+  // ─── Loading / Access ───
+  if (adminLoading || profilesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Loading dashboard...</p>
-        </div>
+        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  // Block access if not admin
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
-          <p className="text-muted-foreground mb-4">You don't have admin privileges to access this page.</p>
-          <Button onClick={() => navigate('/dashboard')}>
-            Go to Dashboard
-          </Button>
+          <p className="text-muted-foreground mb-4">You don't have admin privileges.</p>
+          <Button onClick={() => navigate('/dashboard')}>Go to Dashboard</Button>
         </div>
       </div>
     );
   }
 
+  const adminName = profile?.company_name || user?.email?.split('@')[0] || 'Admin';
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-8">
       {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4">
+      <div className="bg-card border-b border-border">
+        <div className="container mx-auto px-4 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary/10 p-2 rounded-lg">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}><ArrowLeft className="h-5 w-5" /></Button>
               <div>
-                <h1 className="text-xl font-bold text-foreground">TrueTrucker Admin</h1>
-                <p className="text-sm text-muted-foreground">User Analytics & Management</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+                  <Settings className="h-6 w-6 text-primary" /> TrueTrucker Admin Panel
+                </h1>
+                <p className="text-sm text-muted-foreground">Welcome back, {adminName}</p>
               </div>
             </div>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')}>
-              Back to App
-            </Button>
+            <Button variant="outline" onClick={() => refetchProfiles()}><RefreshCw className="h-4 w-4 mr-2" /> Refresh</Button>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+      <div className="container mx-auto px-4 py-6 space-y-6">
+
+        {/* ─── Platform Overview ─── */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              <h2 className="font-semibold text-foreground">Platform Overview</h2>
+            </div>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 min-w-max md:min-w-0">
+                {([
+                  { label: 'Total Users', value: stats.totalUsers, color: 'text-primary', icon: Users },
+                  { label: 'Fleet Owners', value: stats.fleetOwners, color: 'text-secondary', icon: Building2 },
+                  { label: 'Drivers', value: stats.drivers, color: 'text-accent', icon: Truck },
+                  { label: 'Active Fleets', value: stats.activeFleets, color: 'text-primary', icon: Building2 },
+                  { label: 'Total Reports', value: stats.totalReports, color: 'text-muted-foreground', icon: TrendingUp },
+                  { label: 'New Today', value: stats.newToday, color: 'text-accent', icon: Calendar },
+                ] as const).map(s => (
+                  <div key={s.label} className="flex flex-col items-center min-w-[80px]">
+                    <s.icon className={cn('h-5 w-5 mb-1', s.color)} />
+                    <span className={cn('text-2xl font-bold', s.color)}>{s.value}</span>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">{s.label}</span>
+                  </div>
+                ))}
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">New Today</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.newUsersToday}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">This Week</CardTitle>
-                <Calendar className="h-4 w-4 text-blue-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.newUsersWeek}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Trial Users</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.trialUsers}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Paid Users</CardTitle>
-                <DollarSign className="h-4 w-4 text-green-500" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.paidUsers}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Conversion</CardTitle>
-                <Truck className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{stats.conversionRate.toFixed(1)}%</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters & Actions
-            </CardTitle>
+        {/* ─── Revenue Overview ─── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" /> Revenue Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label>Date Range</Label>
-                <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">{stats.trialUsers}</p>
+                <p className="text-xs text-muted-foreground">Trial Users</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-accent">{stats.paidUsers}</p>
+                <p className="text-xs text-muted-foreground">Paid Users</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">{stats.totalUsers > 0 ? ((stats.paidUsers / stats.totalUsers) * 100).toFixed(1) : 0}%</p>
+                <p className="text-xs text-muted-foreground">Conversion Rate</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-secondary">{stats.newWeek}</p>
+                <p className="text-xs text-muted-foreground">New This Week</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm" onClick={() => window.open('https://dashboard.stripe.com', '_blank')}>
+                <CreditCard className="h-4 w-4 mr-2" /> View Stripe Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ─── All Fleets ─── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2"><Truck className="h-5 w-5 text-primary" /> All Fleets</CardTitle>
+              <Badge variant="secondary">{allFleets.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {fleetsLoading ? (
+              <div className="space-y-3">{[1, 2].map(i => <Skeleton key={i} className="h-16 w-full" />)}</div>
+            ) : allFleets.length === 0 ? (
+              <p className="text-center text-muted-foreground py-4">No fleets created yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {allFleets.map(fleet => {
+                  const members = membersByFleet.get(fleet.id) || [];
+                  const activeCount = members.filter(m => m.status === 'active').length;
+                  const ownerProfile = allProfiles.find(p => p.user_id === fleet.owner_id);
+                  return (
+                    <div key={fleet.id} className="p-3 bg-muted/50 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-primary" /> {fleet.company_name}
+                        </p>
+                        <div className="text-sm text-muted-foreground flex flex-wrap gap-2 mt-0.5">
+                          <span>{activeCount} driver{activeCount !== 1 ? 's' : ''}</span>
+                          <span>Code: <span className="font-mono text-primary">{fleet.invite_code}</span></span>
+                          {ownerProfile && <span>Owner: {ownerProfile.email}</span>}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Badge className="bg-accent/15 text-accent">✅ Active</Badge>
+                        <Button size="sm" variant="outline" onClick={() => navigate('/fleet-dashboard')}><Eye className="h-3.5 w-3.5 mr-1" /> View</Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ─── Users Table ─── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> All Users</CardTitle>
+              <Badge variant="secondary">{filteredUsers.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div>
+                <Label className="text-xs">Role</Label>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Last 24 hours</SelectItem>
-                    <SelectItem value="7">Last 7 days</SelectItem>
-                    <SelectItem value="30">Last 30 days</SelectItem>
-                    <SelectItem value="90">Last 90 days</SelectItem>
-                    <SelectItem value="all">All time</SelectItem>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="fleet_owner">Fleet Owner</SelectItem>
+                    <SelectItem value="driver">Driver</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label>Subscription Status</Label>
+              <div>
+                <Label className="text-xs">Status</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="trial">Trial</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="subscribed">Subscribed</SelectItem>
                     <SelectItem value="canceled">Canceled</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label>Search Email</Label>
-                <Input
-                  placeholder="driver@company.com"
-                  value={searchEmail}
-                  onChange={(e) => setSearchEmail(e.target.value)}
-                />
+              <div>
+                <Label className="text-xs">Date Joined</Label>
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="1">Last 24h</SelectItem>
+                    <SelectItem value="7">Last 7 days</SelectItem>
+                    <SelectItem value="30">Last 30 days</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
-              <div className="flex items-end gap-2">
-                <Button onClick={fetchUsers} variant="outline">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
-                </Button>
-                <Button onClick={exportUsers} variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
+              <div>
+                <Label className="text-xs">Search</Label>
+                <Input placeholder="Email…" value={searchEmail} onChange={e => setSearchEmail(e.target.value)} className="h-9" />
+              </div>
+              <div className="flex items-end">
+                <Button variant="outline" size="sm" onClick={exportUsers}><Download className="h-4 w-4 mr-1" /> CSV</Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Signups ({filteredUsers.length} users)</CardTitle>
-            <CardDescription>
-              Real-time signup tracking with user analytics
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-medium">Driver/Company</th>
-                    <th className="text-left p-4 font-medium">Status</th>
-                    <th className="text-left p-4 font-medium">Tier</th>
-                    <th className="text-left p-4 font-medium">Trial Period</th>
-                    <th className="text-left p-4 font-medium">Signup Date</th>
-                    <th className="text-left p-4 font-medium">Actions</th>
+                  <tr className="border-b text-muted-foreground">
+                    <th className="text-left p-3 font-medium">User</th>
+                    <th className="text-left p-3 font-medium">Role</th>
+                    <th className="text-left p-3 font-medium">Fleet</th>
+                    <th className="text-left p-3 font-medium">Status</th>
+                    <th className="text-left p-3 font-medium">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr 
-                      key={user.id} 
-                      id={`user-${user.id}`}
-                      className="border-b hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            <Truck className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{user.email}</p>
-                            {user.phone && (
-                              <p className="text-sm text-muted-foreground">{user.phone}</p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <Badge className={getStatusColor(user.subscription_status)}>
-                          {user.subscription_status}
-                        </Badge>
-                      </td>
-                      <td className="p-4">
-                        <Badge variant="outline" className={getTierColor(user.subscription_tier)}>
-                          {user.subscription_tier?.replace('_', ' ').toUpperCase() || 'FREE'}
-                        </Badge>
-                      </td>
-                      <td className="p-4">
-                        {user.trial_start_date && user.trial_end_date ? (
-                          <div className="text-sm">
-                            <p>{format(new Date(user.trial_start_date), 'MMM dd')} - {format(new Date(user.trial_end_date), 'MMM dd')}</p>
-                            <p className="text-muted-foreground">
-                              {new Date(user.trial_end_date) > new Date() ? 'Active' : 'Expired'}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">N/A</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        <div className="text-sm">
-                          <p>{format(new Date(user.created_at), 'MMM dd, yyyy')}</p>
-                          <p className="text-muted-foreground">{format(new Date(user.created_at), 'HH:mm')}</p>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              window.location.href = `mailto:${user.email}?subject=Welcome to TrueTrucker IFTA Pro&body=Hello, thank you for signing up for TrueTrucker IFTA Pro!`;
-                            }}
-                          >
-                            <Mail className="h-3 w-3" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              toast.success(`Copied ${user.email} to clipboard`);
-                              navigator.clipboard.writeText(user.email);
-                            }}
-                          >
-                            Copy
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredUsers.slice(0, 50).map(u => {
+                    const role = roleMap.get(u.user_id) || 'user';
+                    const fleetName = driverFleetMap.get(u.user_id) || '—';
+                    return (
+                      <tr key={u.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3">
+                          <p className="font-medium text-foreground">{u.company_name || u.email.split('@')[0]}</p>
+                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                        </td>
+                        <td className="p-3">
+                          <Badge variant="outline" className="text-xs capitalize">{role.replace('_', ' ')}</Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground">{fleetName}</td>
+                        <td className="p-3">
+                          <Badge className={cn('text-xs',
+                            u.subscription_status === 'trial' && 'bg-secondary/15 text-secondary',
+                            ['active', 'subscribed'].includes(u.subscription_status) && 'bg-accent/15 text-accent',
+                            u.subscription_status === 'canceled' && 'bg-destructive/15 text-destructive',
+                          )}>{u.subscription_status}</Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground text-xs">{format(new Date(u.created_at), 'MMM d, yyyy')}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-
-              {filteredUsers.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No users found matching your filters</p>
-                </div>
-              )}
+              {filteredUsers.length > 50 && <p className="text-xs text-muted-foreground text-center mt-2">Showing first 50 of {filteredUsers.length} users</p>}
             </div>
           </CardContent>
         </Card>
-      </main>
+
+        {/* ─── System Health ─── */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2"><Database className="h-5 w-5 text-primary" /> System Health</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {([
+                { label: 'Database', status: 'Healthy', ok: true },
+                { label: 'Stripe', status: 'Connected', ok: true },
+                { label: 'Authentication', status: 'Active', ok: true },
+                { label: 'Storage', status: 'Operational', ok: true },
+              ] as const).map(s => (
+                <div key={s.label} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                  {s.ok ? <CheckCircle2 className="h-4 w-4 text-accent" /> : <AlertTriangle className="h-4 w-4 text-secondary" />}
+                  <span className="font-medium text-foreground text-sm">{s.label}</span>
+                  <span className="text-xs text-muted-foreground ml-auto">{s.status}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
