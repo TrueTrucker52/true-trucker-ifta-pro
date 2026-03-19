@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import SecurityMonitor from "@/components/SecurityMonitor";
 import Index from "./pages/Index";
@@ -39,7 +40,7 @@ import TruckingNews from "./pages/TruckingNews";
 import PrivacySummary from "./pages/PrivacySummary";
 import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
-
+import FleetDashboard from "./pages/FleetDashboard";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
