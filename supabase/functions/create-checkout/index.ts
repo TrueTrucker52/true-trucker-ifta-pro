@@ -132,8 +132,8 @@ serve(async (req) => {
           created_from: "app-checkout"
         }
       },
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/?canceled=true`,
+      success_url: `${allowedOrigins.includes(req.headers.get("origin") || '') ? req.headers.get("origin") : 'https://true-trucker-ifta-pro.com'}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${allowedOrigins.includes(req.headers.get("origin") || '') ? req.headers.get("origin") : 'https://true-trucker-ifta-pro.com'}/?canceled=true`,
       metadata: {
         source: "truetrucker-ifta-app",
         app_name: "TrueTrucker IFTA Pro",
