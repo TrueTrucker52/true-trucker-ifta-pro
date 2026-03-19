@@ -251,6 +251,121 @@ export type Database = {
         }
         Relationships: []
       }
+      ifta_reports: {
+        Row: {
+          confirmation_number: string | null
+          created_at: string
+          filed_at: string | null
+          filing_deadline: string | null
+          fleet_id: string | null
+          id: string
+          net_tax_credit: number
+          net_tax_owed: number
+          quarter: number
+          status: string
+          taxable_miles: number
+          total_fuel_cost: number
+          total_gallons: number
+          total_miles: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          confirmation_number?: string | null
+          created_at?: string
+          filed_at?: string | null
+          filing_deadline?: string | null
+          fleet_id?: string | null
+          id?: string
+          net_tax_credit?: number
+          net_tax_owed?: number
+          quarter: number
+          status?: string
+          taxable_miles?: number
+          total_fuel_cost?: number
+          total_gallons?: number
+          total_miles?: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          confirmation_number?: string | null
+          created_at?: string
+          filed_at?: string | null
+          filing_deadline?: string | null
+          fleet_id?: string | null
+          id?: string
+          net_tax_credit?: number
+          net_tax_owed?: number
+          quarter?: number
+          status?: string
+          taxable_miles?: number
+          total_fuel_cost?: number
+          total_gallons?: number
+          total_miles?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_reports_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ifta_state_breakdown: {
+        Row: {
+          created_at: string
+          gallons_purchased: number
+          gallons_used: number
+          id: string
+          miles_driven: number
+          report_id: string
+          state_code: string
+          tax_credit: number
+          tax_owed: number
+          tax_rate: number
+        }
+        Insert: {
+          created_at?: string
+          gallons_purchased?: number
+          gallons_used?: number
+          id?: string
+          miles_driven?: number
+          report_id: string
+          state_code: string
+          tax_credit?: number
+          tax_owed?: number
+          tax_rate?: number
+        }
+        Update: {
+          created_at?: string
+          gallons_purchased?: number
+          gallons_used?: number
+          id?: string
+          miles_driven?: number
+          report_id?: string
+          state_code?: string
+          tax_credit?: number
+          tax_owed?: number
+          tax_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ifta_state_breakdown_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "ifta_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
