@@ -41,6 +41,7 @@ import PrivacySummary from "./pages/PrivacySummary";
 import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
 import FleetDashboard from "./pages/FleetDashboard";
+import Messages from "./pages/Messages";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {

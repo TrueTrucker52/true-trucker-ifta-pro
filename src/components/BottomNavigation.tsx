@@ -15,11 +15,13 @@ const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { unreadCount } = useMessages();
+
   const navItems: NavItem[] = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: MapPin, label: 'Mileage', path: '/mileage-tracker' },
     { icon: Camera, label: 'Scan', path: '/scan-receipt', highlight: true },
-    { icon: FileText, label: 'Reports', path: '/ifta-reports' },
+    { icon: MessageSquare, label: 'Messages', path: '/messages' },
     { icon: LayoutDashboard, label: 'My Reports', path: '/driver-dashboard' },
   ];
 
