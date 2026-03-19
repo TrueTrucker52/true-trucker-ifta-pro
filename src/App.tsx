@@ -45,6 +45,7 @@ import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
+import Onboarding from "./pages/Onboarding";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 const queryClient = new QueryClient();
 
