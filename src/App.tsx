@@ -138,6 +138,11 @@ const App: React.FC = () => {
                 <FleetDashboard />
               </RoleProtectedRoute>
             } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
