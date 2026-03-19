@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MapPin, Camera, FileText, Newspaper } from 'lucide-react';
+import { Home, MapPin, Camera, FileText, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
