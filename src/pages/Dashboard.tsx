@@ -17,6 +17,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
 import DraftIndicator from "@/components/DraftIndicator";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
