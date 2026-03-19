@@ -44,6 +44,8 @@ import FleetDashboard from "./pages/FleetDashboard";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
+import Install from "./pages/Install";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
