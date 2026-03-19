@@ -101,6 +101,9 @@ serve(async (req) => {
     const selectedPlan = priceMapping[validatedPlan as keyof typeof priceMapping];
     if (!selectedPlan) throw new Error("Invalid plan selected");
 
+    const rawOrigin = req.headers.get("origin") || '';
+    const safeOrigin = allowedOrigins.includes(rawOrigin) ? rawOrigin : 'https://true-trucker-ifta-pro.com';
+
     logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount });
 
     const session = await stripe.checkout.sessions.create({
@@ -132,8 +135,8 @@ serve(async (req) => {
           created_from: "app-checkout"
         }
       },
-      success_url: `${allowedOrigins.includes(req.headers.get("origin") || '') ? req.headers.get("origin") : 'https://true-trucker-ifta-pro.com'}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${allowedOrigins.includes(req.headers.get("origin") || '') ? req.headers.get("origin") : 'https://true-trucker-ifta-pro.com'}/?canceled=true`,
+      success_url: `${safeOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${safeOrigin}/?canceled=true`,
       metadata: {
         source: "truetrucker-ifta-app",
         app_name: "TrueTrucker IFTA Pro",
