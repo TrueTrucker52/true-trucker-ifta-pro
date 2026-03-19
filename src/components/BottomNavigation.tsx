@@ -18,7 +18,7 @@ const BottomNavigation = () => {
     { icon: MapPin, label: 'Mileage', path: '/mileage-tracker' },
     { icon: Camera, label: 'Scan', path: '/scan-receipt', highlight: true },
     { icon: FileText, label: 'Reports', path: '/ifta-reports' },
-    { icon: Newspaper, label: 'News', path: '/trucking-news' },
+    { icon: LayoutDashboard, label: 'My Reports', path: '/driver-dashboard' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

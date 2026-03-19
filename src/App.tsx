@@ -126,6 +126,11 @@ const App: React.FC = () => {
             } />
             <Route path="/privacy-summary" element={<PrivacySummary />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
+            <Route path="/driver-dashboard" element={
+              <ProtectedRoute>
+                <DriverDashboard />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
