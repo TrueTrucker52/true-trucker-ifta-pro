@@ -209,6 +209,7 @@ export type Database = {
           driver_id: string
           fleet_id: string
           id: string
+          invitation_status: string
           joined_at: string
           status: string
           truck_number: string | null
@@ -217,6 +218,7 @@ export type Database = {
           driver_id: string
           fleet_id: string
           id?: string
+          invitation_status?: string
           joined_at?: string
           status?: string
           truck_number?: string | null
@@ -225,6 +227,7 @@ export type Database = {
           driver_id?: string
           fleet_id?: string
           id?: string
+          invitation_status?: string
           joined_at?: string
           status?: string
           truck_number?: string | null
