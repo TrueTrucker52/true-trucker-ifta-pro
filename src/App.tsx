@@ -44,6 +44,8 @@ import FleetDashboard from "./pages/FleetDashboard";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
+import Install from "./pages/Install";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -155,9 +157,11 @@ const App: React.FC = () => {
                 <Analytics />
               </ProtectedRoute>
             } />
+            <Route path="/install" element={<Install />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+              <PWAInstallPrompt />
               <SecurityMonitor />
             </TooltipProvider>
           </AuthProvider>
