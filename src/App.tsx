@@ -133,6 +133,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/privacy-summary" element={<PrivacySummary />} />
+            <Route path="/help" element={<HelpCenter />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="/driver-dashboard" element={
               <RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard">
