@@ -66,6 +66,17 @@ const Account = () => {
     oregonAccount: '',
   });
 
+  const {
+    saveDraft,
+    deleteDraft,
+    resumeDraft,
+    dismissBanner,
+    showResumeBanner,
+    draftMeta,
+    lastAutoSave,
+    autoSaveError,
+  } = useFormDraft('account_setup', formData, setFormData);
+
   const isFieldEmpty = (field: string) => !formData[field as keyof typeof formData];
   const hasError = (field: string) => showValidation && isFieldEmpty(field);
 
