@@ -742,14 +742,35 @@ const Account = () => {
           {/* Security & Privacy Section */}
           <DataSafetySection />
 
+          {/* Auto-save indicator */}
+          {(lastAutoSave || autoSaveError) && (
+            <div className="text-center">
+              {autoSaveError ? (
+                <p className="text-xs text-destructive">⚠️ Auto-save failed — please save manually</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">🔄 Auto-saved at {lastAutoSave}</p>
+              )}
+            </div>
+          )}
+
           {/* Submit Buttons */}
           <div className="flex justify-between items-center">
             <Button type="button" variant="outline" onClick={() => navigate('/')}>
               ← Back to Home
             </Button>
-            <Button type="submit" disabled={loading} className="px-8">
-              {loading ? 'Processing...' : 'Continue to Billing →'}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => saveDraft(false)}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Draft
+              </Button>
+              <Button type="submit" disabled={loading} className="px-8">
+                {loading ? 'Processing...' : 'Continue to Billing →'}
+              </Button>
+            </div>
           </div>
         </form>
       </div>
