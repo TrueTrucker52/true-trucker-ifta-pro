@@ -17,6 +17,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
 import DraftIndicator from "@/components/DraftIndicator";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -95,6 +96,7 @@ const Dashboard = () => {
 
       <div className={`min-h-screen bg-background p-6 ${isTracking ? 'pt-20 md:pt-24' : ''}`}>
         <div className="max-w-7xl mx-auto">
+          <OnboardingBanner />
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">

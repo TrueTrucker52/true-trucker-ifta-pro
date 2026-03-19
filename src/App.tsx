@@ -45,6 +45,7 @@ import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
+import Onboarding from "./pages/Onboarding";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 const queryClient = new QueryClient();
 
@@ -158,6 +159,11 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/install" element={<Install />} />
+            <Route path="/onboarding" element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
