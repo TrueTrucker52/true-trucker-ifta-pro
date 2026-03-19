@@ -74,6 +74,7 @@ const Auth = () => {
       fleet_id: fleet.id,
       driver_id: userId,
       status: 'active',
+      invitation_status: 'accepted',
     });
 
     if (joinError) {

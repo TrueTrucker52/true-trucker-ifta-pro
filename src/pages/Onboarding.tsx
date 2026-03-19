@@ -137,6 +137,7 @@ const Onboarding: React.FC = () => {
         fleet_id: fleet.id,
         driver_id: user.id,
         status: 'active',
+        invitation_status: 'accepted',
       });
       setFleetJoined(fleet.company_name);
     }
