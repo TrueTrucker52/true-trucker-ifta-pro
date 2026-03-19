@@ -16,6 +16,7 @@ import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
+import DraftIndicator from "@/components/DraftIndicator";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
@@ -284,6 +285,9 @@ const Dashboard = () => {
               </>
             )}
           </div>
+
+          {/* Draft Indicator */}
+          <DraftIndicator />
 
           {/* Quick Stats - High contrast for truck cab visibility */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

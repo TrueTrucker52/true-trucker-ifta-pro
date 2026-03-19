@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft } from 'lucide-react';
+import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
 import DataSafetySection from '@/components/DataSafetySection';
 import FormProgressBar from '@/components/FormProgressBar';
+import { useFormDraft } from '@/hooks/useFormDraft';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -64,6 +65,17 @@ const Account = () => {
     newYorkHut: '',
     oregonAccount: '',
   });
+
+  const {
+    saveDraft,
+    deleteDraft,
+    resumeDraft,
+    dismissBanner,
+    showResumeBanner,
+    draftMeta,
+    lastAutoSave,
+    autoSaveError,
+  } = useFormDraft('account_setup', formData, setFormData);
 
   const isFieldEmpty = (field: string) => !formData[field as keyof typeof formData];
   const hasError = (field: string) => showValidation && isFieldEmpty(field);
@@ -195,6 +207,7 @@ const Account = () => {
 
       if (error) throw error;
 
+      await deleteDraft();
       await refreshProfile();
 
       toast({
@@ -251,6 +264,31 @@ const Account = () => {
             hasAttemptedSubmit={showValidation}
           />
         </div>
+
+        {/* Resume Draft Banner */}
+        {showResumeBanner && draftMeta && (
+          <div className="max-w-6xl mx-auto mb-6">
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-foreground">
+                  📋 You have an unfinished report from{' '}
+                  {new Date(draftMeta.updatedAt).toLocaleDateString(undefined, {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                  })}
+                </p>
+                <p className="text-sm text-muted-foreground">Resume where you left off?</p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={resumeDraft}>
+                  Resume Draft
+                </Button>
+                <Button size="sm" variant="outline" onClick={dismissBanner}>
+                  Start Fresh
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-8">
           {/* Personal Information */}
@@ -704,14 +742,35 @@ const Account = () => {
           {/* Security & Privacy Section */}
           <DataSafetySection />
 
+          {/* Auto-save indicator */}
+          {(lastAutoSave || autoSaveError) && (
+            <div className="text-center">
+              {autoSaveError ? (
+                <p className="text-xs text-destructive">⚠️ Auto-save failed — please save manually</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">🔄 Auto-saved at {lastAutoSave}</p>
+              )}
+            </div>
+          )}
+
           {/* Submit Buttons */}
           <div className="flex justify-between items-center">
             <Button type="button" variant="outline" onClick={() => navigate('/')}>
               ← Back to Home
             </Button>
-            <Button type="submit" disabled={loading} className="px-8">
-              {loading ? 'Processing...' : 'Continue to Billing →'}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => saveDraft(false)}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Draft
+              </Button>
+              <Button type="submit" disabled={loading} className="px-8">
+                {loading ? 'Processing...' : 'Continue to Billing →'}
+              </Button>
+            </div>
           </div>
         </form>
       </div>
