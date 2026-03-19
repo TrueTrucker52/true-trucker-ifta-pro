@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft } from 'lucide-react';
+import { User, Building, MapPin, Mail, Phone, FileText, Lock, ArrowLeft, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
 import DataSafetySection from '@/components/DataSafetySection';
 import FormProgressBar from '@/components/FormProgressBar';
+import { useFormDraft } from '@/hooks/useFormDraft';
 
 const Account = () => {
   const navigate = useNavigate();
