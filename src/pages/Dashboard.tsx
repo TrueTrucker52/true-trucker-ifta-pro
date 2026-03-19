@@ -16,6 +16,7 @@ import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
+import DraftIndicator from "@/components/DraftIndicator";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
