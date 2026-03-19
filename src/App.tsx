@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import SecurityMonitor from "@/components/SecurityMonitor";
 import Index from "./pages/Index";
@@ -39,7 +40,7 @@ import TruckingNews from "./pages/TruckingNews";
 import PrivacySummary from "./pages/PrivacySummary";
 import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
-
+import FleetDashboard from "./pages/FleetDashboard";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -110,9 +111,9 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/admin" element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['admin']} redirectTo="/dashboard">
                 <Admin />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             } />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/store-listings" element={<StoreListings />} />
@@ -127,9 +128,14 @@ const App: React.FC = () => {
             <Route path="/privacy-summary" element={<PrivacySummary />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="/driver-dashboard" element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard">
                 <DriverDashboard />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
+            } />
+            <Route path="/fleet-dashboard" element={
+              <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
+                <FleetDashboard />
+              </RoleProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

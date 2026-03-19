@@ -106,6 +106,65 @@ export type Database = {
           },
         ]
       }
+      fleet_members: {
+        Row: {
+          driver_id: string
+          fleet_id: string
+          id: string
+          joined_at: string
+          status: string
+          truck_number: string | null
+        }
+        Insert: {
+          driver_id: string
+          fleet_id: string
+          id?: string
+          joined_at?: string
+          status?: string
+          truck_number?: string | null
+        }
+        Update: {
+          driver_id?: string
+          fleet_id?: string
+          id?: string
+          joined_at?: string
+          status?: string
+          truck_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_members_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleets: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          invite_code: string
+          owner_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          invite_code: string
+          owner_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          invite_code?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       form_drafts: {
         Row: {
           created_at: string
@@ -641,6 +700,8 @@ export type Database = {
     }
     Functions: {
       get_demo_user_id: { Args: never; Returns: string }
+      get_user_fleet_id: { Args: never; Returns: string }
+      get_user_role: { Args: never; Returns: string }
       grant_reviewer_role: { Args: { user_email: string }; Returns: undefined }
       has_role: {
         Args: {
@@ -650,6 +711,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_fleet_owner: { Args: never; Returns: boolean }
       log_auth_event: {
         Args: {
           details?: Json
@@ -670,7 +732,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "reviewer"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "reviewer"
+        | "fleet_owner"
+        | "driver"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -798,7 +866,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "reviewer"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "reviewer",
+        "fleet_owner",
+        "driver",
+      ],
     },
   },
 } as const
