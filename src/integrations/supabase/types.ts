@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_reports: {
+        Row: {
+          created_at: string
+          fleet_id: string | null
+          fuel_by_state: Json
+          fuel_cost: number
+          fuel_purchased: number
+          id: string
+          ifta_tax_owed: number
+          ifta_tax_paid: number
+          miles_by_state: Json
+          report_period: string
+          total_miles: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fleet_id?: string | null
+          fuel_by_state?: Json
+          fuel_cost?: number
+          fuel_purchased?: number
+          id?: string
+          ifta_tax_owed?: number
+          ifta_tax_paid?: number
+          miles_by_state?: Json
+          report_period: string
+          total_miles?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fleet_id?: string | null
+          fuel_by_state?: Json
+          fuel_cost?: number
+          fuel_purchased?: number
+          id?: string
+          ifta_tax_owed?: number
+          ifta_tax_paid?: number
+          miles_by_state?: Json
+          report_period?: string
+          total_miles?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_reports_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills_of_lading: {
         Row: {
           bol_image_url: string | null
