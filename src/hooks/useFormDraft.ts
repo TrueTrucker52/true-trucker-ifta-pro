@@ -14,7 +14,7 @@ interface DraftMeta {
 export function useFormDraft<T extends Record<string, string>>(
   formType: string,
   formData: T,
-  setFormData: (data: T) => void,
+  setFormData: React.Dispatch<React.SetStateAction<T>>,
 ) {
   const { user } = useAuth();
   const { toast } = useToast();
