@@ -159,6 +159,11 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/install" element={<Install />} />
+            <Route path="/onboarding" element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
