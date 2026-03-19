@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
 import DataSafetySection from '@/components/DataSafetySection';
+import FormProgressBar from '@/components/FormProgressBar';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -238,27 +239,17 @@ const Account = () => {
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium">
-                1
-              </div>
-              <span className="ml-2 text-sm font-medium text-primary">Account Information</span>
-            </div>
-            <div className="h-0.5 w-16 bg-muted"></div>
-            <div className="flex items-center">
-              <div className="bg-muted text-muted-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium">
-                2
-              </div>
-              <span className="ml-2 text-sm text-muted-foreground">Billing Information & Checkout</span>
-            </div>
-            <div className="flex items-center ml-4">
-              <Lock className="h-5 w-5 text-green-600" />
-              <span className="ml-2 text-sm font-medium text-green-600">100% Secure Checkout</span>
-            </div>
-          </div>
+        <div className="max-w-6xl mx-auto">
+          <FormProgressBar
+            steps={[
+              { label: 'Driver Information', fields: ['firstName', 'lastName', 'email', 'emailConfirm', 'phone'] },
+              { label: 'Company & Address', fields: ['carrierType', 'feid', 'physicalStreet', 'physicalCity', 'physicalState', 'physicalZip'] },
+              { label: 'Mailing Address', fields: ['mailingStreet', 'mailingCity', 'mailingState', 'mailingZip'] },
+              { label: 'Review & Billing', fields: [] },
+            ]}
+            formData={formData}
+            hasAttemptedSubmit={showValidation}
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-8">
