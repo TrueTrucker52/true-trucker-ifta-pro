@@ -162,6 +162,48 @@ export type Database = {
           },
         ]
       }
+      driver_onboarding: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          device_type: string | null
+          id: string
+          is_complete: boolean
+          onboarding_type: string
+          skipped_steps: Json
+          started_at: string
+          step_completed: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          is_complete?: boolean
+          onboarding_type?: string
+          skipped_steps?: Json
+          started_at?: string
+          step_completed?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          is_complete?: boolean
+          onboarding_type?: string
+          skipped_steps?: Json
+          started_at?: string
+          step_completed?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fleet_members: {
         Row: {
           driver_id: string
