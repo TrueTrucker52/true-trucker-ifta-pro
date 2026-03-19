@@ -60,7 +60,14 @@ const BottomNavigation = () => {
                   <Icon className="h-7 w-7 text-white" />
                 </div>
               ) : (
-                <Icon className={cn("h-6 w-6", active && "scale-110")} />
+                <div className="relative">
+                  <Icon className={cn("h-6 w-6", active && "scale-110")} />
+                  {item.path === '/messages' && unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </div>
               )}
               <span className={cn(
                 "text-xs mt-1 font-medium",
