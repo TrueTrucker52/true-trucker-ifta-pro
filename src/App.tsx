@@ -111,9 +111,9 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="/admin" element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRoles={['admin']} redirectTo="/dashboard">
                 <Admin />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             } />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/store-listings" element={<StoreListings />} />
