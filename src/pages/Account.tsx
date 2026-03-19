@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
 import DataSafetySection from '@/components/DataSafetySection';
+import FormProgressBar from '@/components/FormProgressBar';
 
 const Account = () => {
   const navigate = useNavigate();
