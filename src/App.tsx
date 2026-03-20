@@ -49,6 +49,7 @@ import Install from "./pages/Install";
 import Onboarding from "./pages/Onboarding";
 import HelpCenter from "./pages/HelpCenter";
 import ELD from "./pages/ELD";
+import Referrals from "./pages/Referrals";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import TruckerAIAssistant from "./components/ai-assistant/TruckerAIAssistant";
 import VoiceCommandSystem from "./components/voice-commands/VoiceCommandSystem";
@@ -180,6 +181,11 @@ const App: React.FC = () => {
             <Route path="/eld" element={
               <ProtectedRoute>
                 <ELD />
+              </ProtectedRoute>
+            } />
+            <Route path="/referrals" element={
+              <ProtectedRoute>
+                <Referrals />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
