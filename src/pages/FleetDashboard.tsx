@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Users, Truck, Plus, Copy, Building2, UserPlus, RefreshCw, Mail,
   MessageSquare, UserMinus, UserX, PenLine, BarChart3, Package,
-  FileText, Search, Eye, Download, CheckCircle2, Clock, ArrowLeft,
+  FileText, Search, Eye, Download, CheckCircle2, Clock, ArrowLeft, MapPin,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -296,6 +296,9 @@ const FleetDashboard = () => {
                 </div>
               </div>
             </div>
+            <Button onClick={() => navigate('/fleet-map')} className="bg-primary text-primary-foreground">
+              <MapPin className="h-4 w-4 mr-1" /> Live Map
+            </Button>
           </div>
         </div>
       </div>
