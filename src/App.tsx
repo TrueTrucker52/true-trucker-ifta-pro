@@ -52,6 +52,8 @@ import ELD from "./pages/ELD";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import TruckerAIAssistant from "./components/ai-assistant/TruckerAIAssistant";
 import VoiceCommandSystem from "./components/voice-commands/VoiceCommandSystem";
+import TrialConversionBanner from "./components/trial/TrialConversionBanner";
+import TrialExpiryWall from "./components/trial/TrialExpiryWall";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -183,6 +185,8 @@ const App: React.FC = () => {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+              <TrialConversionBanner />
+              <TrialExpiryWall />
               <PWAInstallPrompt />
               <TruckerAIAssistant />
               <VoiceCommandSystem />
