@@ -296,6 +296,9 @@ const FleetDashboard = () => {
                 </div>
               </div>
             </div>
+            <Button onClick={() => navigate('/fleet-map')} className="bg-primary text-primary-foreground">
+              <MapPin className="h-4 w-4 mr-1" /> Live Map
+            </Button>
           </div>
         </div>
       </div>
