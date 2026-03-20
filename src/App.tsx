@@ -148,6 +148,11 @@ const App: React.FC = () => {
                 <FleetDashboard />
               </RoleProtectedRoute>
             } />
+            <Route path="/fleet-map" element={
+              <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
+                <FleetMap />
+              </RoleProtectedRoute>
+            } />
             <Route path="/messages" element={
               <ProtectedRoute>
                 <Messages />
