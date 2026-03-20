@@ -1073,6 +1073,88 @@ export type Database = {
           },
         ]
       }
+      trip_routes: {
+        Row: {
+          avg_speed: number | null
+          created_at: string
+          driver_id: string
+          end_location: string | null
+          end_time: string | null
+          fleet_id: string | null
+          id: string
+          idle_time: number | null
+          max_speed: number | null
+          route_points: Json
+          start_location: string | null
+          start_time: string | null
+          states_visited: Json
+          total_miles: number | null
+          trip_id: string
+          truck_id: string
+          updated_at: string
+        }
+        Insert: {
+          avg_speed?: number | null
+          created_at?: string
+          driver_id: string
+          end_location?: string | null
+          end_time?: string | null
+          fleet_id?: string | null
+          id?: string
+          idle_time?: number | null
+          max_speed?: number | null
+          route_points?: Json
+          start_location?: string | null
+          start_time?: string | null
+          states_visited?: Json
+          total_miles?: number | null
+          trip_id: string
+          truck_id: string
+          updated_at?: string
+        }
+        Update: {
+          avg_speed?: number | null
+          created_at?: string
+          driver_id?: string
+          end_location?: string | null
+          end_time?: string | null
+          fleet_id?: string | null
+          id?: string
+          idle_time?: number | null
+          max_speed?: number | null
+          route_points?: Json
+          start_location?: string | null
+          start_time?: string | null
+          states_visited?: Json
+          total_miles?: number | null
+          trip_id?: string
+          truck_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_routes_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_routes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_routes_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           created_at: string
@@ -1140,6 +1222,85 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "trips_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      truck_locations: {
+        Row: {
+          address: string | null
+          battery_level: number | null
+          created_at: string
+          driver_id: string
+          fleet_id: string
+          heading: number | null
+          id: string
+          is_moving: boolean | null
+          latitude: number
+          longitude: number
+          recorded_at: string
+          signal_strength: string | null
+          speed: number | null
+          state_code: string | null
+          trip_id: string | null
+          truck_id: string
+        }
+        Insert: {
+          address?: string | null
+          battery_level?: number | null
+          created_at?: string
+          driver_id: string
+          fleet_id: string
+          heading?: number | null
+          id?: string
+          is_moving?: boolean | null
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          signal_strength?: string | null
+          speed?: number | null
+          state_code?: string | null
+          trip_id?: string | null
+          truck_id: string
+        }
+        Update: {
+          address?: string | null
+          battery_level?: number | null
+          created_at?: string
+          driver_id?: string
+          fleet_id?: string
+          heading?: number | null
+          id?: string
+          is_moving?: boolean | null
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          signal_strength?: string | null
+          speed?: number | null
+          state_code?: string | null
+          trip_id?: string | null
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "truck_locations_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "truck_locations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "truck_locations_truck_id_fkey"
             columns: ["truck_id"]
             isOneToOne: false
             referencedRelation: "trucks"
