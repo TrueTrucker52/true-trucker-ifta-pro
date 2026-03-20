@@ -1,322 +1,189 @@
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Check, X, Star, Crown, Truck, Users, Zap, Building2, Shield, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { subscription_tier, createCheckout } = useSubscription();
+  const [annual, setAnnual] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const handlePlanClick = (plan: string) => {
-    console.log('🎯 Plan clicked:', plan, 'User authenticated:', !!user);
+  const plans = [
+    { id: 'solo', name: 'Solo', icon: Truck, trucks: '1 truck', monthlyPrice: 39, badge: null },
+    { id: 'small_fleet', name: 'Small Fleet', icon: Users, trucks: '2–5 trucks', monthlyPrice: 79, badge: 'MOST POPULAR' },
+    { id: 'fleet_pro', name: 'Fleet Pro', icon: Zap, trucks: '6–10 trucks', monthlyPrice: 129, badge: 'BEST VALUE' },
+    { id: 'enterprise', name: 'Enterprise', icon: Building2, trucks: '11–25 trucks', monthlyPrice: 199, badge: null },
+  ];
+
+  const getPrice = (p: typeof plans[0]) => annual ? Math.round(p.monthlyPrice * 12 * 0.8) : p.monthlyPrice;
+
+  const handlePlanClick = (planId: string) => {
     if (!user) {
-      console.log('🔄 Redirecting to auth - no user');
       navigate('/auth');
-    } else {
-      console.log('💳 Creating checkout for authenticated user');
-      createCheckout(plan);
+      return;
     }
+    const suffix = annual ? '_annual' : '';
+    createCheckout(planId + suffix);
   };
+
+  const features = [
+    { name: 'IFTA Quarterly Reports', solo: true, small_fleet: true, fleet_pro: true, enterprise: true },
+    { name: 'GPS & ELD', solo: true, small_fleet: true, fleet_pro: true, enterprise: true },
+    { name: 'Voice Commands', solo: true, small_fleet: true, fleet_pro: true, enterprise: true },
+    { name: 'Receipt Scanning', solo: true, small_fleet: true, fleet_pro: true, enterprise: true },
+    { name: 'Fleet Dashboard', solo: false, small_fleet: true, fleet_pro: true, enterprise: true },
+    { name: 'Geofencing', solo: false, small_fleet: false, fleet_pro: true, enterprise: true },
+    { name: 'API Access', solo: false, small_fleet: false, fleet_pro: false, enterprise: true },
+    { name: 'Dedicated Support', solo: false, small_fleet: false, fleet_pro: false, enterprise: true },
+  ];
+
+  const faqs = [
+    { q: 'Do I need a credit card for the trial?', a: 'No. Start your 7-day free trial with no credit card required.' },
+    { q: 'Can I add extra trucks?', a: 'Yes — Small Fleet, Fleet Pro, and Enterprise plans support extra trucks at $12/truck/month.' },
+    { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel anytime with no penalties or hidden fees.' },
+    { q: 'Is there a money-back guarantee?', a: 'Yes — 30-day money-back guarantee on all plans.' },
+  ];
 
   return (
     <section id="pricing" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          {/* Urgency Banner */}
-          <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 rounded-lg p-4 mb-8 max-w-3xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-red-600 font-semibold">🔥 FLEET EXPANSION SPECIAL</span>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            </div>
-            <p className="text-sm text-red-700">89% of solo drivers upgrade to fleet management within 60 days • Don't get left behind</p>
-          </div>
-
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            From Solo Driver to
-            <span className="block text-primary">Fleet Owner</span>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Simple, Transparent Pricing
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-4">
-            Stop limiting yourself to one truck. Scale your operation with professional fleet management tools.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
+            7-day free trial on every plan — no credit card required
           </p>
-          
-          {/* Social Proof */}
-          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 max-w-2xl mx-auto">
-            <p className="text-green-700 font-semibold text-sm">💰 10,000+ drivers scaled • Average: +$2,500/month within 90 days</p>
+
+          {/* Annual toggle */}
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className={`text-sm font-medium ${!annual ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
+            <Switch checked={annual} onCheckedChange={setAnnual} />
+            <span className={`text-sm font-medium ${annual ? 'text-foreground' : 'text-muted-foreground'}`}>Annual</span>
+            {annual && <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/30">Save 20%</Badge>}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-4">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Shield className="h-4 w-4 text-primary" /> 30-day money-back guarantee
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <CreditCard className="h-4 w-4 text-primary" /> No credit card for trial
+            </div>
           </div>
         </div>
 
-        {/* Mobile-First Responsive Pricing */}
-        <div className="block md:hidden">
-          {/* Mobile Card Layout */}
-          <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
-            {[
-              { name: 'OWNER OPERATOR', price: '$29', trucks: '2 Only', popular: false, plan: 'small' },
-              { name: 'FLEET MANAGER', price: '$59', trucks: '10 Trucks', popular: true, plan: 'medium', badge: '🚀 SCALE NOW' },
-              { name: 'FLEET EMPIRE', price: '$129', trucks: 'Unlimited', popular: false, plan: 'large', badge: '💎 UNLIMITED' }
-            ].map((plan) => (
-              <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary scale-105 shadow-xl' : ''} hover:shadow-lg transition-all duration-300`}>
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-green-500 to-blue-500 px-4 py-1 rounded-full animate-pulse">
-                      <Star className="inline h-4 w-4 text-white mr-1" />
-                      <span className="text-white font-semibold text-xs">{plan.badge}</span>
-                    </div>
-                  </div>
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
+          {plans.map((plan) => {
+            const price = getPrice(plan);
+            const Icon = plan.icon;
+            const isPopular = plan.badge === 'MOST POPULAR';
+            const isBestValue = plan.badge === 'BEST VALUE';
+            const isCurrent = subscription_tier === plan.id;
+
+            return (
+              <Card key={plan.id} className={`relative flex flex-col ${
+                isPopular ? 'border-primary shadow-xl ring-2 ring-primary/40 scale-[1.02]' :
+                isBestValue ? 'border-accent shadow-lg ring-1 ring-accent/40' : ''
+              } hover:shadow-xl transition-all`}>
+                {plan.badge && (
+                  <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${
+                    isPopular ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground'
+                  }`}>
+                    {isPopular && <Star className="h-3 w-3 mr-1" />}
+                    {isBestValue && <Crown className="h-3 w-3 mr-1" />}
+                    {plan.badge}
+                  </Badge>
                 )}
-                
-
-
-                
-                <CardHeader className="text-center pb-4">
-                  <CardTitle className={`text-lg ${plan.popular ? 'text-primary' : ''}`}>{plan.name}</CardTitle>
-                  <CardDescription>
-                    {plan.plan === 'small' ? '🚛 Independent Operator' : 
-                     plan.plan === 'medium' ? '🚛 Fleet Ready' : 
-                     '🏢 Enterprise Level'}
-                  </CardDescription>
-                  <div className="text-3xl font-bold text-primary mt-2">{plan.price}</div>
-                  <div className="text-sm text-muted-foreground">per month</div>
-                  <div className="text-xs text-green-600 font-semibold mt-1">7-day free trial</div>
+                <CardHeader className="text-center pb-2">
+                  <div className="bg-primary/10 p-2.5 rounded-full w-fit mx-auto mb-2">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs font-semibold text-primary/80 uppercase tracking-wide">{plan.trucks}</CardDescription>
+                  <div className="mt-3">
+                    <span className="text-4xl font-bold">${price}</span>
+                    <span className="text-muted-foreground">/{annual ? 'year' : 'mo'}</span>
+                  </div>
+                  {plan.id !== 'solo' && <p className="text-xs text-muted-foreground mt-1">Extra trucks: $12/truck/mo</p>}
+                  <p className="text-xs text-green-600 font-semibold mt-1">7-day free trial</p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Number of Trucks:</span>
-                      <span className="font-semibold">{plan.trucks}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Number of Trips:</span>
-                      <span className="font-semibold">Unlimited</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Number of Quarters:</span>
-                      <span className="font-semibold">Unlimited</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2 pt-2 border-t">
-                    <div className="text-sm font-semibold mb-2">All Features Included:</div>
-                    {[
-                      'Smart Location Auto-Complete',
-                      'Professional Trip Editing',
-                      'Kentucky KYU Compliance',
-                      'Mobile Trip Entry',
-                      'Generate Trip Sheets',
-                      'IFTA Quarterly Returns',
-                      'Quarterly Mileage Returns',
-                      'Recap Reports',
-                      'Truck Reports',
-                      'Auto Routing & Calculations',
-                      'Data Exporting'
-                    ].map((feature) => (
-                      <div key={feature} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <Button 
-                    variant={subscription_tier === plan.plan ? 'default' : plan.popular ? 'hero' : 'outline'}
-                    className={`w-full mt-4 ${plan.popular ? 'animate-pulse' : ''}`}
-                    onClick={() => handlePlanClick(plan.plan)}
-                    disabled={subscription_tier === plan.plan}
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="flex-1" />
+                  <Button
+                    variant={isPopular ? 'hero' : 'outline'}
+                    className="w-full"
+                    onClick={() => handlePlanClick(plan.id)}
+                    disabled={isCurrent}
                   >
-                    {subscription_tier === plan.plan ? 'Current Plan' : 
-                      plan.plan === 'small' ? 'START SOLO' :
-                      plan.plan === 'medium' ? '🚀 SCALE TO FLEET' : 
-                      '💎 BUILD EMPIRE'
-                    }
+                    {isCurrent ? 'Current Plan' : 'Start Free Trial'}
                   </Button>
-                  
-                  {plan.popular && (
-                    <p className="text-xs text-green-600 font-semibold mt-2 text-center">
-                      ⚡ Start earning more in 5 minutes
-                    </p>
-                  )}
+                  <p className="text-xs text-center text-muted-foreground mt-2">Cancel anytime</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        {/* Desktop Table Layout */}
-        <div className="hidden md:block">
-          <div className="overflow-x-auto">
-            <table className="w-full max-w-5xl mx-auto bg-card rounded-lg shadow-lg">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-4 text-left"></th>
-                  <th className="p-4 text-center">
-                    <div className="font-bold text-lg">STARTER</div>
-                    <div className="text-sm text-muted-foreground">Package</div>
-                  </th>
-                  <th className="p-4 text-center relative">
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <div className="bg-gradient-sunset px-4 py-1 rounded-full">
-                        <Star className="inline h-4 w-4 text-white mr-1" />
-                        <span className="text-white font-semibold text-xs">Most Popular</span>
-                      </div>
-                    </div>
-                    <div className="font-bold text-lg pt-4">PROFESSIONAL</div>
-                    <div className="text-sm text-muted-foreground">Package</div>
-                  </th>
-                  <th className="p-4 text-center">
-                    <div className="font-bold text-lg">ENTERPRISE</div>
-                    <div className="text-sm text-muted-foreground">Package</div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b bg-muted/20">
-                  <td className="p-4 font-semibold">Monthly Fee:</td>
-                  <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$29</div>
-                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
-                  </td>
-                  <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$59</div>
-                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
-                  </td>
-                  <td className="p-4 text-center">
-                    <div className="font-bold text-2xl text-primary">$129</div>
-                    <div className="text-xs text-green-600 font-semibold">7-day free trial</div>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-semibold">Number of Trucks:</td>
-                  <td className="p-4 text-center">2</td>
-                  <td className="p-4 text-center">10</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-semibold">Number of Trips:</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-semibold">Number of Quarters:</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                  <td className="p-4 text-center">Unlimited</td>
-                </tr>
-                {[
-                  'Smart Location Auto-Complete',
-                  'Professional Trip Editing',
-                  'Kentucky KYU Compliance',
-                  'Mobile Trip Entry',
-                  'Generate Trip Sheets',
-                  'IFTA Quarterly Returns',
-                  'Quarterly Mileage Returns',
-                  'Recap Reports',
-                  'Truck Reports',
-                  'Auto Routing & Calculations',
-                  'Data Exporting'
-                ].map((feature) => (
-                  <tr key={feature} className="border-b">
-                    <td className="p-4 font-semibold">{feature}:</td>
-                    <td className="p-4 text-center">
-                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
-                    </td>
-                    <td className="p-4 text-center">
-                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
-                    </td>
-                    <td className="p-4 text-center">
-                      <CheckCircle className="h-5 w-5 text-success mx-auto" />
-                    </td>
-                  </tr>
+        {/* Feature comparison (desktop) */}
+        <div className="hidden md:block max-w-5xl mx-auto mb-16">
+          <h3 className="text-2xl font-bold text-center mb-6">Feature Comparison</h3>
+          <div className="overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-[200px]">Feature</TableHead>
+                  <TableHead className="text-center">Solo</TableHead>
+                  <TableHead className="text-center">Small Fleet</TableHead>
+                  <TableHead className="text-center">Fleet Pro</TableHead>
+                  <TableHead className="text-center">Enterprise</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {features.map((row) => (
+                  <TableRow key={row.name}>
+                    <TableCell className="font-medium text-sm">{row.name}</TableCell>
+                    {(['solo', 'small_fleet', 'fleet_pro', 'enterprise'] as const).map((p) => (
+                      <TableCell key={p} className="text-center">
+                        {row[p] ? <Check className="h-5 w-5 text-primary mx-auto" /> : <X className="h-5 w-5 text-muted-foreground/40 mx-auto" />}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-                <tr>
-                  <td className="p-4"></td>
-                  <td className="p-4 text-center">
-                    <Button 
-                      variant={subscription_tier === 'small' ? 'default' : 'outline'}
-                      className="w-full"
-                      onClick={() => handlePlanClick('small')}
-                      disabled={subscription_tier === 'small'}
-                    >
-                      {subscription_tier === 'small' ? 'Current Plan' : 'SIGNUP NOW!'}
-                    </Button>
-                  </td>
-                  <td className="p-4 text-center">
-                    <Button 
-                      variant={subscription_tier === 'medium' ? 'default' : 'hero'}
-                      className="w-full"
-                      onClick={() => handlePlanClick('medium')}
-                      disabled={subscription_tier === 'medium'}
-                    >
-                      {subscription_tier === 'medium' ? 'Current Plan' : 'SIGNUP NOW!'}
-                    </Button>
-                  </td>
-                  <td className="p-4 text-center">
-                    <Button 
-                      variant={subscription_tier === 'large' ? 'default' : 'outline'}
-                      className="w-full"
-                      onClick={() => handlePlanClick('large')}
-                      disabled={subscription_tier === 'large'}
-                    >
-                      {subscription_tier === 'large' ? 'Current Plan' : 'SIGNUP NOW!'}
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
 
-        {/* Security Notice */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            The security of our checkout process and your personal information has been tested by 3rd party entities and is 100% secure.
-          </p>
+        {/* Guarantee */}
+        <div className="max-w-2xl mx-auto mb-16 bg-muted/50 p-8 rounded-xl text-center border">
+          <Shield className="h-10 w-10 text-primary mx-auto mb-3" />
+          <h3 className="text-xl font-bold mb-2">30-Day Money-Back Guarantee</h3>
+          <p className="text-muted-foreground text-sm">Not satisfied? Full refund within 30 days, no questions asked.</p>
         </div>
 
-        {/* Money Back Guarantee */}
-        <div className="mt-12 max-w-2xl mx-auto bg-muted/50 p-6 rounded-lg text-center">
-          <p className="text-muted-foreground">
-            <strong className="text-foreground">30-Day Money-Back Guarantee</strong><br />
-            Not satisfied? Get a full refund, no questions asked. All plans include free setup and migration assistance.
-          </p>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h3 className="text-2xl font-bold text-center text-foreground mb-8">
-            Frequently Asked Questions
-          </h3>
-          <div className="space-y-6">
-            {[
-              {
-                 question: "How does billing work?",
-                 answer: "7-day free trial, then $29/month for Starter (2 trucks), $59/month for Professional (10 trucks), or $129/month for Enterprise (unlimited trucks). You can cancel anytime with no penalty."
-              },
-              {
-                question: "Do you support all IFTA jurisdictions?",
-                answer: "Yes! We support all 48 contiguous U.S. states plus the 10 Canadian provinces that participate in IFTA."
-              },
-               {
-                 question: "What makes this different from basic mileage trackers?",
-                 answer: "Our professional tools include smart location auto-complete with 100+ trucking destinations, full trip editing capabilities, Kentucky KYU compliance, and advanced IFTA calculations. Built specifically for active drivers, not casual users."
-               },
-               {
-                 question: "Can I use this for multiple trucks?",
-                 answer: "Absolutely! Our fleet management tools let you track multiple vehicles and drivers from a single account with individual trip tracking and consolidated reporting."
-               },
-               {
-                 question: "Is my data secure?",
-                 answer: "Yes, we use bank-level encryption and security measures. Your data is backed up daily and stored securely in the cloud."
-               }
-            ].map((faq, index) => (
-              <Card key={index} className="border-border">
-                <CardContent className="p-6">
-                  <h4 className="font-semibold text-foreground mb-2">{faq.question}</h4>
-                  <p className="text-muted-foreground">{faq.answer}</p>
-                </CardContent>
-              </Card>
+        {/* FAQ */}
+        <div className="max-w-3xl mx-auto">
+          <h3 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h3>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <div key={i} className="bg-card border rounded-lg overflow-hidden">
+                <button className="w-full flex items-center justify-between p-5 text-left" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                  <span className="font-semibold text-sm">{faq.q}</span>
+                  {openFaq === i ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                {openFaq === i && <div className="px-5 pb-5 text-sm text-muted-foreground">{faq.a}</div>}
+              </div>
             ))}
           </div>
         </div>

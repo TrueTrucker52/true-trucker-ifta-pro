@@ -35,7 +35,7 @@ export const TrialGuard: React.FC<TrialGuardProps> = ({
 
   // Allow access if user has active subscription of required tier or higher
   if (subscribed) {
-    const tierHierarchy = ['small', 'medium', 'large', 'admin'];
+    const tierHierarchy = ['solo', 'small', 'small_fleet', 'medium', 'fleet_pro', 'large', 'enterprise', 'admin'];
     const userTierIndex = tierHierarchy.indexOf(subscription_tier || '');
     const requiredTierIndex = tierHierarchy.indexOf(requiredTier);
     

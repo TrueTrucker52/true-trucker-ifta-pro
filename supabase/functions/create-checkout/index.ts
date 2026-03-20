@@ -24,31 +24,39 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
+// New pricing: solo, small_fleet, fleet_pro, enterprise (monthly & annual)
+const priceMapping: Record<string, { amount: number; name: string; interval: 'month' | 'year' }> = {
+  // Monthly
+  solo:             { amount: 3900,   name: 'Solo',         interval: 'month' },
+  small_fleet:      { amount: 7900,   name: 'Small Fleet',  interval: 'month' },
+  fleet_pro:        { amount: 12900,  name: 'Fleet Pro',    interval: 'month' },
+  enterprise:       { amount: 19900,  name: 'Enterprise',   interval: 'month' },
+  // Annual (20% off)
+  solo_annual:      { amount: 37440,  name: 'Solo (Annual)',        interval: 'year' },
+  small_fleet_annual: { amount: 75840, name: 'Small Fleet (Annual)', interval: 'year' },
+  fleet_pro_annual: { amount: 123840, name: 'Fleet Pro (Annual)',   interval: 'year' },
+  enterprise_annual:{ amount: 191040, name: 'Enterprise (Annual)',  interval: 'year' },
+  // Legacy plans — kept for existing subscribers creating new checkouts
+  small:            { amount: 2900,   name: 'Starter Plan (Legacy)', interval: 'month' },
+  medium:           { amount: 5900,   name: 'Professional Plan (Legacy)', interval: 'month' },
+  large:            { amount: 12900,  name: 'Enterprise Plan (Legacy)', interval: 'month' },
+};
+
 const validateInput = (plan: string) => {
-  const validPlans = ['small', 'medium', 'large'];
   logStep("Validating plan input", { received: plan, type: typeof plan });
-  
   if (!plan || typeof plan !== 'string') {
     throw new Error(`Plan is required and must be a string. Received: ${plan} (type: ${typeof plan})`);
   }
-  
-  const trimmedPlan = plan.trim().toLowerCase();
-  logStep("Plan after trimming", { original: plan, trimmed: trimmedPlan });
-  
-  if (!validPlans.includes(trimmedPlan)) {
-    throw new Error(`Invalid plan selected. Received: "${trimmedPlan}". Valid plans are: ${validPlans.join(', ')}`);
+  const trimmed = plan.trim().toLowerCase();
+  if (trimmed.length > 50) throw new Error('Plan name too long');
+  if (!priceMapping[trimmed]) {
+    throw new Error(`Invalid plan: "${trimmed}". Valid plans: ${Object.keys(priceMapping).join(', ')}`);
   }
-  
-  if (trimmedPlan.length > 50) {
-    throw new Error('Plan name too long');
-  }
-  
-  return trimmedPlan;
+  return trimmed;
 };
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
-  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -64,7 +72,6 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
@@ -87,39 +94,31 @@ serve(async (req) => {
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
       logStep("Found existing customer", { customerId });
-    } else {
-      logStep("No existing customer found, will create new one");
     }
 
-    // Define pricing based on plan
-    const priceMapping = {
-      "small": { amount: 2900, name: "Starter Plan" }, // $29.00
-      "medium": { amount: 5900, name: "Professional Plan" }, // $59.00
-      "large": { amount: 12900, name: "Enterprise Plan" }, // $129.00
-    };
-
-    const selectedPlan = priceMapping[validatedPlan as keyof typeof priceMapping];
-    if (!selectedPlan) throw new Error("Invalid plan selected");
+    const selectedPlan = priceMapping[validatedPlan];
 
     const rawOrigin = req.headers.get("origin") || '';
     const safeOrigin = allowedOrigins.includes(rawOrigin) ? rawOrigin : 'https://true-trucker-ifta-pro.com';
 
-    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount });
+    // Derive the base plan id (strip _annual suffix) for metadata
+    const basePlan = validatedPlan.replace('_annual', '');
+
+    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount, interval: selectedPlan.interval });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      
       line_items: [
         {
           price_data: {
             currency: "usd",
-            product_data: { 
+            product_data: {
               name: `TrueTrucker IFTA Pro - ${selectedPlan.name}`,
-              description: `IFTA Pro ${selectedPlan.name} Subscription`
+              description: `IFTA Pro ${selectedPlan.name} Subscription`,
             },
             unit_amount: selectedPlan.amount,
-            recurring: { interval: "month" }
+            recurring: { interval: selectedPlan.interval },
           },
           quantity: 1,
         },
@@ -131,22 +130,24 @@ serve(async (req) => {
           source: "truetrucker-ifta-app",
           app_name: "TrueTrucker IFTA Pro",
           user_id: user.id,
-          plan: validatedPlan,
-          created_from: "app-checkout"
-        }
+          plan: basePlan,
+          billing_interval: selectedPlan.interval,
+          created_from: "app-checkout",
+        },
       },
       success_url: `${safeOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${safeOrigin}/?canceled=true`,
       metadata: {
         source: "truetrucker-ifta-app",
         app_name: "TrueTrucker IFTA Pro",
-        app_version: "1.0",
+        app_version: "2.0",
         user_id: user.id,
-        plan: validatedPlan,
+        plan: basePlan,
+        billing_interval: selectedPlan.interval,
         purchase_type: "subscription",
         purchase_date: new Date().toISOString(),
-        user_email: user.email
-      }
+        user_email: user.email,
+      },
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
