@@ -173,6 +173,7 @@ const App: React.FC = () => {
           </Routes>
               <PWAInstallPrompt />
               <TruckerAIAssistant />
+              <VoiceCommandSystem />
               
             </TooltipProvider>
           </AuthProvider>
