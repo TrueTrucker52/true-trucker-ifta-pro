@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -12,7 +12,6 @@ import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
 import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
-import DraftIndicator from "@/components/DraftIndicator";
 
 // Lazy load non-critical dashboard components
 const BottomNavigation = lazy(() => import("@/components/BottomNavigation"));
@@ -22,6 +21,28 @@ const ProminentLocationDisclosure = lazy(() => import("@/components/ProminentLoc
 const OnboardingBanner = lazy(() => import("@/components/OnboardingBanner").then(m => ({ default: m.OnboardingBanner })));
 const ReferralWidget = lazy(() => import("@/components/ReferralWidget"));
 const BOLUpgradeIncentive = lazy(() => import("@/components/BOLUpgradeIncentive").then(m => ({ default: m.BOLUpgradeIncentive })));
+const DraftIndicator = lazy(() => import("@/components/DraftIndicator"));
+
+const quickStats = [
+  { title: "Total Miles", value: "12,847", icon: MapPin, trend: "+8.2%" },
+  { title: "Fuel Purchases", value: "$8,423", icon: DollarSign, trend: "+5.1%" },
+  { title: "Tax Owed", value: "$1,247", icon: Calculator, trend: "-2.3%" },
+  { title: "Active Reports", value: "3", icon: FileText, trend: "+1" }
+];
+
+const monthlyData = [
+  { month: "Jan", miles: 4200, fuel: 2800 },
+  { month: "Feb", miles: 3800, fuel: 2600 },
+  { month: "Mar", miles: 4500, fuel: 3100 },
+  { month: "Apr", miles: 4100, fuel: 2900 },
+  { month: "May", miles: 4300, fuel: 3000 },
+  { month: "Jun", miles: 4600, fuel: 3200 }
+];
+
+const chartConfig = {
+  miles: { label: "Miles", color: "hsl(var(--primary))" },
+  fuel: { label: "Fuel ($)", color: "hsl(var(--secondary))" }
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -48,26 +69,7 @@ const Dashboard = () => {
     stopTracking,
   } = useAutoTracking();
 
-  const quickStats = [
-    { title: "Total Miles", value: "12,847", icon: MapPin, trend: "+8.2%" },
-    { title: "Fuel Purchases", value: "$8,423", icon: DollarSign, trend: "+5.1%" },
-    { title: "Tax Owed", value: "$1,247", icon: Calculator, trend: "-2.3%" },
-    { title: "Active Reports", value: "3", icon: FileText, trend: "+1" }
-  ];
-
-  const monthlyData = [
-    { month: "Jan", miles: 4200, fuel: 2800 },
-    { month: "Feb", miles: 3800, fuel: 2600 },
-    { month: "Mar", miles: 4500, fuel: 3100 },
-    { month: "Apr", miles: 4100, fuel: 2900 },
-    { month: "May", miles: 4300, fuel: 3000 },
-    { month: "Jun", miles: 4600, fuel: 3200 }
-  ];
-
-  const chartConfig = {
-    miles: { label: "Miles", color: "hsl(var(--primary))" },
-    fuel: { label: "Fuel ($)", color: "hsl(var(--secondary))" }
-  };
+  const displayName = useMemo(() => user?.email?.split('@')[0] || 'Driver', [user?.email]);
 
   if (loading) {
     return (
@@ -112,7 +114,7 @@ const Dashboard = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.email?.split('@')[0] || 'Driver'}</h1>
+                <h1 className="text-3xl font-bold text-foreground">Welcome back, {displayName}</h1>
                 <p className="text-muted-foreground mt-2">Your IFTA management dashboard</p>
               </div>
               <div className="flex items-center gap-3">
@@ -237,7 +239,9 @@ const Dashboard = () => {
             )}
           </div>
 
-          <DraftIndicator />
+          <Suspense fallback={null}>
+            <DraftIndicator />
+          </Suspense>
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
