@@ -170,7 +170,7 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
               <PWAInstallPrompt />
-              <SecurityMonitor />
+              
             </TooltipProvider>
           </AuthProvider>
         </BrowserRouter>
