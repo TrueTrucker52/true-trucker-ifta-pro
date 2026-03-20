@@ -1308,6 +1308,96 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_offers: {
+        Row: {
+          created_at: string
+          discount_percent: number | null
+          id: string
+          offer_code: string | null
+          offer_expires_at: string | null
+          offer_type: string
+          user_id: string
+          was_accepted: boolean | null
+          was_shown: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          offer_code?: string | null
+          offer_expires_at?: string | null
+          offer_type?: string
+          user_id: string
+          was_accepted?: boolean | null
+          was_shown?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          discount_percent?: number | null
+          id?: string
+          offer_code?: string | null
+          offer_expires_at?: string | null
+          offer_type?: string
+          user_id?: string
+          was_accepted?: boolean | null
+          was_shown?: boolean | null
+        }
+        Relationships: []
+      }
+      trial_tracking: {
+        Row: {
+          converted: boolean | null
+          converted_at: string | null
+          converted_plan: string | null
+          created_at: string
+          days_remaining: number | null
+          features_used: Json | null
+          id: string
+          last_active: string | null
+          last_nudge_sent: string | null
+          login_count: number | null
+          nudge_count: number | null
+          plan_attempted: string | null
+          trial_end: string
+          trial_start: string
+          user_id: string
+        }
+        Insert: {
+          converted?: boolean | null
+          converted_at?: string | null
+          converted_plan?: string | null
+          created_at?: string
+          days_remaining?: number | null
+          features_used?: Json | null
+          id?: string
+          last_active?: string | null
+          last_nudge_sent?: string | null
+          login_count?: number | null
+          nudge_count?: number | null
+          plan_attempted?: string | null
+          trial_end?: string
+          trial_start?: string
+          user_id: string
+        }
+        Update: {
+          converted?: boolean | null
+          converted_at?: string | null
+          converted_plan?: string | null
+          created_at?: string
+          days_remaining?: number | null
+          features_used?: Json | null
+          id?: string
+          last_active?: string | null
+          last_nudge_sent?: string | null
+          login_count?: number | null
+          nudge_count?: number | null
+          plan_attempted?: string | null
+          trial_end?: string
+          trial_start?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_logs: {
         Row: {
           created_at: string
