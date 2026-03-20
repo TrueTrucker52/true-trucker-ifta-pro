@@ -1264,6 +1264,90 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_commands: {
+        Row: {
+          command_matched: string | null
+          command_spoken: string
+          confidence_score: number | null
+          created_at: string
+          id: string
+          page_context: string | null
+          user_id: string
+          was_successful: boolean
+        }
+        Insert: {
+          command_matched?: string | null
+          command_spoken?: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          page_context?: string | null
+          user_id: string
+          was_successful?: boolean
+        }
+        Update: {
+          command_matched?: string | null
+          command_spoken?: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          page_context?: string | null
+          user_id?: string
+          was_successful?: boolean
+        }
+        Relationships: []
+      }
+      voice_settings: {
+        Row: {
+          announce_state_crossings: boolean
+          auto_driving_mode: boolean
+          created_at: string
+          fuel_stop_reminders: boolean
+          id: string
+          language: string
+          read_messages_aloud: boolean
+          updated_at: string
+          user_id: string
+          voice_enabled: boolean
+          voice_gender: string
+          voice_speed: number
+          voice_volume: number
+          wake_word: string
+        }
+        Insert: {
+          announce_state_crossings?: boolean
+          auto_driving_mode?: boolean
+          created_at?: string
+          fuel_stop_reminders?: boolean
+          id?: string
+          language?: string
+          read_messages_aloud?: boolean
+          updated_at?: string
+          user_id: string
+          voice_enabled?: boolean
+          voice_gender?: string
+          voice_speed?: number
+          voice_volume?: number
+          wake_word?: string
+        }
+        Update: {
+          announce_state_crossings?: boolean
+          auto_driving_mode?: boolean
+          created_at?: string
+          fuel_stop_reminders?: boolean
+          id?: string
+          language?: string
+          read_messages_aloud?: boolean
+          updated_at?: string
+          user_id?: string
+          voice_enabled?: boolean
+          voice_gender?: string
+          voice_speed?: number
+          voice_volume?: number
+          wake_word?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
