@@ -49,6 +49,7 @@ import Onboarding from "./pages/Onboarding";
 import HelpCenter from "./pages/HelpCenter";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import TruckerAIAssistant from "./components/ai-assistant/TruckerAIAssistant";
+import VoiceCommandSystem from "./components/voice-commands/VoiceCommandSystem";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -172,6 +173,7 @@ const App: React.FC = () => {
           </Routes>
               <PWAInstallPrompt />
               <TruckerAIAssistant />
+              <VoiceCommandSystem />
               
             </TooltipProvider>
           </AuthProvider>
