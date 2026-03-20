@@ -122,12 +122,9 @@ serve(async (req) => {
 
     if (deleteUserError) {
       console.error('Error deleting auth user:', deleteUserError);
+      console.error('Data deletion results:', JSON.stringify(deletionResults));
       return new Response(
-        JSON.stringify({ 
-          error: 'Failed to delete authentication account',
-          details: deleteUserError.message,
-          dataDeleted: deletionResults
-        }),
+        JSON.stringify({ error: 'Account deletion failed. Please contact support.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
