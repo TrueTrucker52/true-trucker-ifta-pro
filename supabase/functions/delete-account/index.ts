@@ -122,12 +122,9 @@ serve(async (req) => {
 
     if (deleteUserError) {
       console.error('Error deleting auth user:', deleteUserError);
+      console.error('Data deletion results:', JSON.stringify(deletionResults));
       return new Response(
-        JSON.stringify({ 
-          error: 'Failed to delete authentication account',
-          details: deleteUserError.message,
-          dataDeleted: deletionResults
-        }),
+        JSON.stringify({ error: 'Account deletion failed. Please contact support.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -147,7 +144,7 @@ serve(async (req) => {
     console.error('Account deletion error:', error);
     const corsHeaders = getCorsHeaders(req);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
