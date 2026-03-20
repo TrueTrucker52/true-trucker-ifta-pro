@@ -88,6 +88,11 @@ const TrialConversionBanner: React.FC = () => {
     }
   };
 
+  const handleDirectUpgrade = (plan: string) => {
+    const coupon = (urgencyLevel === 'orange' || urgencyLevel === 'red') ? 'TRIAL10' : undefined;
+    createCheckout(plan, coupon);
+  };
+
   return (
     <>
       <AnimatePresence>
