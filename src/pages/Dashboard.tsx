@@ -18,6 +18,7 @@ import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
 import DraftIndicator from "@/components/DraftIndicator";
 import { OnboardingBanner } from "@/components/OnboardingBanner";
+import ReferralWidget from "@/components/ReferralWidget";
 
 const Dashboard = () => {
   const { user, profile, profileLoading } = useAuth();
