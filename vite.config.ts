@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: false,
     minify: "esbuild",
+    esbuild: mode === "production" ? {
+      drop: ["console", "debugger"],
+    } : undefined,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -25,6 +28,7 @@ export default defineConfig(({ mode }) => ({
           ],
           charts: ["recharts"],
           supabase: ["@supabase/supabase-js"],
+          motion: ["framer-motion"],
         },
       },
     },

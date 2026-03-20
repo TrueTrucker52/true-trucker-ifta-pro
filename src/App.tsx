@@ -10,11 +10,9 @@ import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageLoadingFallback } from "@/components/PageLoadingFallback";
 
-// Eagerly loaded (critical path)
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-
-// Lazy loaded pages
+// ALL pages lazy-loaded (including Index and Auth)
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Calculator = lazy(() => import("./pages/Calculator"));
 const IFTAReports = lazy(() => import("./pages/IFTAReports"));
@@ -66,7 +64,7 @@ const TrialExpiryWall = lazy(() => import("./components/trial/TrialExpiryWall"))
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
       retry: 1,
       refetchOnWindowFocus: false,
