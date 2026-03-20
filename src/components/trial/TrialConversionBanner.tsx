@@ -88,6 +88,11 @@ const TrialConversionBanner: React.FC = () => {
     }
   };
 
+  const handleDirectUpgrade = (plan: string) => {
+    const coupon = (urgencyLevel === 'orange' || urgencyLevel === 'red') ? 'TRIAL10' : undefined;
+    createCheckout(plan, coupon);
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -136,7 +141,7 @@ const TrialConversionBanner: React.FC = () => {
           daysRemaining={daysRemaining}
           onAccept={async (plan) => {
             if (activeOffer) await acceptOffer(activeOffer.id);
-            await createCheckout(plan);
+            await createCheckout(plan, 'TRIAL10');
           }}
         />
       )}

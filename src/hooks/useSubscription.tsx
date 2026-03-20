@@ -210,8 +210,8 @@ export const useSubscription = () => {
     }
   }, [user?.id, session?.access_token, isAdmin, toast]);
 
-  const createCheckout = async (plan: string) => {
-    console.log('🚀 Creating checkout for plan:', plan);
+  const createCheckout = async (plan: string, coupon?: string) => {
+    console.log('🚀 Creating checkout for plan:', plan, coupon ? `with coupon: ${coupon}` : '');
     if (!user || !session) {
       console.log('❌ No user or session for checkout');
       toast({
@@ -225,7 +225,7 @@ export const useSubscription = () => {
     try {
       console.log('📡 Invoking create-checkout function with plan:', plan);
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { plan },
+        body: { plan, ...(coupon ? { coupon } : {}) },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
