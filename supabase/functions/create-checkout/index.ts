@@ -81,7 +81,7 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { plan } = await req.json();
+    const { plan, coupon } = await req.json();
     const validatedPlan = validateInput(plan);
     logStep("Plan validated", { plan: validatedPlan });
 
