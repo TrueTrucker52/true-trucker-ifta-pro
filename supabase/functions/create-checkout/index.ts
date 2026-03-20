@@ -104,7 +104,25 @@ serve(async (req) => {
     // Derive the base plan id (strip _annual suffix) for metadata
     const basePlan = validatedPlan.replace('_annual', '');
 
-    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount, interval: selectedPlan.interval });
+    // Validate coupon if provided — must be one of our known Stripe coupon IDs
+    const validCoupons: Record<string, string> = {
+      'TRIAL10': 'cllDKxUq',
+      'COMEBACK20': 'hWkvax24',
+      'EARLYBIRD15': 'A61H8B1V',
+      'WINBACK25': 'wjtQTTy0',
+    };
+    let stripeCouponId: string | undefined;
+    if (coupon && typeof coupon === 'string') {
+      const upperCoupon = coupon.toUpperCase();
+      if (validCoupons[upperCoupon]) {
+        stripeCouponId = validCoupons[upperCoupon];
+        logStep("Applying coupon", { code: upperCoupon, stripeId: stripeCouponId });
+      } else {
+        logStep("Invalid coupon ignored", { coupon });
+      }
+    }
+
+    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount, interval: selectedPlan.interval, coupon: stripeCouponId });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
