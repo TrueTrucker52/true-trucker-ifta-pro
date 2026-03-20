@@ -1,7 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, LayoutDashboard } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -16,26 +16,26 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center space-y-6 px-4">
+        <p className="text-6xl">🚛</p>
         <div className="space-y-2">
-          <h1 className="text-7xl font-bold text-primary">404</h1>
-          <h2 className="text-2xl font-semibold text-foreground">Page Not Found</h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Sorry, the page you're looking for doesn't exist or has been moved.
+          <h1 className="text-5xl font-extrabold text-primary">Wrong Turn!</h1>
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            Looks like this road doesn't exist. Let's get you back on the highway.
           </p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild variant="default">
+          <Button asChild variant="default" size="lg">
             <Link to="/">
-              <Home className="mr-2 h-4 w-4" />
-              Return to Home
+              <Home className="mr-2 h-5 w-5" />
+              Go Back Home
             </Link>
           </Button>
-          <Button asChild variant="outline" onClick={() => window.history.back()}>
-            <span className="cursor-pointer">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go Back
-            </span>
+          <Button asChild variant="outline" size="lg">
+            <Link to="/dashboard">
+              <LayoutDashboard className="mr-2 h-5 w-5" />
+              Go to Dashboard
+            </Link>
           </Button>
         </div>
       </div>
