@@ -162,6 +162,106 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          message_count: number
+          page_context: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          message_count?: number
+          page_context?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          message_count?: number
+          page_context?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_feedback: {
+        Row: {
+          created_at: string
+          feedback_reason: string | null
+          id: string
+          is_helpful: boolean
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_reason?: string | null
+          id?: string
+          is_helpful: boolean
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_reason?: string | null
+          id?: string
+          is_helpful?: boolean
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_feedback_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_onboarding: {
         Row: {
           completed_at: string | null

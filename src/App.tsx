@@ -48,6 +48,7 @@ import Install from "./pages/Install";
 import Onboarding from "./pages/Onboarding";
 import HelpCenter from "./pages/HelpCenter";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import TruckerAIAssistant from "./components/ai-assistant/TruckerAIAssistant";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -170,6 +171,7 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
               <PWAInstallPrompt />
+              <TruckerAIAssistant />
               
             </TooltipProvider>
           </AuthProvider>
