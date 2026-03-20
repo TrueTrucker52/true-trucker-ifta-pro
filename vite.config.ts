@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 500,
   },
   optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom"],
+    include: ["react", "react-dom", "react-router-dom", "lucide-react"],
   },
   plugins: [
     react(),
