@@ -175,6 +175,11 @@ const App: React.FC = () => {
                 <Onboarding />
               </ProtectedRoute>
             } />
+            <Route path="/eld" element={
+              <ProtectedRoute>
+                <ELD />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

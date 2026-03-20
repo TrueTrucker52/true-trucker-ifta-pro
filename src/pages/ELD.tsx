@@ -14,7 +14,7 @@ import LogHistoryCard from '@/components/eld/LogHistoryCard';
 import CertifyLogDialog from '@/components/eld/CertifyLogDialog';
 import { ArrowLeft, ClipboardList, CheckCircle, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const ELD: React.FC = () => {
   const navigate = useNavigate();
