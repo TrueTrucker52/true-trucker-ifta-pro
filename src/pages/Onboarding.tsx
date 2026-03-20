@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +23,7 @@ const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const onboarding = useOnboarding();
   const [currentStep, setCurrentStep] = useState(1);
+  const [stepTimeoutVisible, setStepTimeoutVisible] = useState(false);
 
   // Step 2 state
   const [firstName, setFirstName] = useState('');
@@ -51,6 +52,16 @@ const Onboarding: React.FC = () => {
 
   // Step 6 state
   const [cameraWorking, setCameraWorking] = useState<boolean | null>(null);
+  const [cameraTesting, setCameraTesting] = useState(false);
+  const [cameraPreviewActive, setCameraPreviewActive] = useState(false);
+  const [cameraMessage, setCameraMessage] = useState('');
+
+  // Step 7 state
+  const [notificationStatus, setNotificationStatus] = useState<'idle' | 'granted' | 'denied' | 'unsupported' | 'install_required'>('idle');
+  const [notificationLoading, setNotificationLoading] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     if (!onboarding.loading && onboarding.isComplete) {
@@ -63,7 +74,28 @@ const Onboarding: React.FC = () => {
     if (!onboarding.loading && onboarding.stepCompleted > 0) {
       setCurrentStep(Math.min(onboarding.stepCompleted + 1, TOTAL_STEPS));
     }
-  }, [onboarding.loading, onboarding.isComplete, onboarding.id, user?.id]);
+  }, [onboarding.loading, onboarding.isComplete, onboarding.id, onboarding.stepCompleted, user?.id, navigate]);
+
+  useEffect(() => {
+    setStepTimeoutVisible(false);
+    const timeout = window.setTimeout(() => setStepTimeoutVisible(true), 60000);
+
+    return () => window.clearTimeout(timeout);
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (!cameraPreviewActive || !videoRef.current || !streamRef.current) return;
+
+    videoRef.current.srcObject = streamRef.current;
+    videoRef.current.play().catch(() => undefined);
+  }, [cameraPreviewActive]);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    };
+  }, []);
 
   if (onboarding.loading) {
     return (
@@ -75,88 +107,198 @@ const Onboarding: React.FC = () => {
 
   const progressPercent = Math.round((currentStep / TOTAL_STEPS) * 100);
 
-  const handleNext = async () => {
-    await onboarding.completeStep(currentStep);
-    if (currentStep < TOTAL_STEPS) {
-      setCurrentStep(currentStep + 1);
-    }
+  const stopCameraStream = () => {
+    streamRef.current?.getTracks().forEach(track => track.stop());
+    streamRef.current = null;
+    setCameraPreviewActive(false);
   };
 
-  const handleSkip = async () => {
-    await onboarding.skipStep(currentStep);
-    if (currentStep < TOTAL_STEPS) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleFinish = async () => {
+  const finishAndGoToDashboard = async () => {
+    stopCameraStream();
     await onboarding.completeStep(TOTAL_STEPS);
     await onboarding.finishOnboarding();
     navigate('/dashboard', { replace: true });
   };
 
+  const handleNext = async () => {
+    await onboarding.completeStep(currentStep);
+    if (currentStep < TOTAL_STEPS) {
+      setCurrentStep(currentStep + 1);
+      return;
+    }
+
+    await finishAndGoToDashboard();
+  };
+
+  const handleSkip = async () => {
+    if (currentStep === 6) {
+      localStorage.setItem('camera_not_tested', 'true');
+      stopCameraStream();
+      setCameraWorking(false);
+      setCameraMessage('Camera test skipped for now. You can test it later from the dashboard.');
+    }
+
+    if (currentStep === 7) {
+      localStorage.setItem('notifications_enabled', 'false');
+      setNotificationStatus('denied');
+    }
+
+    await onboarding.skipStep(currentStep);
+    if (currentStep < TOTAL_STEPS) {
+      setCurrentStep(currentStep + 1);
+      return;
+    }
+
+    await finishAndGoToDashboard();
+  };
+
+  const handleFinish = async () => {
+    await finishAndGoToDashboard();
+  };
+
   const handleSaveProfile = async () => {
     if (!user?.id) return;
-    await supabase
-      .from('profiles')
-      .update({
-        phone,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
+    try {
+      await supabase
+        .from('profiles')
+        .update({
+          phone,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+    } catch {
+      // Never trap onboarding progress on profile save issues
+    }
     await handleNext();
   };
 
   const handleSaveTruck = async () => {
     if (!user?.id || !truckNumber) return;
-    await supabase.from('trucks').insert({
-      user_id: user.id,
-      unit_number: truckNumber,
-      make: truckMake || null,
-      model: truckModel || null,
-      year: truckYear ? parseInt(truckYear) : null,
-      vin: vin || null,
-      license_plate: licensePlate || null,
-      registration_state: plateState || null,
-      fuel_type: fuelType,
-    });
+    try {
+      await supabase.from('trucks').insert({
+        user_id: user.id,
+        unit_number: truckNumber,
+        make: truckMake || null,
+        model: truckModel || null,
+        year: truckYear ? parseInt(truckYear) : null,
+        vin: vin || null,
+        license_plate: licensePlate || null,
+        registration_state: plateState || null,
+        fuel_type: fuelType,
+      });
+    } catch {
+      // Never trap onboarding progress on truck save issues
+    }
     await handleNext();
   };
 
   const handleJoinFleet = async () => {
     if (!user?.id || !inviteCode) return;
-    const code = inviteCode.toUpperCase().trim();
-    const { data: fleet } = await supabase
-      .from('fleets')
-      .select('id, company_name')
-      .eq('invite_code', code)
-      .maybeSingle();
+    try {
+      const code = inviteCode.toUpperCase().trim();
+      const { data: fleet } = await supabase
+        .from('fleets')
+        .select('id, company_name')
+        .eq('invite_code', code)
+        .maybeSingle();
 
-    if (fleet) {
-      await supabase.from('fleet_members').insert({
-        fleet_id: fleet.id,
-        driver_id: user.id,
-        status: 'active',
-        invitation_status: 'accepted',
-      });
-      setFleetJoined(fleet.company_name);
+      if (fleet) {
+        await supabase.from('fleet_members').insert({
+          fleet_id: fleet.id,
+          driver_id: user.id,
+          status: 'active',
+          invitation_status: 'accepted',
+        });
+        setFleetJoined(fleet.company_name);
+      }
+    } catch {
+      // Drivers can still continue even if fleet join fails right now
     }
+  };
+
+  const openSystemSettings = () => {
+    window.open('app-settings:', '_blank');
   };
 
   const handleTestCamera = async () => {
+    stopCameraStream();
+    setCameraTesting(true);
+    setCameraWorking(null);
+    setCameraMessage('');
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      stream.getTracks().forEach(t => t.stop());
-      setCameraWorking(true);
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('camera_not_supported');
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+
+      streamRef.current = stream;
+      setCameraPreviewActive(true);
+      setCameraMessage('Camera is live — take a quick test photo to confirm everything works.');
     } catch {
       setCameraWorking(false);
+      setCameraPreviewActive(false);
+      localStorage.setItem('camera_not_tested', 'true');
+      setCameraMessage('Camera access is blocked right now. You can allow it in iPhone Settings or skip this step and continue.');
+    } finally {
+      setCameraTesting(false);
     }
   };
 
+  const handleCaptureCameraTest = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    const context = canvas.getContext('2d');
+
+    if (!context) return;
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    stopCameraStream();
+    setCameraWorking(true);
+    setCameraMessage('Camera working perfectly! Your BOL scanner is ready.');
+    localStorage.removeItem('camera_not_tested');
+  };
+
   const handleRequestNotifications = async () => {
-    if ('Notification' in window) {
-      await Notification.requestPermission();
+    setNotificationLoading(true);
+
+    try {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone;
+
+      if (!('Notification' in window)) {
+        setNotificationStatus('unsupported');
+        localStorage.setItem('notifications_enabled', 'false');
+      } else if (isIOS && !isStandalone) {
+        setNotificationStatus('install_required');
+        localStorage.setItem('notifications_enabled', 'false');
+      } else {
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          setNotificationStatus('granted');
+          localStorage.setItem('notifications_enabled', 'true');
+        } else {
+          setNotificationStatus('denied');
+          localStorage.setItem('notifications_enabled', 'false');
+        }
+      }
+    } catch {
+      setNotificationStatus('unsupported');
+      localStorage.setItem('notifications_enabled', 'false');
+    } finally {
+      setNotificationLoading(false);
     }
+
     await handleNext();
   };
 
@@ -224,7 +366,7 @@ const Onboarding: React.FC = () => {
             </div>
             <div className="flex gap-3">
               <Button className="flex-1" onClick={handleSaveProfile}>Save & Continue <ChevronRight className="h-4 w-4 ml-1" /></Button>
-              <Button variant="outline" onClick={handleSkip}>Skip</Button>
+              <Button variant="outline" onClick={handleSkip}>Skip Step</Button>
             </div>
           </motion.div>
         );
@@ -337,7 +479,7 @@ const Onboarding: React.FC = () => {
             </div>
             <div className="flex gap-3">
               <Button className="flex-1" onClick={handleSaveTruck} disabled={!truckNumber}>Save & Continue <ChevronRight className="h-4 w-4 ml-1" /></Button>
-              <Button variant="outline" onClick={handleSkip}>Skip</Button>
+              <Button variant="outline" onClick={handleSkip}>Skip Step</Button>
             </div>
           </motion.div>
         );
@@ -411,7 +553,23 @@ const Onboarding: React.FC = () => {
             </div>
             <Card>
               <CardContent className="p-6 text-center space-y-4">
-                {cameraWorking === null ? (
+                {cameraPreviewActive ? (
+                  <>
+                    <div className="overflow-hidden rounded-xl border border-border bg-muted">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        className="aspect-video w-full object-cover"
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">{cameraMessage}</p>
+                    <Button size="lg" onClick={handleCaptureCameraTest}>
+                      ✅ Take Test Photo
+                    </Button>
+                  </>
+                ) : cameraWorking === null ? (
                   <>
                     <Camera className="h-16 w-16 text-muted-foreground mx-auto" />
                     <p className="text-muted-foreground">Point your camera at any document to test</p>
@@ -421,27 +579,41 @@ const Onboarding: React.FC = () => {
                       <p>— Hold phone steady</p>
                       <p>— Keep document flat</p>
                     </div>
-                    <Button size="lg" onClick={handleTestCamera}>📷 Test Scan Now</Button>
+                    {cameraMessage ? <p className="text-sm text-muted-foreground">{cameraMessage}</p> : null}
+                    <Button size="lg" onClick={handleTestCamera} disabled={cameraTesting}>
+                      {cameraTesting ? 'Opening Camera...' : '📷 Test Scan Now'}
+                    </Button>
                   </>
                 ) : cameraWorking ? (
                   <>
                     <div className="bg-accent/10 p-4 rounded-full inline-block"><Check className="h-10 w-10 text-accent" /></div>
-                    <p className="font-semibold text-foreground">Camera working perfectly! 🎉</p>
-                    <p className="text-sm text-muted-foreground">Your BOL scanner is ready to use</p>
+                    <p className="font-semibold text-foreground">Camera working perfectly! ✅</p>
+                    <p className="text-sm text-muted-foreground">{cameraMessage || 'Your BOL scanner is ready to use.'}</p>
+                    <Button size="lg" onClick={handleNext}>
+                      Continue to Step 7 <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   </>
                 ) : (
                   <>
                     <div className="bg-destructive/10 p-4 rounded-full inline-block"><Camera className="h-10 w-10 text-destructive" /></div>
-                    <p className="font-semibold text-foreground">Camera access needed</p>
-                    <p className="text-sm text-muted-foreground">Please allow camera access in your phone settings</p>
+                    <p className="font-semibold text-foreground">⚠️ Camera access needed</p>
+                    <p className="text-sm text-muted-foreground">To enable camera on iPhone: Settings → Safari → Camera → Allow</p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                      <Button variant="outline" onClick={openSystemSettings}>Open Settings</Button>
+                      <Button onClick={handleSkip}>Skip Camera Test</Button>
+                    </div>
                   </>
                 )}
               </CardContent>
             </Card>
-            <div className="flex gap-3">
-              <Button className="flex-1" onClick={handleNext}>Continue <ChevronRight className="h-4 w-4 ml-1" /></Button>
-              <Button variant="outline" onClick={handleSkip}>Skip</Button>
-            </div>
+            {!cameraPreviewActive && cameraWorking !== true ? (
+              <div className="flex gap-3">
+                <Button className="flex-1" onClick={handleTestCamera} disabled={cameraTesting}>
+                  {cameraTesting ? 'Opening Camera...' : 'Try Camera Again'}
+                </Button>
+                <Button variant="outline" onClick={handleSkip}>Skip Step</Button>
+              </div>
+            ) : null}
           </motion.div>
         );
 
@@ -471,10 +643,24 @@ const Onboarding: React.FC = () => {
                     </div>
                   </div>
                 ))}
+
+                {notificationStatus === 'install_required' ? (
+                  <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+                    To get notifications on iPhone, install TrueTrucker to your home screen first.
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                      <Button variant="outline" size="sm" onClick={() => navigate('/install')}>How to Install</Button>
+                      <Button size="sm" onClick={handleSkip}>Skip for Now</Button>
+                    </div>
+                  </div>
+                ) : null}
+
+                {notificationStatus === 'granted' ? <p className="text-sm text-accent">✅ Notifications enabled — heading to your dashboard.</p> : null}
+                {notificationStatus === 'denied' ? <p className="text-sm text-muted-foreground">Notifications skipped — you can enable them later in settings.</p> : null}
+                {notificationStatus === 'unsupported' ? <p className="text-sm text-muted-foreground">Notifications are not available here, but you can still continue now.</p> : null}
               </CardContent>
             </Card>
             <div className="space-y-3">
-              <Button size="lg" className="w-full" onClick={handleRequestNotifications}>
+              <Button size="lg" className="w-full" onClick={handleRequestNotifications} disabled={notificationLoading}>
                 🔔 Enable Notifications
               </Button>
               <Button variant="outline" className="w-full" onClick={handleSkip}>Skip Notifications</Button>
@@ -526,8 +712,8 @@ const Onboarding: React.FC = () => {
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-foreground">🚛 Getting You Set Up!</p>
-            <button onClick={() => navigate('/dashboard')} className="text-xs text-muted-foreground hover:text-foreground">
-              <HelpCircle className="h-4 w-4" />
+            <button onClick={finishAndGoToDashboard} className="text-xs text-muted-foreground hover:text-foreground">
+              Skip Setup — Go to Dashboard
             </button>
           </div>
           <p className="text-xs text-muted-foreground mb-2">
@@ -553,6 +739,19 @@ const Onboarding: React.FC = () => {
             {renderStep()}
           </div>
         </AnimatePresence>
+
+        <div className="mt-6 space-y-3 text-center">
+          <Button variant="ghost" size="sm" onClick={currentStep === TOTAL_STEPS ? finishAndGoToDashboard : handleSkip}>
+            <HelpCircle className="mr-2 h-4 w-4" />
+            Having trouble? Skip this step
+          </Button>
+
+          {stepTimeoutVisible ? (
+            <Button variant="outline" size="sm" onClick={finishAndGoToDashboard}>
+              Taking longer than expected? Skip to Dashboard
+            </Button>
+          ) : null}
+        </div>
       </div>
     </div>
   );
