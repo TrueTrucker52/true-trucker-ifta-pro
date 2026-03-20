@@ -1080,6 +1080,7 @@ export type Database = {
           feid_number: string | null
           id: string
           phone: string | null
+          referral_code: string | null
           stripe_customer_id: string | null
           subscription_end: string | null
           subscription_status: string
@@ -1099,6 +1100,7 @@ export type Database = {
           feid_number?: string | null
           id?: string
           phone?: string | null
+          referral_code?: string | null
           stripe_customer_id?: string | null
           subscription_end?: string | null
           subscription_status?: string
@@ -1118,6 +1120,7 @@ export type Database = {
           feid_number?: string | null
           id?: string
           phone?: string | null
+          referral_code?: string | null
           stripe_customer_id?: string | null
           subscription_end?: string | null
           subscription_status?: string
@@ -1180,6 +1183,92 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vendor?: string | null
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          referral_id: string | null
+          reward_status: string
+          reward_type: string
+          reward_value: number
+          stripe_coupon_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          referral_id?: string | null
+          reward_status?: string
+          reward_type?: string
+          reward_value?: number
+          stripe_coupon_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          referral_id?: string | null
+          reward_status?: string
+          reward_type?: string
+          reward_value?: number
+          stripe_coupon_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string | null
+          referred_id: string | null
+          referrer_id: string
+          reward_applied: boolean | null
+          reward_applied_at: string | null
+          signed_up_at: string | null
+          status: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email?: string | null
+          referred_id?: string | null
+          referrer_id: string
+          reward_applied?: boolean | null
+          reward_applied_at?: string | null
+          signed_up_at?: string | null
+          status?: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string | null
+          referred_id?: string | null
+          referrer_id?: string
+          reward_applied?: boolean | null
+          reward_applied_at?: string | null
+          signed_up_at?: string | null
+          status?: string
         }
         Relationships: []
       }
