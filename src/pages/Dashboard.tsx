@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -70,6 +70,11 @@ const Dashboard = () => {
   } = useAutoTracking();
 
   const displayName = useMemo(() => user?.email?.split('@')[0] || 'Driver', [user?.email]);
+  const [cameraTestPending, setCameraTestPending] = useState(false);
+
+  useEffect(() => {
+    setCameraTestPending(localStorage.getItem('camera_not_tested') === 'true');
+  }, []);
 
   if (loading) {
     return (
@@ -109,6 +114,20 @@ const Dashboard = () => {
             <OnboardingBanner />
             <ReferralWidget />
           </Suspense>
+
+          {cameraTestPending ? (
+            <Card className="mb-6 border-border bg-card">
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="font-semibold text-foreground">Camera not tested yet</h2>
+                  <p className="text-sm text-muted-foreground">Run a quick camera check before scanning your first BOL.</p>
+                </div>
+                <Button variant="outline" onClick={() => navigate('/scan-receipt')}>
+                  Test Camera Now
+                </Button>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {/* Header */}
           <div className="mb-8">
