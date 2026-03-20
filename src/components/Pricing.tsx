@@ -31,7 +31,9 @@ const Pricing = () => {
       return;
     }
     const suffix = annual ? '_annual' : '';
-    createCheckout(planId + suffix);
+    // Apply EARLYBIRD15 coupon for annual plans
+    const coupon = annual ? 'EARLYBIRD15' : undefined;
+    createCheckout(planId + suffix, coupon);
   };
 
   const features = [

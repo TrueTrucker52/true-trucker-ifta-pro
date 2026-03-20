@@ -141,7 +141,7 @@ const TrialConversionBanner: React.FC = () => {
           daysRemaining={daysRemaining}
           onAccept={async (plan) => {
             if (activeOffer) await acceptOffer(activeOffer.id);
-            await createCheckout(plan);
+            await createCheckout(plan, 'TRIAL10');
           }}
         />
       )}

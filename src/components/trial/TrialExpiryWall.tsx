@@ -53,7 +53,7 @@ const TrialExpiryWall: React.FC = () => {
                 key={plan.id}
                 className="w-full justify-between min-h-[52px]"
                 variant={plan.id === 'solo' ? 'default' : 'outline'}
-                onClick={() => createCheckout(plan.id)}
+                onClick={() => createCheckout(plan.id, 'COMEBACK20')}
               >
                 <div className="text-left">
                   <span className="font-bold">{plan.name}</span>
