@@ -183,6 +183,11 @@ const App: React.FC = () => {
                 <ELD />
               </ProtectedRoute>
             } />
+            <Route path="/referrals" element={
+              <ProtectedRoute>
+                <Referrals />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
