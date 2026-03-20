@@ -142,8 +142,9 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
+      ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
       subscription_data: {
-        trial_period_days: 7,
+        ...(!stripeCouponId ? { trial_period_days: 7 } : {}),
         metadata: {
           source: "truetrucker-ifta-app",
           app_name: "TrueTrucker IFTA Pro",
@@ -151,6 +152,7 @@ serve(async (req) => {
           plan: basePlan,
           billing_interval: selectedPlan.interval,
           created_from: "app-checkout",
+          coupon_applied: stripeCouponId || 'none',
         },
       },
       success_url: `${safeOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
