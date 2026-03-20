@@ -41,6 +41,7 @@ import PrivacySummary from "./pages/PrivacySummary";
 import DeleteAccount from "./pages/DeleteAccount";
 import DriverDashboard from "./pages/DriverDashboard";
 import FleetDashboard from "./pages/FleetDashboard";
+import FleetMap from "./pages/FleetMap";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
