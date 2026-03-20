@@ -1,31 +1,38 @@
+import { lazy, Suspense } from "react";
 import LandingHeader from "@/components/landing/LandingHeader";
 import HeroSection from "@/components/landing/HeroSection";
-import PainPointsSection from "@/components/landing/PainPointsSection";
-import FeaturesShowcase from "@/components/landing/FeaturesShowcase";
-import HowItWorks from "@/components/landing/HowItWorks";
-import CompetitorComparison from "@/components/landing/CompetitorComparison";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
-import LaunchOfferBanner from "@/components/landing/LaunchOfferBanner";
-import FAQSection from "@/components/landing/FAQSection";
-import FinalCTA from "@/components/landing/FinalCTA";
-import LandingFooter from "@/components/landing/LandingFooter";
+
+// Lazy load below-the-fold sections to reduce initial DOM nodes and JS
+const PainPointsSection = lazy(() => import("@/components/landing/PainPointsSection"));
+const FeaturesShowcase = lazy(() => import("@/components/landing/FeaturesShowcase"));
+const HowItWorks = lazy(() => import("@/components/landing/HowItWorks"));
+const CompetitorComparison = lazy(() => import("@/components/landing/CompetitorComparison"));
+const TestimonialsSection = lazy(() => import("@/components/landing/TestimonialsSection"));
+const PricingSection = lazy(() => import("@/components/landing/PricingSection"));
+const LaunchOfferBanner = lazy(() => import("@/components/landing/LaunchOfferBanner"));
+const FAQSection = lazy(() => import("@/components/landing/FAQSection"));
+const FinalCTA = lazy(() => import("@/components/landing/FinalCTA"));
+const LandingFooter = lazy(() => import("@/components/landing/LandingFooter"));
+
+const SectionFallback = () => <div className="py-20" />;
 
 const Index = () => {
   return (
     <>
       <LandingHeader />
       <HeroSection />
-      <PainPointsSection />
-      <FeaturesShowcase />
-      <HowItWorks />
-      <CompetitorComparison />
-      <TestimonialsSection />
-      <PricingSection />
-      <LaunchOfferBanner />
-      <FAQSection />
-      <FinalCTA />
-      <LandingFooter />
+      <Suspense fallback={<SectionFallback />}>
+        <PainPointsSection />
+        <FeaturesShowcase />
+        <HowItWorks />
+        <CompetitorComparison />
+        <TestimonialsSection />
+        <PricingSection />
+        <LaunchOfferBanner />
+        <FAQSection />
+        <FinalCTA />
+        <LandingFooter />
+      </Suspense>
 
       {/* JSON-LD Schema */}
       <script

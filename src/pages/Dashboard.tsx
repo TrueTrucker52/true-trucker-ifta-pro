@@ -1,27 +1,30 @@
+import { lazy, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts";
-import { Truck, Calculator, FileText, TrendingUp, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft, Clock, Star, Building } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, LineChart, Line } from "recharts";
+import { Truck, Calculator, FileText, MapPin, DollarSign, Users, Settings, CreditCard, ArrowLeft, Clock, Star, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TrialGuard } from "@/components/TrialGuard";
-import { BOLUpgradeIncentive } from '@/components/BOLUpgradeIncentive';
 import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
-import BottomNavigation from "@/components/BottomNavigation";
-import TrackingBanner from "@/components/TrackingBanner";
-import AutoTrackToggle from "@/components/AutoTrackToggle";
 import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
-import { ProminentLocationDisclosure } from "@/components/ProminentLocationDisclosure";
 import DraftIndicator from "@/components/DraftIndicator";
-import { OnboardingBanner } from "@/components/OnboardingBanner";
-import ReferralWidget from "@/components/ReferralWidget";
+
+// Lazy load non-critical dashboard components
+const BottomNavigation = lazy(() => import("@/components/BottomNavigation"));
+const TrackingBanner = lazy(() => import("@/components/TrackingBanner"));
+const AutoTrackToggle = lazy(() => import("@/components/AutoTrackToggle"));
+const ProminentLocationDisclosure = lazy(() => import("@/components/ProminentLocationDisclosure"));
+const OnboardingBanner = lazy(() => import("@/components/OnboardingBanner").then(m => ({ default: m.OnboardingBanner })));
+const ReferralWidget = lazy(() => import("@/components/ReferralWidget"));
+const BOLUpgradeIncentive = lazy(() => import("@/components/BOLUpgradeIncentive").then(m => ({ default: m.BOLUpgradeIncentive })));
 
 const Dashboard = () => {
-  const { user, profile, profileLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { 
     openCustomerPortal, 
@@ -76,29 +79,35 @@ const Dashboard = () => {
 
   return (
     <>
-      {/* Google Play Prominent Location Disclosure - Shows on first dashboard visit */}
-      <ProminentLocationDisclosure 
-        onAccepted={() => console.log('Location disclosure accepted')}
-        onDenied={() => console.log('Location disclosure denied - manual mode')}
-      />
+      <Suspense fallback={null}>
+        <ProminentLocationDisclosure 
+          onAccepted={() => {}}
+          onDenied={() => {}}
+        />
+      </Suspense>
 
-      {/* Offline Banner - Fixed at very top */}
       <OfflineBanner />
 
-      {/* Tracking Banner - Fixed at top when active */}
-      <TrackingBanner
-        isTracking={isTracking}
-        currentState={currentState}
-        totalMiles={totalMiles}
-        statesCrossed={statesCrossed}
-        startTime={startTime}
-        onStopTracking={stopTracking}
-      />
+      {isTracking && (
+        <Suspense fallback={null}>
+          <TrackingBanner
+            isTracking={isTracking}
+            currentState={currentState}
+            totalMiles={totalMiles}
+            statesCrossed={statesCrossed}
+            startTime={startTime}
+            onStopTracking={stopTracking}
+          />
+        </Suspense>
+      )}
 
       <div className={`min-h-screen bg-background p-6 ${isTracking ? 'pt-20 md:pt-24' : ''}`}>
         <div className="max-w-7xl mx-auto">
-          <OnboardingBanner />
-          <ReferralWidget />
+          <Suspense fallback={null}>
+            <OnboardingBanner />
+            <ReferralWidget />
+          </Suspense>
+
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -117,11 +126,13 @@ const Dashboard = () => {
 
             {/* Auto-Track Toggle */}
             <div className="mb-6">
-              <AutoTrackToggle
-                isTracking={isTracking}
-                onStartTracking={startTracking}
-                onStopTracking={stopTracking}
-              />
+              <Suspense fallback={null}>
+                <AutoTrackToggle
+                  isTracking={isTracking}
+                  onStartTracking={startTracking}
+                  onStopTracking={stopTracking}
+                />
+              </Suspense>
             </div>
 
             {/* Trial Status Card */}
@@ -149,12 +160,8 @@ const Dashboard = () => {
                           </>
                         ) : (
                           <>
-                            <h3 className="font-semibold text-foreground">
-                              Free Trial Ended
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Subscribe to continue using all IFTA features
-                            </p>
+                            <h3 className="font-semibold text-foreground">Free Trial Ended</h3>
+                            <p className="text-sm text-muted-foreground">Subscribe to continue using all IFTA features</p>
                           </>
                         )}
                       </div>
@@ -162,61 +169,24 @@ const Dashboard = () => {
                     <div className="flex items-center gap-2">
                       {trial_active && trial_days_remaining <= 3 && (
                         <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate('/pricing')}
-                          >
-                            View All Plans
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => createCheckout('medium')}
-                          >
-                            <Star className="h-4 w-4 mr-2" />
-                            Upgrade Now
+                          <Button variant="outline" size="sm" onClick={() => navigate('/pricing')}>View All Plans</Button>
+                          <Button variant="outline" size="sm" onClick={() => createCheckout('medium')}>
+                            <Star className="h-4 w-4 mr-2" />Upgrade Now
                           </Button>
                         </>
                       )}
                       {trial_active && trial_days_remaining > 3 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate('/pricing')}
-                        >
-                          Upgrade Early
-                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => navigate('/pricing')}>Upgrade Early</Button>
                       )}
                       {subscription_status === 'trial_expired' && (
                         <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate('/pricing')}
-                          >
-                            View All Plans
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => createCheckout('medium')}
-                          >
-                            <Star className="h-4 w-4 mr-2" />
-                            Subscribe Now
+                          <Button variant="outline" size="sm" onClick={() => navigate('/pricing')}>View All Plans</Button>
+                          <Button variant="default" size="sm" onClick={() => createCheckout('medium')}>
+                            <Star className="h-4 w-4 mr-2" />Subscribe Now
                           </Button>
                         </>
                       )}
-                      {/* Add refresh button for cached subscription issues */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          await checkSubscription();
-                          window.location.reload();
-                        }}
-                        className="text-xs"
-                      >
+                      <Button variant="ghost" size="sm" onClick={async () => { await checkSubscription(); window.location.reload(); }} className="text-xs">
                         🔄 Refresh Status
                       </Button>
                     </div>
@@ -235,54 +205,31 @@ const Dashboard = () => {
                           <Star className="h-5 w-5 text-success" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-foreground">
-                            {subscription_tier?.toUpperCase()} Plan Active
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Complete company setup to unlock all IFTA features
-                          </p>
+                          <h3 className="font-semibold text-foreground">{subscription_tier?.toUpperCase()} Plan Active</h3>
+                          <p className="text-sm text-muted-foreground">Complete company setup to unlock all IFTA features</p>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate('/account?flow=setup')}
-                          className="bg-primary/10"
-                        >
-                          <Building className="h-4 w-4 mr-2" />
-                          Complete Setup
+                        <Button variant="outline" size="sm" onClick={() => navigate('/account?flow=setup')} className="bg-primary/10">
+                          <Building className="h-4 w-4 mr-2" />Complete Setup
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={openCustomerPortal}
-                        >
-                          <CreditCard className="h-4 w-4 mr-2" />
-                          Manage Subscription
+                        <Button variant="outline" size="sm" onClick={openCustomerPortal}>
+                          <CreditCard className="h-4 w-4 mr-2" />Manage Subscription
                         </Button>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
                 
-                {/* Company Setup Alert */}
                 <Card className="mb-6 border-orange-200 bg-orange-50">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <Building className="h-6 w-6 text-orange-600" />
                       <div className="flex-1">
                         <h3 className="font-semibold text-orange-800">Complete Your Company Setup</h3>
-                        <p className="text-sm text-orange-700">
-                          Add your company information to begin tracking IFTA miles and generating reports.
-                        </p>
+                        <p className="text-sm text-orange-700">Add your company information to begin tracking IFTA miles and generating reports.</p>
                       </div>
-                      <Button
-                        onClick={() => navigate('/account?flow=setup')}
-                        className="bg-orange-600 hover:bg-orange-700"
-                      >
-                        Setup Now
-                      </Button>
+                      <Button onClick={() => navigate('/account?flow=setup')} className="bg-orange-600 hover:bg-orange-700">Setup Now</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -290,10 +237,9 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Draft Indicator */}
           <DraftIndicator />
 
-          {/* Quick Stats - High contrast for truck cab visibility */}
+          {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {quickStats.map((stat, index) => (
               <Card key={index} className="border-2">
@@ -314,11 +260,8 @@ const Dashboard = () => {
           {/* Charts Section */}
           <TrialGuard feature="Advanced Analytics" requiredTier="small">
             <div className="grid lg:grid-cols-2 gap-6 mb-8">
-              {/* Monthly Miles */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Monthly Mileage</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Monthly Mileage</CardTitle></CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig}>
                     <BarChart data={monthlyData}>
@@ -330,12 +273,8 @@ const Dashboard = () => {
                   </ChartContainer>
                 </CardContent>
               </Card>
-
-              {/* Fuel Spending */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Fuel Spending Trend</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Fuel Spending Trend</CardTitle></CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig}>
                     <LineChart data={monthlyData}>
@@ -350,83 +289,68 @@ const Dashboard = () => {
             </div>
           </TrialGuard>
 
-          {/* BOL Upgrade Incentive */}
-          <BOLUpgradeIncentive showIf="starter" />
+          <Suspense fallback={null}>
+            <BOLUpgradeIncentive showIf="starter" />
+          </Suspense>
 
-          {/* Quick Actions - Large touch targets for truck cab use */}
+          {/* Quick Actions */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Quick Actions</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-xl">Quick Actions</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Button onClick={() => navigate('/ifta-reports')} size="xl" className="h-20">
-                  <Calculator className="mr-3 h-7 w-7" />
-                  <span className="text-lg">IFTA Calculator</span>
+                  <Calculator className="mr-3 h-7 w-7" /><span className="text-lg">IFTA Calculator</span>
                 </Button>
                 <Button onClick={() => navigate('/scan-receipt')} variant="secondary" size="xl" className="h-20">
-                  <FileText className="mr-3 h-7 w-7" />
-                  <span className="text-lg">Scan Receipt</span>
+                  <FileText className="mr-3 h-7 w-7" /><span className="text-lg">Scan Receipt</span>
                 </Button>
                 <Button onClick={() => navigate('/mileage-tracker')} variant="outline" size="xl" className="h-20 border-2">
-                  <Truck className="mr-3 h-7 w-7" />
-                  <span className="text-lg">Track Mileage</span>
+                  <Truck className="mr-3 h-7 w-7" /><span className="text-lg">Track Mileage</span>
                 </Button>
                 <Button onClick={() => navigate('/bol-management')} variant="outline" size="xl" className="h-20 border-2">
-                  <FileText className="mr-3 h-7 w-7" />
-                  <span className="text-lg">BOL Manager</span>
+                  <FileText className="mr-3 h-7 w-7" /><span className="text-lg">BOL Manager</span>
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Additional Tools */}
           <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Additional Tools</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Additional Tools</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Button onClick={() => navigate('/calculator')} variant="outline" className="h-16">
-                  <Calculator className="mr-2 h-5 w-5" />
-                  Savings Calculator
+                  <Calculator className="mr-2 h-5 w-5" />Savings Calculator
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Management & Settings */}
           <TrialGuard feature="Fleet Management" requiredTier="large">
             <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Management & Settings</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Management & Settings</CardTitle></CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Button onClick={() => navigate('/vehicles')} variant="outline" size="lg" className="h-16 border-2">
-                    <Users className="mr-2 h-5 w-5" />
-                    Fleet Management
+                    <Users className="mr-2 h-5 w-5" />Fleet Management
                   </Button>
                   <Button onClick={openCustomerPortal} variant="outline" size="lg" className="h-16 border-2">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Manage Subscription
+                    <CreditCard className="mr-2 h-5 w-5" />Manage Subscription
                   </Button>
                   <Button onClick={() => navigate('/account')} variant="outline" size="lg" className="h-16 border-2">
-                    <Settings className="mr-2 h-5 w-5" />
-                    Settings / Account
+                    <Settings className="mr-2 h-5 w-5" />Settings / Account
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </TrialGuard>
           
-          {/* Bottom padding for fixed navigation */}
           <div className="h-24 md:hidden" />
         </div>
         
-        {/* Bottom Navigation - Mobile only */}
         <div className="md:hidden">
-          <BottomNavigation />
+          <Suspense fallback={null}>
+            <BottomNavigation />
+          </Suspense>
         </div>
       </div>
     </>
