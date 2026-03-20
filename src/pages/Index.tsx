@@ -27,7 +27,7 @@ const Index = () => {
       <Pricing />
       <ContactSection />
       <Footer />
-      <SupportBot />
+      
     </>
   );
 };

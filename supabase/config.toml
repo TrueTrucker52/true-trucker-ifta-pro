@@ -99,3 +99,6 @@ verify_jwt = false
 
 [functions.delete-account]
 verify_jwt = false
+
+[functions.trucker-ai-chat]
+verify_jwt = false

@@ -171,6 +171,7 @@ const App: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
               <PWAInstallPrompt />
+              <TruckerAIAssistant />
               
             </TooltipProvider>
           </AuthProvider>
