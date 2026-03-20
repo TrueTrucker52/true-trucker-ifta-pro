@@ -396,6 +396,120 @@ export type Database = {
         }
         Relationships: []
       }
+      geofence_events: {
+        Row: {
+          created_at: string
+          driver_id: string
+          event_type: string
+          fleet_id: string
+          geofence_id: string
+          id: string
+          recorded_at: string
+          truck_id: string
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          event_type: string
+          fleet_id: string
+          geofence_id: string
+          id?: string
+          recorded_at?: string
+          truck_id: string
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          event_type?: string
+          fleet_id?: string
+          geofence_id?: string
+          id?: string
+          recorded_at?: string
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_events_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_geofence_id_fkey"
+            columns: ["geofence_id"]
+            isOneToOne: false
+            referencedRelation: "geofences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofences: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string
+          fleet_id: string
+          id: string
+          is_active: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          notify_on_enter: boolean | null
+          notify_on_exit: boolean | null
+          radius_meters: number
+          updated_at: string
+          zone_type: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by: string
+          fleet_id: string
+          id?: string
+          is_active?: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          notify_on_enter?: boolean | null
+          notify_on_exit?: boolean | null
+          radius_meters?: number
+          updated_at?: string
+          zone_type?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          fleet_id?: string
+          id?: string
+          is_active?: boolean | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          notify_on_enter?: boolean | null
+          notify_on_exit?: boolean | null
+          radius_meters?: number
+          updated_at?: string
+          zone_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofences_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       help_articles: {
         Row: {
           category_id: string | null
