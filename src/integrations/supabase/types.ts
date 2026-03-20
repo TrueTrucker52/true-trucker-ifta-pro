@@ -304,6 +304,150 @@ export type Database = {
         }
         Relationships: []
       }
+      eld_inspections: {
+        Row: {
+          created_at: string
+          driver_id: string
+          fleet_id: string | null
+          id: string
+          inspection_code: string | null
+          inspector_name: string | null
+          location: string | null
+          notes: string | null
+          result: string | null
+          transfer_method: string | null
+          truck_id: string | null
+          violations_found: Json | null
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          fleet_id?: string | null
+          id?: string
+          inspection_code?: string | null
+          inspector_name?: string | null
+          location?: string | null
+          notes?: string | null
+          result?: string | null
+          transfer_method?: string | null
+          truck_id?: string | null
+          violations_found?: Json | null
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          fleet_id?: string | null
+          id?: string
+          inspection_code?: string | null
+          inspector_name?: string | null
+          location?: string | null
+          notes?: string | null
+          result?: string | null
+          transfer_method?: string | null
+          truck_id?: string | null
+          violations_found?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eld_inspections_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eld_inspections_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eld_logs: {
+        Row: {
+          certified_at: string | null
+          created_at: string
+          driver_id: string
+          duration_minutes: number | null
+          duty_status: string
+          edit_reason: string | null
+          edited: boolean | null
+          fleet_id: string | null
+          id: string
+          is_certified: boolean | null
+          location_end: string | null
+          location_start: string | null
+          log_date: string
+          notes: string | null
+          odometer_end: number | null
+          odometer_start: number | null
+          original_data: Json | null
+          status_end: string | null
+          status_start: string
+          truck_id: string | null
+        }
+        Insert: {
+          certified_at?: string | null
+          created_at?: string
+          driver_id: string
+          duration_minutes?: number | null
+          duty_status?: string
+          edit_reason?: string | null
+          edited?: boolean | null
+          fleet_id?: string | null
+          id?: string
+          is_certified?: boolean | null
+          location_end?: string | null
+          location_start?: string | null
+          log_date?: string
+          notes?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          original_data?: Json | null
+          status_end?: string | null
+          status_start?: string
+          truck_id?: string | null
+        }
+        Update: {
+          certified_at?: string | null
+          created_at?: string
+          driver_id?: string
+          duration_minutes?: number | null
+          duty_status?: string
+          edit_reason?: string | null
+          edited?: boolean | null
+          fleet_id?: string | null
+          id?: string
+          is_certified?: boolean | null
+          location_end?: string | null
+          location_start?: string | null
+          log_date?: string
+          notes?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          original_data?: Json | null
+          status_end?: string | null
+          status_start?: string
+          truck_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eld_logs_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eld_logs_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_members: {
         Row: {
           driver_id: string
@@ -604,6 +748,63 @@ export type Database = {
           sort_order?: number
         }
         Relationships: []
+      }
+      hos_violations: {
+        Row: {
+          created_at: string
+          driver_id: string
+          fleet_id: string | null
+          id: string
+          occurred_at: string
+          resolved_at: string | null
+          severity: string
+          truck_id: string | null
+          violation_detail: string | null
+          violation_type: string
+          was_resolved: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          fleet_id?: string | null
+          id?: string
+          occurred_at?: string
+          resolved_at?: string | null
+          severity?: string
+          truck_id?: string | null
+          violation_detail?: string | null
+          violation_type: string
+          was_resolved?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          fleet_id?: string | null
+          id?: string
+          occurred_at?: string
+          resolved_at?: string | null
+          severity?: string
+          truck_id?: string | null
+          violation_detail?: string | null
+          violation_type?: string
+          was_resolved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hos_violations_fleet_id_fkey"
+            columns: ["fleet_id"]
+            isOneToOne: false
+            referencedRelation: "fleets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hos_violations_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "trucks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ifta_reports: {
         Row: {
