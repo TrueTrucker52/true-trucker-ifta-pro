@@ -55,6 +55,13 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
+    /* Landing page */
+    --landing-navy: 215 28% 10%;
+    --landing-navy-foreground: 0 0% 100%;
+    --landing-orange: 25 95% 53%;
+    --landing-orange-foreground: 0 0% 100%;
+    --landing-gray: 220 14% 96%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
