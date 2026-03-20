@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,58 +8,73 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { PageLoadingFallback } from "@/components/PageLoadingFallback";
 
+// Eagerly loaded (critical path)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Calculator from "./pages/Calculator";
-import IFTAReports from "./pages/IFTAReports";
-import MileageTracker from "./pages/MileageTracker";
-import ReceiptScan from "./pages/ReceiptScan";
-import VehicleManagement from "./pages/VehicleManagement";
-import TripManagement from "./pages/TripManagement";
-import Reports from "./pages/Reports";
-import Invoices from "./pages/Invoices";
-import SiteTest from "./pages/SiteTest";
-import Pricing from "./pages/Pricing";
-import Account from "./pages/Account";
-import Demo from "./pages/Demo";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import RefundPolicy from "./pages/RefundPolicy";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import Admin from "./pages/Admin";
-import BOLManagement from "./pages/BOLManagement";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import StoreListings from "./components/StoreListings";
-import AudienceTargetedLanding from "./components/AudienceTargetedLanding";
-import StorePreview from "./components/StorePreview";
-import MarketingHub from "./components/MarketingHub";
-import TruckingNews from "./pages/TruckingNews";
-import PrivacySummary from "./pages/PrivacySummary";
-import DeleteAccount from "./pages/DeleteAccount";
-import DriverDashboard from "./pages/DriverDashboard";
-import FleetDashboard from "./pages/FleetDashboard";
-import FleetMap from "./pages/FleetMap";
-import Messages from "./pages/Messages";
-import Notifications from "./pages/Notifications";
-import Analytics from "./pages/Analytics";
-import Install from "./pages/Install";
-import Onboarding from "./pages/Onboarding";
-import HelpCenter from "./pages/HelpCenter";
-import ELD from "./pages/ELD";
-import Referrals from "./pages/Referrals";
-import PWAInstallPrompt from "./components/PWAInstallPrompt";
-import TruckerAIAssistant from "./components/ai-assistant/TruckerAIAssistant";
-import VoiceCommandSystem from "./components/voice-commands/VoiceCommandSystem";
-import TrialConversionBanner from "./components/trial/TrialConversionBanner";
-import TrialExpiryWall from "./components/trial/TrialExpiryWall";
-const queryClient = new QueryClient();
+
+// Lazy loaded pages
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Calculator = lazy(() => import("./pages/Calculator"));
+const IFTAReports = lazy(() => import("./pages/IFTAReports"));
+const MileageTracker = lazy(() => import("./pages/MileageTracker"));
+const ReceiptScan = lazy(() => import("./pages/ReceiptScan"));
+const VehicleManagement = lazy(() => import("./pages/VehicleManagement"));
+const TripManagement = lazy(() => import("./pages/TripManagement"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Invoices = lazy(() => import("./pages/Invoices"));
+const SiteTest = lazy(() => import("./pages/SiteTest"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Account = lazy(() => import("./pages/Account"));
+const Demo = lazy(() => import("./pages/Demo"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const Contact = lazy(() => import("./pages/Contact"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Admin = lazy(() => import("./pages/Admin"));
+const BOLManagement = lazy(() => import("./pages/BOLManagement"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const StoreListings = lazy(() => import("./components/StoreListings"));
+const AudienceTargetedLanding = lazy(() => import("./components/AudienceTargetedLanding"));
+const StorePreview = lazy(() => import("./components/StorePreview"));
+const MarketingHub = lazy(() => import("./components/MarketingHub"));
+const TruckingNews = lazy(() => import("./pages/TruckingNews"));
+const PrivacySummary = lazy(() => import("./pages/PrivacySummary"));
+const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
+const DriverDashboard = lazy(() => import("./pages/DriverDashboard"));
+const FleetDashboard = lazy(() => import("./pages/FleetDashboard"));
+const FleetMap = lazy(() => import("./pages/FleetMap"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Install = lazy(() => import("./pages/Install"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const ELD = lazy(() => import("./pages/ELD"));
+const Referrals = lazy(() => import("./pages/Referrals"));
+const Learn = lazy(() => import("./pages/Learn"));
+
+// Lazy loaded global overlays
+const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
+const TruckerAIAssistant = lazy(() => import("./components/ai-assistant/TruckerAIAssistant"));
+const VoiceCommandSystem = lazy(() => import("./components/voice-commands/VoiceCommandSystem"));
+const TrialConversionBanner = lazy(() => import("./components/trial/TrialConversionBanner"));
+const TrialExpiryWall = lazy(() => import("./components/trial/TrialExpiryWall"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App: React.FC = () => {
-  console.log('App rendering...');
-  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -68,141 +83,64 @@ const App: React.FC = () => {
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/ifta-reports" element={
-              <ProtectedRoute>
-                <IFTAReports />
-              </ProtectedRoute>
-            } />
-              <Route path="/mileage-tracker" element={
-                <ProtectedRoute>
-                  <MileageTracker />
-                </ProtectedRoute>
-              } />
-              <Route path="/vehicles" element={
-                <ProtectedRoute>
-                  <VehicleManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/trips" element={
-                <ProtectedRoute>
-                  <TripManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports" element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              } />
-            <Route path="/scan-receipt" element={
-              <ProtectedRoute>
-                <ReceiptScan />
-              </ProtectedRoute>
-            } />
-            <Route path="/invoices" element={
-              <ProtectedRoute>
-                <Invoices />
-              </ProtectedRoute>
-            } />
-            <Route path="/calculator" element={<Calculator />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/refund-policy" element={<RefundPolicy />} />
-            <Route path="/site-test" element={<SiteTest />} />
-            <Route path="/bol-management" element={
-              <ProtectedRoute>
-                <BOLManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <RoleProtectedRoute allowedRoles={['admin']} redirectTo="/dashboard">
-                <Admin />
-              </RoleProtectedRoute>
-            } />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/store-listings" element={<StoreListings />} />
-            <Route path="/audience-landing" element={<AudienceTargetedLanding />} />
-            <Route path="/store-preview" element={<StorePreview />} />
-            <Route path="/marketing-hub" element={<MarketingHub />} />
-            <Route path="/trucking-news" element={
-              <ProtectedRoute>
-                <TruckingNews />
-              </ProtectedRoute>
-            } />
-            <Route path="/privacy-summary" element={<PrivacySummary />} />
-            <Route path="/help" element={<HelpCenter />} />
-            <Route path="/delete-account" element={<DeleteAccount />} />
-            <Route path="/driver-dashboard" element={
-              <RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard">
-                <DriverDashboard />
-              </RoleProtectedRoute>
-            } />
-            <Route path="/fleet-dashboard" element={
-              <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
-                <FleetDashboard />
-              </RoleProtectedRoute>
-            } />
-            <Route path="/fleet-map" element={
-              <RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard">
-                <FleetMap />
-              </RoleProtectedRoute>
-            } />
-            <Route path="/messages" element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            } />
-            <Route path="/notifications" element={
-              <ProtectedRoute>
-                <Notifications />
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics" element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            } />
-            <Route path="/install" element={<Install />} />
-            <Route path="/onboarding" element={
-              <ProtectedRoute>
-                <Onboarding />
-              </ProtectedRoute>
-            } />
-            <Route path="/eld" element={
-              <ProtectedRoute>
-                <ELD />
-              </ProtectedRoute>
-            } />
-            <Route path="/referrals" element={
-              <ProtectedRoute>
-                <Referrals />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-              <TrialConversionBanner />
-              <TrialExpiryWall />
-              <PWAInstallPrompt />
-              <TruckerAIAssistant />
-              <VoiceCommandSystem />
-              
+              <Suspense fallback={<PageLoadingFallback />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/ifta-reports" element={<ProtectedRoute><IFTAReports /></ProtectedRoute>} />
+                  <Route path="/mileage-tracker" element={<ProtectedRoute><MileageTracker /></ProtectedRoute>} />
+                  <Route path="/vehicles" element={<ProtectedRoute><VehicleManagement /></ProtectedRoute>} />
+                  <Route path="/trips" element={<ProtectedRoute><TripManagement /></ProtectedRoute>} />
+                  <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+                  <Route path="/scan-receipt" element={<ProtectedRoute><ReceiptScan /></ProtectedRoute>} />
+                  <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+                  <Route path="/calculator" element={<Calculator />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/account" element={<Account />} />
+                  <Route path="/demo" element={<Demo />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/site-test" element={<SiteTest />} />
+                  <Route path="/bol-management" element={<ProtectedRoute><BOLManagement /></ProtectedRoute>} />
+                  <Route path="/admin" element={<RoleProtectedRoute allowedRoles={['admin']} redirectTo="/dashboard"><Admin /></RoleProtectedRoute>} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/store-listings" element={<StoreListings />} />
+                  <Route path="/audience-landing" element={<AudienceTargetedLanding />} />
+                  <Route path="/store-preview" element={<StorePreview />} />
+                  <Route path="/marketing-hub" element={<MarketingHub />} />
+                  <Route path="/trucking-news" element={<ProtectedRoute><TruckingNews /></ProtectedRoute>} />
+                  <Route path="/privacy-summary" element={<PrivacySummary />} />
+                  <Route path="/help" element={<HelpCenter />} />
+                  <Route path="/delete-account" element={<DeleteAccount />} />
+                  <Route path="/driver-dashboard" element={<RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard"><DriverDashboard /></RoleProtectedRoute>} />
+                  <Route path="/fleet-dashboard" element={<RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard"><FleetDashboard /></RoleProtectedRoute>} />
+                  <Route path="/fleet-map" element={<RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard"><FleetMap /></RoleProtectedRoute>} />
+                  <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                  <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                  <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                  <Route path="/install" element={<Install />} />
+                  <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+                  <Route path="/eld" element={<ProtectedRoute><ELD /></ProtectedRoute>} />
+                  <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
+                  <Route path="/learn" element={<Learn />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+              <Suspense fallback={null}>
+                <TrialConversionBanner />
+                <TrialExpiryWall />
+                <PWAInstallPrompt />
+                <TruckerAIAssistant />
+                <VoiceCommandSystem />
+              </Suspense>
             </TooltipProvider>
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </ErrorBoundary>
-);
+  );
 };
 
 export default App;
