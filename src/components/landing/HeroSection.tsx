@@ -7,14 +7,18 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-[100vh] flex items-center overflow-hidden">
-      {/* Background image */}
+    <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
+      {/* Background image with fetchpriority */}
       <div className="absolute inset-0">
         <img
           src={heroTruck}
           alt="Semi truck on American highway at sunset"
           className="w-full h-full object-cover"
           loading="eager"
+          fetchPriority="high"
+          width={1440}
+          height={810}
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--landing-navy))]/90 via-[hsl(var(--landing-navy))]/70 to-[hsl(var(--landing-navy))]/40" />
       </div>
