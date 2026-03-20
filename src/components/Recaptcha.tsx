@@ -1,5 +1,4 @@
-
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 interface RecaptchaProps {
@@ -7,43 +6,50 @@ interface RecaptchaProps {
   className?: string;
 }
 
+let recaptchaScriptLoaded = false;
+let recaptchaScriptLoading = false;
+
+function loadRecaptchaScript(): Promise<void> {
+  if (recaptchaScriptLoaded) return Promise.resolve();
+  if (recaptchaScriptLoading) {
+    return new Promise((resolve) => {
+      const check = () => {
+        if ((window as any).grecaptcha) { recaptchaScriptLoaded = true; resolve(); }
+        else setTimeout(check, 100);
+      };
+      check();
+    });
+  }
+  recaptchaScriptLoading = true;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => { recaptchaScriptLoaded = true; resolve(); };
+    script.onerror = () => reject(new Error('Failed to load reCAPTCHA'));
+    document.head.appendChild(script);
+  });
+}
+
 const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(recaptchaScriptLoaded);
   const [hasError, setHasError] = useState(false);
-  
-  // Public site key (safe to ship). Replace with your real reCAPTCHA v2 site key for production.
+
   const siteKey = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
-  
+
   useEffect(() => {
-    // Check if reCAPTCHA script is loaded
-    const checkRecaptchaLoaded = () => {
-      if ((window as any).grecaptcha) {
-        setIsLoaded(true);
-      } else {
-        setTimeout(checkRecaptchaLoaded, 100);
-      }
-    };
-    
-    checkRecaptchaLoaded();
+    let cancelled = false;
+    loadRecaptchaScript()
+      .then(() => { if (!cancelled) setIsLoaded(true); })
+      .catch(() => { if (!cancelled) setHasError(true); });
+    return () => { cancelled = true; };
   }, []);
 
-  const handleLoad = () => {
-    console.log('✅ reCAPTCHA loaded successfully');
-    setIsLoaded(true);
-    setHasError(false);
-  };
-
-  const handleError = () => {
-    console.error('❌ reCAPTCHA failed to load');
-    setHasError(true);
-    setIsLoaded(false);
-  };
-
-  const handleChange = (token: string | null) => {
-    console.log('🔒 reCAPTCHA verification:', token ? 'success' : 'cleared');
+  const handleChange = useCallback((token: string | null) => {
     onVerify(token);
-  };
+  }, [onVerify]);
 
   if (hasError) {
     return (
@@ -58,21 +64,17 @@ const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   if (!isLoaded) {
     return (
       <div className={`${className} text-center p-4`}>
-        <div className="text-sm text-muted-foreground">
-          Loading verification...
-        </div>
+        <div className="text-sm text-muted-foreground">Loading verification...</div>
       </div>
     );
   }
-  
+
   return (
     <div className={className}>
       <ReCAPTCHA
         ref={recaptchaRef}
         sitekey={siteKey}
         onChange={handleChange}
-        onLoad={handleLoad}
-        onError={handleError}
         theme="light"
         size="normal"
       />
