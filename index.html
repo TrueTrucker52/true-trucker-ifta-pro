@@ -67,6 +67,10 @@
       #root{min-height:100dvh}
       .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
     </style>
+
+    <!-- Preload hero images for instant LCP -->
+    <link rel="preload" as="image" type="image/webp" href="/src/assets/landing-hero-truck-mobile.webp" media="(max-width: 768px)" />
+    <link rel="preload" as="image" type="image/webp" href="/src/assets/landing-hero-truck-desktop.webp" media="(min-width: 769px)" />
   </head>
 
   <body>
