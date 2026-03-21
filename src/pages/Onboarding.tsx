@@ -115,9 +115,14 @@ const Onboarding: React.FC = () => {
 
   const finishAndGoToDashboard = async () => {
     stopCameraStream();
-    await onboarding.completeStep(TOTAL_STEPS);
-    await onboarding.finishOnboarding();
-    navigate('/dashboard', { replace: true });
+    try {
+      await onboarding.completeStep(TOTAL_STEPS);
+      await onboarding.finishOnboarding();
+    } catch {
+      // Never trap users in onboarding
+    } finally {
+      navigate('/dashboard', { replace: true });
+    }
   };
 
   const handleNext = async () => {
@@ -136,14 +141,27 @@ const Onboarding: React.FC = () => {
       stopCameraStream();
       setCameraWorking(false);
       setCameraMessage('Camera test skipped for now. You can test it later from the dashboard.');
+      setCurrentStep(7);
+      try {
+        await onboarding.skipStep(currentStep);
+      } catch {
+        // Continue anyway
+      }
+      return;
     }
 
     if (currentStep === 7) {
       localStorage.setItem('notifications_enabled', 'false');
       setNotificationStatus('denied');
+      await finishAndGoToDashboard();
+      return;
     }
 
-    await onboarding.skipStep(currentStep);
+    try {
+      await onboarding.skipStep(currentStep);
+    } catch {
+      // Continue anyway
+    }
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
       return;
@@ -232,7 +250,7 @@ const Onboarding: React.FC = () => {
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
+        video: { facingMode: 'environment' },
         audio: false,
       });
 
@@ -297,9 +315,8 @@ const Onboarding: React.FC = () => {
       localStorage.setItem('notifications_enabled', 'false');
     } finally {
       setNotificationLoading(false);
+      await finishAndGoToDashboard();
     }
-
-    await handleNext();
   };
 
   const driverName = profile?.company_name || user?.email?.split('@')[0] || 'Driver';
@@ -663,7 +680,7 @@ const Onboarding: React.FC = () => {
               <Button size="lg" className="w-full" onClick={handleRequestNotifications} disabled={notificationLoading}>
                 🔔 Enable Notifications
               </Button>
-              <Button variant="outline" className="w-full" onClick={handleSkip}>Skip Notifications</Button>
+              <Button variant="outline" className="w-full" onClick={handleSkip} disabled={notificationLoading}>Skip Notifications</Button>
             </div>
           </motion.div>
         );

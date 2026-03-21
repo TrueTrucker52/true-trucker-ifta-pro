@@ -9,7 +9,6 @@ import { Truck, Mail, Lock, Eye, EyeOff, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import Recaptcha from '@/components/Recaptcha';
 
 type AuthTab = 'signin' | 'signup' | 'reset';
 
@@ -28,7 +27,6 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [activeTab, setActiveTab] = useState<AuthTab>(initialTab);
@@ -36,8 +34,6 @@ const Auth = () => {
   const { signUp, signIn, resetPassword, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const isRecaptchaEnabled = Boolean(import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim());
-
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
@@ -50,7 +46,6 @@ const Auth = () => {
   }, [initialTab]);
 
   useEffect(() => {
-    setRecaptchaToken(null);
     setSignInGuidance(null);
   }, [activeTab]);
 
@@ -79,12 +74,13 @@ const Auth = () => {
     if (accountExists === false) {
       const guidance = {
         title: 'No account found',
-        description: 'No account was found with this email. Create your free account to get started.',
+        description: 'No account found with this email. Create an account instead to get started.',
         targetTab: 'signup' as const,
-        actionLabel: 'Create account →',
+        actionLabel: 'Click Sign Up →',
       };
 
       setSignInGuidance(guidance);
+      setActiveTab('signup');
       toast({
         title: guidance.title,
         description: guidance.description,
@@ -93,8 +89,8 @@ const Auth = () => {
     }
 
     const guidance = {
-      title: 'Check your password or confirmation email',
-      description: 'We found an account with this email. Try resetting your password or confirm your email before signing in.',
+      title: 'Email or password incorrect',
+      description: 'Email or password incorrect. Need an account? Click Sign Up, or reset your password if you already signed up.',
       targetTab: 'reset' as const,
       actionLabel: 'Reset password →',
     };
@@ -178,15 +174,6 @@ const Auth = () => {
       return;
     }
 
-    if (isRecaptchaEnabled && !recaptchaToken) {
-      toast({
-        title: "Verification Required",
-        description: "Please complete the reCAPTCHA verification",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (password.length < 6) {
       console.log('❌ Validation failed - password too short');
       toast({
@@ -201,7 +188,7 @@ const Auth = () => {
     console.log('📧 Calling signUp function...');
     
     try {
-      const { error } = await signUp(email, password, recaptchaToken);
+      const { error } = await signUp(email, password, null);
       
       if (error) {
         console.log('❌ Sign up error:', error);
@@ -257,20 +244,11 @@ const Auth = () => {
       return;
     }
 
-    if (isRecaptchaEnabled && !recaptchaToken) {
-      toast({
-        title: "Verification Required", 
-        description: "Please complete the reCAPTCHA verification",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setLoading(true);
     console.log('🔑 Calling signIn function...');
     
     try {
-      const { error } = await signIn(email, password, recaptchaToken);
+      const { error } = await signIn(email, password, null);
       
       if (error) {
         console.log('❌ Sign in error:', error);
@@ -415,18 +393,11 @@ const Auth = () => {
                     </div>
                   </div>
                   
-                  {isRecaptchaEnabled ? (
-                    <Recaptcha 
-                      onVerify={setRecaptchaToken}
-                      className="flex justify-center"
-                    />
-                  ) : (
-                    <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
-                      Sign-in verification is disabled during beta testing.
-                    </div>
-                  )}
+                  <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+                    Beta mode: sign in with email and password only.
+                  </div>
                   
-                  <Button type="submit" className="w-full" disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}>
+                  <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
@@ -531,18 +502,11 @@ const Auth = () => {
              </p>
            </div>
                   
-                  {isRecaptchaEnabled ? (
-                    <Recaptcha 
-                      onVerify={setRecaptchaToken}
-                      className="flex justify-center"
-                    />
-                  ) : (
-                    <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
-                      Sign-up verification is disabled during beta testing.
-                    </div>
-                  )}
+                  <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+                    Beta mode: no reCAPTCHA required during testing.
+                  </div>
                   
-                  <Button type="submit" className="w-full" disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}>
+                  <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Start Free Trial"}
                   </Button>
                 </form>
