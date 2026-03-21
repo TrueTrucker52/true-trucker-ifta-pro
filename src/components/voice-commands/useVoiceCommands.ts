@@ -19,11 +19,27 @@ export function useVoiceCommands() {
 
   const recognitionRef = useRef<any>(null);
   const wakeWordRecognitionRef = useRef<any>(null);
+  const pendingTimeoutsRef = useRef<number[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
   const settingsLoadedRef = useRef(false);
+
+  const registerTimeout = useCallback((callback: () => void, delay: number) => {
+    const timeoutId = window.setTimeout(() => {
+      pendingTimeoutsRef.current = pendingTimeoutsRef.current.filter((id) => id !== timeoutId);
+      callback();
+    }, delay);
+
+    pendingTimeoutsRef.current.push(timeoutId);
+    return timeoutId;
+  }, []);
+
+  const clearPendingTimeouts = useCallback(() => {
+    pendingTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    pendingTimeoutsRef.current = [];
+  }, []);
 
   // Load settings from Supabase
   useEffect(() => {
@@ -224,7 +240,7 @@ export function useVoiceCommands() {
       setLastResponse(errorMsg);
       speak(errorMsg);
       logCommand(spoken, null, false, 0);
-      setTimeout(() => setVoiceState('idle'), 3000);
+        registerTimeout(() => setVoiceState('idle'), 3000);
       return;
     }
 
@@ -256,8 +272,8 @@ export function useVoiceCommands() {
     speak(responseText);
     logCommand(spoken, command.action, true, confidence);
 
-    setTimeout(() => setVoiceState('idle'), 3000);
-  }, [pendingConfirmation, handlers, navigate, speak, logCommand]);
+    registerTimeout(() => setVoiceState('idle'), 3000);
+  }, [pendingConfirmation, handlers, navigate, speak, logCommand, registerTimeout]);
 
   // Start listening for a single command
   const startListening = useCallback(() => {
@@ -286,7 +302,7 @@ export function useVoiceCommands() {
         setVoiceState('idle');
       } else {
         setVoiceState('error');
-        setTimeout(() => setVoiceState('idle'), 2000);
+        registerTimeout(() => setVoiceState('idle'), 2000);
       }
     };
 
@@ -323,7 +339,7 @@ export function useVoiceCommands() {
           recognition.stop();
           if (navigator.vibrate) navigator.vibrate(100);
           // Small delay then start command listening
-          setTimeout(() => startListening(), 300);
+          registerTimeout(() => startListening(), 300);
           return;
         }
       }
@@ -331,7 +347,7 @@ export function useVoiceCommands() {
 
     recognition.onerror = () => {
       // Restart after error
-      setTimeout(() => {
+      registerTimeout(() => {
         if (settings.voice_enabled) startWakeWordListening();
       }, 1000);
     };
@@ -339,7 +355,7 @@ export function useVoiceCommands() {
     recognition.onend = () => {
       // Restart if still enabled
       if (settings.voice_enabled) {
-        setTimeout(() => startWakeWordListening(), 500);
+        registerTimeout(() => startWakeWordListening(), 500);
       }
     };
 
@@ -349,7 +365,7 @@ export function useVoiceCommands() {
     } catch (e) {
       // Already started
     }
-  }, [settings.language, settings.wake_word, settings.voice_enabled, startListening]);
+  }, [settings.language, settings.wake_word, settings.voice_enabled, startListening, registerTimeout]);
 
   const stopWakeWordListening = useCallback(() => {
     wakeWordRecognitionRef.current?.stop();
@@ -384,11 +400,12 @@ export function useVoiceCommands() {
   // Cleanup
   useEffect(() => {
     return () => {
+      clearPendingTimeouts();
       recognitionRef.current?.stop();
       wakeWordRecognitionRef.current?.stop();
       ttsEngine.stop();
     };
-  }, []);
+  }, [clearPendingTimeouts]);
 
   const hasSpeechSupport = typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
 
