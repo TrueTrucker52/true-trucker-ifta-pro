@@ -11,8 +11,19 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Recaptcha from '@/components/Recaptcha';
 
+type AuthTab = 'signin' | 'signup' | 'reset';
+
+interface SignInGuidance {
+  title: string;
+  description: string;
+  targetTab: AuthTab;
+  actionLabel: string;
+}
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
+  const requestedMode = searchParams.get('mode');
+  const initialTab: AuthTab = requestedMode === 'signup' || requestedMode === 'reset' ? requestedMode : 'signin';
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,12 +31,12 @@ const Auth = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [activeTab, setActiveTab] = useState<AuthTab>(initialTab);
+  const [signInGuidance, setSignInGuidance] = useState<SignInGuidance | null>(null);
   const { signUp, signIn, resetPassword, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  // Get mode from URL parameters (signin or signup)
-  const mode = searchParams.get('mode') || 'signin';
+  const isRecaptchaEnabled = Boolean(import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim());
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -33,6 +44,68 @@ const Auth = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
+  useEffect(() => {
+    setRecaptchaToken(null);
+    setSignInGuidance(null);
+  }, [activeTab]);
+
+  const checkAccountExists = async (value: string) => {
+    const normalizedEmail = value.trim().toLowerCase();
+
+    if (!normalizedEmail) return null;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Unable to check account existence:', error);
+      return null;
+    }
+
+    return Boolean(data);
+  };
+
+  const handleInvalidCredentials = async (value: string) => {
+    const accountExists = await checkAccountExists(value);
+
+    if (accountExists === false) {
+      const guidance = {
+        title: 'No account found',
+        description: 'No account was found with this email. Create your free account to get started.',
+        targetTab: 'signup' as const,
+        actionLabel: 'Create account →',
+      };
+
+      setSignInGuidance(guidance);
+      toast({
+        title: guidance.title,
+        description: guidance.description,
+      });
+      return;
+    }
+
+    const guidance = {
+      title: 'Check your password or confirmation email',
+      description: 'We found an account with this email. Try resetting your password or confirm your email before signing in.',
+      targetTab: 'reset' as const,
+      actionLabel: 'Reset password →',
+    };
+
+    setSignInGuidance(guidance);
+    toast({
+      title: guidance.title,
+      description: guidance.description,
+      variant: 'destructive',
+    });
+  };
 
   const joinFleetWithCode = async (userId: string, code: string) => {
     const trimmedCode = code.trim().toUpperCase();
@@ -105,7 +178,7 @@ const Auth = () => {
       return;
     }
 
-    if (!recaptchaToken) {
+    if (isRecaptchaEnabled && !recaptchaToken) {
       toast({
         title: "Verification Required",
         description: "Please complete the reCAPTCHA verification",
@@ -184,7 +257,7 @@ const Auth = () => {
       return;
     }
 
-    if (!recaptchaToken) {
+    if (isRecaptchaEnabled && !recaptchaToken) {
       toast({
         title: "Verification Required", 
         description: "Please complete the reCAPTCHA verification",
@@ -201,6 +274,11 @@ const Auth = () => {
       
       if (error) {
         console.log('❌ Sign in error:', error);
+        if (/invalid login credentials/i.test(error.message ?? '')) {
+          await handleInvalidCredentials(email);
+          return;
+        }
+
         toast({
           title: "Error",
           description: error.message,
@@ -284,7 +362,7 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue={mode} className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as AuthTab)} className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -302,7 +380,10 @@ const Auth = () => {
                         type="email"
                         placeholder="Enter your email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setSignInGuidance(null);
+                        }}
                         className="pl-10"
                         required
                       />
@@ -317,7 +398,10 @@ const Auth = () => {
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setSignInGuidance(null);
+                        }}
                         className="pl-10 pr-10"
                         required
                       />
@@ -331,26 +415,42 @@ const Auth = () => {
                     </div>
                   </div>
                   
-                  <Recaptcha 
-                    onVerify={setRecaptchaToken}
-                    className="flex justify-center"
-                  />
+                  {isRecaptchaEnabled ? (
+                    <Recaptcha 
+                      onVerify={setRecaptchaToken}
+                      className="flex justify-center"
+                    />
+                  ) : (
+                    <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+                      Sign-in verification is disabled during beta testing.
+                    </div>
+                  )}
                   
-                  <Button type="submit" className="w-full" disabled={loading || !recaptchaToken}>
+                  <Button type="submit" className="w-full" disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}>
                     {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
+
+                {signInGuidance && (
+                  <div className="rounded-lg border bg-muted/40 p-3 text-sm">
+                    <p className="font-medium text-foreground">{signInGuidance.title}</p>
+                    <p className="mt-1 text-muted-foreground">{signInGuidance.description}</p>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab(signInGuidance.targetTab)}
+                      className="mt-2 font-medium text-primary hover:underline"
+                    >
+                      {signInGuidance.actionLabel}
+                    </button>
+                  </div>
+                )}
                 
                 <div className="text-center mt-4 space-y-2">
                   <div className="p-3 bg-muted/50 rounded-lg border">
                     <p className="text-sm font-medium text-foreground">Having trouble signing in?</p>
                     <button
                       type="button"
-                      onClick={() => {
-                        const tabs = document.querySelector('[role="tablist"]');
-                        const resetTab = tabs?.querySelector('[value="reset"]') as HTMLElement;
-                        resetTab?.click();
-                      }}
+                      onClick={() => setActiveTab('reset')}
                       className="text-sm text-primary hover:underline font-medium mt-1"
                     >
                       Reset your password here →
@@ -431,12 +531,18 @@ const Auth = () => {
              </p>
            </div>
                   
-                  <Recaptcha 
-                    onVerify={setRecaptchaToken}
-                    className="flex justify-center"
-                  />
+                  {isRecaptchaEnabled ? (
+                    <Recaptcha 
+                      onVerify={setRecaptchaToken}
+                      className="flex justify-center"
+                    />
+                  ) : (
+                    <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+                      Sign-up verification is disabled during beta testing.
+                    </div>
+                  )}
                   
-                  <Button type="submit" className="w-full" disabled={loading || !recaptchaToken}>
+                  <Button type="submit" className="w-full" disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}>
                     {loading ? "Creating account..." : "Start Free Trial"}
                   </Button>
                 </form>

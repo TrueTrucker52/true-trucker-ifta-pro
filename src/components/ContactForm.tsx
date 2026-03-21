@@ -9,6 +9,7 @@ import Recaptcha from '@/components/Recaptcha';
 import { useToast } from '@/hooks/use-toast';
 
 const ContactForm = () => {
+  const isRecaptchaEnabled = Boolean(import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim());
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,7 +24,7 @@ const ContactForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!recaptchaToken) {
+    if (isRecaptchaEnabled && !recaptchaToken) {
       toast({
         title: "Verification Required",
         description: "Please complete the reCAPTCHA verification.",
@@ -142,15 +143,21 @@ const ContactForm = () => {
             />
           </div>
 
-          <Recaptcha 
-            onVerify={setRecaptchaToken}
-            className="flex justify-center"
-          />
+          {isRecaptchaEnabled ? (
+            <Recaptcha 
+              onVerify={setRecaptchaToken}
+              className="flex justify-center"
+            />
+          ) : (
+            <div className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+              Contact form verification is disabled during beta testing.
+            </div>
+          )}
 
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={isSubmitting || !recaptchaToken}
+            disabled={isSubmitting || (isRecaptchaEnabled && !recaptchaToken)}
           >
             {isSubmitting ? "Sending..." : "Send Message"}
           </Button>
