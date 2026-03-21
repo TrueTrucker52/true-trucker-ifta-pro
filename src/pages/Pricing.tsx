@@ -1,6 +1,5 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Check, CreditCard, Shield, Truck, Users, Star, Zap, Crown, Building2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -174,7 +173,7 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
+        <section className="grid grid-cols-1 gap-6 mx-auto mb-16 max-w-7xl md:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan) => {
             const price = getPrice(plan);
             const Icon = plan.icon;
@@ -183,13 +182,13 @@ const Pricing = () => {
             const isCurrent = subscription_tier === plan.id;
 
             return (
-              <Card
+              <article
                 key={plan.id}
                 className={`relative flex flex-col ${
                   isPopular ? 'border-primary shadow-xl ring-2 ring-primary/40 scale-[1.02]' :
                   isBestValue ? 'border-accent shadow-lg ring-1 ring-accent/40' :
                   'border-border'
-                } hover:shadow-xl transition-all duration-300`}
+                } rounded-2xl border bg-card p-6 transition-all duration-300 hover:shadow-xl`}
               >
                 {plan.badge && (
                   <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${
@@ -201,61 +200,54 @@ const Pricing = () => {
                   </Badge>
                 )}
 
-                <CardHeader className="text-center pb-2">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="bg-primary/10 p-2.5 rounded-full">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <CardDescription className="text-xs font-semibold text-primary/80 uppercase tracking-wide">{plan.trucks}</CardDescription>
-                  <CardDescription className="min-h-[36px] text-sm">{plan.description}</CardDescription>
-
-                  <div className="mt-3">
+                <header className="mb-5 text-center">
+                  <span className="inline-flex items-center justify-center p-2.5 mb-3 rounded-full bg-primary/10">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </span>
+                  <h2 className="text-xl font-semibold">{plan.name}</h2>
+                  <p className="text-xs font-semibold tracking-wide uppercase text-primary/80">{plan.trucks}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
+                  <p className="mt-4">
                     <span className="text-4xl font-bold">${price}</span>
                     <span className="text-muted-foreground">/{annual ? 'year' : 'mo'}</span>
-                    {annual && (
-                      <div className="text-xs text-green-600 font-semibold mt-1">
-                        ${Math.round(price / 12)}/mo billed annually
-                      </div>
-                    )}
-                  </div>
-                  {plan.extraTrucks && (
-                    <p className="text-xs text-muted-foreground mt-1">Extra trucks: $12/truck/mo</p>
+                  </p>
+                  {annual && (
+                    <p className="mt-1 text-xs font-semibold text-green-600">
+                      ${Math.round(price / 12)}/mo billed annually
+                    </p>
                   )}
-                  <p className="text-xs text-green-600 font-semibold mt-1">7-day free trial</p>
-                </CardHeader>
+                  {plan.extraTrucks && <p className="mt-1 text-xs text-muted-foreground">Extra trucks: $12/truck/mo</p>}
+                  <p className="mt-1 text-xs font-semibold text-green-600">7-day free trial</p>
+                </header>
 
-                <CardContent className="flex flex-col flex-1">
-                  <ul className="space-y-2.5 mb-6 flex-1">
+                <ul className="flex-1 mb-6 space-y-2.5">
                     {plan.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span className="text-sm">{f}</span>
                       </li>
                     ))}
-                  </ul>
+                </ul>
 
-                  <Button
-                    className="w-full"
-                    variant={isPopular ? 'hero' : 'outline'}
-                    onClick={() => handlePlanSelect(plan.id)}
-                    disabled={loading === plan.id || isCurrent}
-                    size="lg"
-                  >
-                    {loading === plan.id ? 'Setting up...' : isCurrent ? 'Current Plan' : 'Start Free Trial'}
-                  </Button>
-                  <p className="text-xs text-center text-muted-foreground mt-2">Cancel anytime • No setup fees</p>
-                </CardContent>
-              </Card>
+                <Button
+                  className="w-full"
+                  variant={isPopular ? 'hero' : 'outline'}
+                  onClick={() => handlePlanSelect(plan.id)}
+                  disabled={loading === plan.id || isCurrent}
+                  size="lg"
+                >
+                  {loading === plan.id ? 'Setting up...' : isCurrent ? 'Current Plan' : 'Start Free Trial'}
+                </Button>
+                <p className="mt-2 text-xs text-center text-muted-foreground">Cancel anytime • No setup fees</p>
+              </article>
             );
           })}
-        </div>
+        </section>
 
         {/* Tabbed Feature Comparison — minimal DOM */}
-        <div className="max-w-3xl mx-auto mb-16">
+        <section className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl font-bold text-center mb-6">Feature Comparison</h2>
-          <div className="flex justify-center gap-2 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
             {plans.map((p, i) => (
               <button
                 key={p.id}
@@ -270,17 +262,17 @@ const Pricing = () => {
               </button>
             ))}
           </div>
-          <div className="rounded-lg border bg-card p-4">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b">
+          <div className="p-4 border rounded-lg bg-card">
+            <header className="flex items-center gap-3 pb-4 mb-4 border-b">
               {(() => {
                 const Icon = plans[comparisonTab].icon;
                 return <Icon className="h-6 w-6 text-primary" />;
               })()}
               <div>
-                <h3 className="font-bold text-lg">{plans[comparisonTab].name}</h3>
+                <h3 className="text-lg font-bold">{plans[comparisonTab].name}</h3>
                 <p className="text-sm text-muted-foreground">{plans[comparisonTab].trucks} • ${getPrice(plans[comparisonTab])}/{annual ? 'year' : 'mo'}</p>
               </div>
-            </div>
+            </header>
             <ul className="space-y-3">
               {featureRows.map((row) => (
                 <li key={row.feature} className="flex items-center justify-between text-sm">
@@ -294,7 +286,7 @@ const Pricing = () => {
               ))}
             </ul>
           </div>
-        </div>
+        </section>
 
         {/* 30-day guarantee */}
         <div className="max-w-2xl mx-auto mb-16 bg-muted/50 p-8 rounded-xl text-center border">
@@ -306,25 +298,25 @@ const Pricing = () => {
         </div>
 
         {/* FAQ */}
-        <div className="max-w-3xl mx-auto mb-12">
+        <section className="max-w-3xl mx-auto mb-12">
           <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <div key={i} className="bg-card border rounded-lg overflow-hidden">
-                <button
-                  className="w-full flex items-center justify-between p-5 text-left"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="font-semibold text-sm">{faq.q}</span>
-                  {openFaq === i ? <ChevronUp className="h-4 w-4 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 flex-shrink-0" />}
-                </button>
-                {openFaq === i && (
-                  <div className="px-5 pb-5 text-sm text-muted-foreground">{faq.a}</div>
-                )}
-              </div>
+              <details
+                key={i}
+                className="overflow-hidden border rounded-lg bg-card group"
+                open={openFaq === i}
+                onToggle={(event) => setOpenFaq((event.currentTarget as HTMLDetailsElement).open ? i : null)}
+              >
+                <summary className="flex items-center justify-between p-5 text-sm font-semibold list-none cursor-pointer">
+                  <span>{faq.q}</span>
+                  {openFaq === i ? <ChevronUp className="flex-shrink-0 w-4 h-4" /> : <ChevronDown className="flex-shrink-0 w-4 h-4" />}
+                </summary>
+                <p className="px-5 pb-5 text-sm text-muted-foreground">{faq.a}</p>
+              </details>
             ))}
           </div>
-        </div>
+        </section>
 
         <div className="text-center">
           <Button onClick={() => navigate('/')} variant="outline">← Back to Home</Button>
