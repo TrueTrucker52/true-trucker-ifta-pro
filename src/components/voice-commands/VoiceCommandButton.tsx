@@ -29,6 +29,10 @@ const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
   const config = stateConfig[voiceState];
   const longPressRef = React.useRef<NodeJS.Timeout | null>(null);
 
+  if (isMobile) {
+    return null;
+  }
+
   const handlePointerDown = () => {
     longPressRef.current = setTimeout(onLongPress, 500);
   };
