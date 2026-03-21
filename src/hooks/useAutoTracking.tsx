@@ -86,6 +86,20 @@ export const useAutoTracking = () => {
   const accumulatedMilesRef = useRef(0);
   const lastLoggedMilesRef = useRef(0);
 
+  const clearActiveWatch = useCallback(async () => {
+    if (!watchIdRef.current) return;
+
+    const currentWatchId = watchIdRef.current;
+    watchIdRef.current = null;
+
+    if (Capacitor.isNativePlatform()) {
+      await Geolocation.clearWatch({ id: currentWatchId });
+      return;
+    }
+
+    navigator.geolocation.clearWatch(Number(currentWatchId));
+  }, []);
+
   // Determine state from coordinates using bounding boxes
   const getStateFromCoords = useCallback((lat: number, lng: number): string | null => {
     for (const [stateCode, bounds] of Object.entries(STATE_BOUNDARIES)) {
@@ -222,6 +236,8 @@ export const useAutoTracking = () => {
     }
 
     try {
+      await clearActiveWatch();
+
       // Check permission
       const permission = localStorage.getItem('location_permission');
       if (permission !== 'granted') {
@@ -339,18 +355,11 @@ export const useAutoTracking = () => {
       });
       return false;
     }
-  }, [user?.id, getStateFromCoords, handlePositionUpdate, toast]);
+  }, [user?.id, getStateFromCoords, handlePositionUpdate, toast, clearActiveWatch]);
 
   // Stop tracking
   const stopTracking = useCallback(async () => {
-    if (watchIdRef.current) {
-      if (Capacitor.isNativePlatform()) {
-        await Geolocation.clearWatch({ id: watchIdRef.current });
-      } else {
-        navigator.geolocation.clearWatch(Number(watchIdRef.current));
-      }
-      watchIdRef.current = null;
-    }
+    await clearActiveWatch();
 
     // Log any remaining miles
     if (accumulatedMilesRef.current > 0 && trackingState.currentState && trackingState.lastPosition) {
@@ -388,7 +397,7 @@ export const useAutoTracking = () => {
     });
 
     return summary;
-  }, [trackingState, logMileage, toast]);
+  }, [trackingState, logMileage, toast, clearActiveWatch]);
 
   // Restore tracking state on mount
   useEffect(() => {
@@ -400,15 +409,9 @@ export const useAutoTracking = () => {
 
     return () => {
       // Cleanup on unmount
-      if (watchIdRef.current) {
-        if (Capacitor.isNativePlatform()) {
-          Geolocation.clearWatch({ id: watchIdRef.current });
-        } else {
-          navigator.geolocation.clearWatch(Number(watchIdRef.current));
-        }
-      }
+      void clearActiveWatch();
     };
-  }, [user?.id]);
+  }, [user?.id, clearActiveWatch]);
 
   return {
     ...trackingState,

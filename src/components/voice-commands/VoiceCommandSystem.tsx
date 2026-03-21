@@ -59,7 +59,7 @@ const VoiceCommandSystem: React.FC = () => {
 
   const handleTryNow = () => {
     dismissTutorial();
-    setTimeout(() => startListening(), 300);
+    window.setTimeout(() => startListening(), 300);
   };
 
   return (
