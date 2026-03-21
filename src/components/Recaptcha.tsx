@@ -8,8 +8,10 @@ interface RecaptchaProps {
 
 let recaptchaScriptLoaded = false;
 let recaptchaScriptLoading = false;
+const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim();
 
 function loadRecaptchaScript(): Promise<void> {
+  if (!siteKey) return Promise.resolve();
   if (recaptchaScriptLoaded) return Promise.resolve();
   if (recaptchaScriptLoading) {
     return new Promise((resolve) => {
@@ -27,19 +29,28 @@ function loadRecaptchaScript(): Promise<void> {
     script.async = true;
     script.defer = true;
     script.onload = () => { recaptchaScriptLoaded = true; resolve(); };
-    script.onerror = () => reject(new Error('Failed to load reCAPTCHA'));
+    script.onerror = () => {
+      recaptchaScriptLoading = false;
+      reject(new Error('Failed to load reCAPTCHA'));
+    };
     document.head.appendChild(script);
   });
 }
 
 const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-  const [isLoaded, setIsLoaded] = useState(recaptchaScriptLoaded);
+  const [isLoaded, setIsLoaded] = useState(!siteKey || recaptchaScriptLoaded);
   const [hasError, setHasError] = useState(false);
 
-  const siteKey = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+  useEffect(() => {
+    if (!siteKey) {
+      onVerify(null);
+    }
+  }, [onVerify]);
 
   useEffect(() => {
+    if (!siteKey) return;
+
     let cancelled = false;
     loadRecaptchaScript()
       .then(() => { if (!cancelled) setIsLoaded(true); })
@@ -50,6 +61,10 @@ const Recaptcha: React.FC<RecaptchaProps> = ({ onVerify, className }) => {
   const handleChange = useCallback((token: string | null) => {
     onVerify(token);
   }, [onVerify]);
+
+  if (!siteKey) {
+    return null;
+  }
 
   if (hasError) {
     return (
