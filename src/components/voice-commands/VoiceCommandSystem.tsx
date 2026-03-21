@@ -34,6 +34,14 @@ const VoiceCommandSystem: React.FC = () => {
     speak,
   } = useVoiceCommands();
 
+  useEffect(() => {
+    return () => {
+      if (tryNowTimeoutRef.current) {
+        window.clearTimeout(tryNowTimeoutRef.current);
+      }
+    };
+  }, []);
+
   if (!user || !hasSpeechSupport) return null;
 
   const handleButtonTap = () => {
@@ -69,14 +77,6 @@ const VoiceCommandSystem: React.FC = () => {
       startListening();
     }, 300);
   };
-
-  useEffect(() => {
-    return () => {
-      if (tryNowTimeoutRef.current) {
-        window.clearTimeout(tryNowTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <>
