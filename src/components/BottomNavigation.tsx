@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MapPin, Camera, Bell, BarChart3 } from 'lucide-react';
+import { MapPin, Camera, FileText, Newspaper } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 
@@ -14,14 +14,13 @@ const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { unreadCount } = useNotifications();
+  useNotifications();
 
   const navItems: NavItem[] = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: MapPin, label: 'Mileage', path: '/mileage-tracker' },
     { icon: Camera, label: 'Scan', path: '/scan-receipt', highlight: true },
-    { icon: Bell, label: 'Alerts', path: '/notifications' },
-    { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+    { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: Newspaper, label: 'News', path: '/trucking-news' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -59,11 +58,6 @@ const BottomNavigation = () => {
               ) : (
                 <div className="relative">
                   <Icon className={cn("h-6 w-6", active && "scale-110")} />
-                  {item.path === '/notifications' && unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
                 </div>
               )}
               <span className={cn(
