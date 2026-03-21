@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVoiceCommands } from './useVoiceCommands';
 import VoiceCommandButton from './VoiceCommandButton';
@@ -11,6 +11,7 @@ import VoiceSettingsPanel from './VoiceSettingsPanel';
 const VoiceCommandSystem: React.FC = () => {
   const { user } = useAuth();
   const [showSettings, setShowSettings] = useState(false);
+  const tryNowTimeoutRef = useRef<number | null>(null);
 
   const {
     voiceState,
@@ -59,8 +60,23 @@ const VoiceCommandSystem: React.FC = () => {
 
   const handleTryNow = () => {
     dismissTutorial();
-    window.setTimeout(() => startListening(), 300);
+    if (tryNowTimeoutRef.current) {
+      window.clearTimeout(tryNowTimeoutRef.current);
+    }
+
+    tryNowTimeoutRef.current = window.setTimeout(() => {
+      tryNowTimeoutRef.current = null;
+      startListening();
+    }, 300);
   };
+
+  useEffect(() => {
+    return () => {
+      if (tryNowTimeoutRef.current) {
+        window.clearTimeout(tryNowTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
