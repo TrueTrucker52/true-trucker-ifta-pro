@@ -8,7 +8,7 @@ const plans = [
     badge: "Most Popular",
     monthly: 39,
     trucks: "1 truck included",
-    features: ["IFTA tracking", "ELD compliance", "Live GPS", "Voice commands", "BOL scanning", "AI assistant", "All features"],
+    features: ["IFTA tracking", "ELD compliance", "Live GPS", "BOL scanning"],
     link: "https://buy.stripe.com/4gM28s4SncsG67FahjdEs03",
   },
   {
@@ -16,7 +16,7 @@ const plans = [
     badge: "Best Value",
     monthly: 79,
     trucks: "2–5 trucks included",
-    features: ["Everything in Solo PLUS:", "Fleet dashboard", "Driver management", "Fleet messaging", "Combined IFTA reports", "Dispatch & routing"],
+    features: ["Fleet dashboard", "Driver management", "Fleet messaging", "Combined IFTA reports"],
     link: "https://buy.stripe.com/3cIeVe2Kf3Wa9jRexzdEs04",
     highlight: true,
   },
@@ -25,7 +25,7 @@ const plans = [
     badge: null,
     monthly: 129,
     trucks: "6–10 trucks included",
-    features: ["Everything in Small Fleet PLUS:", "Advanced analytics", "DOT audit package", "Safety scores", "Priority support"],
+    features: ["Advanced analytics", "DOT audit package", "Safety scores", "Priority support"],
     link: "https://buy.stripe.com/5kQ3cwacH50eanVfBDdEs05",
   },
   {
@@ -33,7 +33,7 @@ const plans = [
     badge: null,
     monthly: 199,
     trucks: "11–25 trucks included",
-    features: ["Everything in Fleet Pro PLUS:", "Dedicated support", "API access", "Custom onboarding", "SLA guarantee"],
+    features: ["Dedicated support", "API access", "Custom onboarding", "SLA guarantee"],
     link: "https://buy.stripe.com/aFa3cw70v50ebrZ0GJdEs06",
   },
 ];
@@ -67,11 +67,11 @@ const PricingSection = () => {
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-10">
+        <div className="grid max-w-6xl gap-6 mx-auto mb-10 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((p) => {
             const price = annual ? Math.round(p.monthly * 0.8) : p.monthly;
             return (
-              <div
+              <article
                 key={p.name}
                 className={`rounded-xl border p-6 text-left flex flex-col ${
                   p.highlight
@@ -84,13 +84,15 @@ const PricingSection = () => {
                     {p.badge}
                   </span>
                 )}
-                <h3 className="text-lg font-bold text-card-foreground mb-1">{p.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{p.trucks}</p>
-                <div className="mb-6">
+                <header className="mb-6">
+                  <h3 className="mb-1 text-lg font-bold text-card-foreground">{p.name}</h3>
+                  <p className="text-sm text-muted-foreground">{p.trucks}</p>
+                  <div className="mt-4">
                   <span className="text-4xl font-extrabold text-foreground">${price}</span>
                   <span className="text-muted-foreground">/mo</span>
-                </div>
-                <ul className="space-y-2 mb-8 flex-1">
+                  </div>
+                </header>
+                <ul className="flex-1 mb-6 space-y-2">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
@@ -98,6 +100,7 @@ const PricingSection = () => {
                     </li>
                   ))}
                 </ul>
+                <p className="mb-4 text-xs text-muted-foreground">See full comparison on the pricing page.</p>
                 <Button
                   variant={p.highlight ? "hero" : "default"}
                   size="default"
@@ -108,7 +111,7 @@ const PricingSection = () => {
                     Start Free Trial →
                   </a>
                 </Button>
-              </div>
+              </article>
             );
           })}
         </div>
