@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RoleProtectedRoute from "@/components/RoleProtectedRoute";
@@ -111,6 +111,7 @@ const App: React.FC = () => {
                   <Route path="/trucking-news" element={<ProtectedRoute><TruckingNews /></ProtectedRoute>} />
                   <Route path="/privacy-summary" element={<PrivacySummary />} />
                   <Route path="/help" element={<HelpCenter />} />
+                  <Route path="/security" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/delete-account" element={<DeleteAccount />} />
                   <Route path="/driver-dashboard" element={<RoleProtectedRoute allowedRoles={['driver', 'admin']} redirectTo="/dashboard"><DriverDashboard /></RoleProtectedRoute>} />
                   <Route path="/fleet-dashboard" element={<RoleProtectedRoute allowedRoles={['fleet_owner', 'admin']} redirectTo="/dashboard"><FleetDashboard /></RoleProtectedRoute>} />
