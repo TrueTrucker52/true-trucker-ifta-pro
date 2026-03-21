@@ -104,11 +104,18 @@ export function useTruckerAI() {
     const assistantId = (Date.now() + 1).toString();
 
     try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
+      if (sessionError || !accessToken) {
+        throw new Error('You must be signed in to use the AI assistant.');
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           messages: allMessages,
