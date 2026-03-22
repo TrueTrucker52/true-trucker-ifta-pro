@@ -1373,7 +1373,6 @@ export type Database = {
           id: string
           is_active: boolean
           notes: string | null
-          password_hash: string
         }
         Insert: {
           account_type?: string
@@ -1383,7 +1382,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
-          password_hash: string
         }
         Update: {
           account_type?: string
@@ -1393,7 +1391,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
-          password_hash?: string
         }
         Relationships: []
       }
