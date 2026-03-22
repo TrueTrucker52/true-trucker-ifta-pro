@@ -65,72 +65,74 @@ const InspectionMode: React.FC<Props> = ({ currentStatus, hosSummary, driverName
           {!eld_active ? (
             <ELDUpgradeCard inspectionMode />
           ) : (
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" /> DOT INSPECTION MODE
-            </DialogTitle>
-          </DialogHeader>
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" /> DOT INSPECTION MODE
+                </DialogTitle>
+              </DialogHeader>
 
-          <div className="space-y-4">
-            <Card className="bg-muted/50">
-              <CardContent className="pt-4 space-y-1 text-sm">
-                <p><strong>Driver:</strong> {driverName || user?.email}</p>
-                <p><strong>Status:</strong> <Badge variant="outline">{statusLabel[currentStatus]}</Badge></p>
-                <p><strong>Drive Time Left:</strong> {formatMinutes(hosSummary.driveTimeRemainingMinutes)}</p>
-                <p><strong>On Duty Left:</strong> {formatMinutes(hosSummary.onDutyTimeRemainingMinutes)}</p>
-                <p><strong>Cycle Left:</strong> {formatMinutes(hosSummary.cycleHoursRemainingMinutes)}</p>
-              </CardContent>
-            </Card>
+              <div className="space-y-4">
+                <Card className="bg-muted/50">
+                  <CardContent className="pt-4 space-y-1 text-sm">
+                    <p><strong>Driver:</strong> {driverName || user?.email}</p>
+                    <p><strong>Status:</strong> <Badge variant="outline">{statusLabel[currentStatus]}</Badge></p>
+                    <p><strong>Drive Time Left:</strong> {formatMinutes(hosSummary.driveTimeRemainingMinutes)}</p>
+                    <p><strong>On Duty Left:</strong> {formatMinutes(hosSummary.onDutyTimeRemainingMinutes)}</p>
+                    <p><strong>Cycle Left:</strong> {formatMinutes(hosSummary.cycleHoursRemainingMinutes)}</p>
+                  </CardContent>
+                </Card>
 
-            <div className="space-y-2">
-              <Label>Inspector Name</Label>
-              <Input value={inspectorName} onChange={e => setInspectorName(e.target.value)} placeholder="DOT Officer Name" />
-              <Label>Inspection Code</Label>
-              <Input value={inspectionCode} onChange={e => setInspectionCode(e.target.value)} placeholder="DOT Inspection ID" />
-            </div>
+                <div className="space-y-2">
+                  <Label>Inspector Name</Label>
+                  <Input value={inspectorName} onChange={e => setInspectorName(e.target.value)} placeholder="DOT Officer Name" />
+                  <Label>Inspection Code</Label>
+                  <Input value={inspectionCode} onChange={e => setInspectionCode(e.target.value)} placeholder="DOT Inspection ID" />
+                </div>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Quick Actions</p>
-              <Button variant="outline" className="w-full gap-2 justify-start" onClick={() => {}}>
-                <Calendar className="h-4 w-4" /> Show Today's Log
-              </Button>
-              <Button variant="outline" className="w-full gap-2 justify-start" onClick={() => {}}>
-                <Calendar className="h-4 w-4" /> Show Last 8 Days
-              </Button>
-            </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Quick Actions</p>
+                  <Button variant="outline" className="w-full gap-2 justify-start" onClick={() => {}}>
+                    <Calendar className="h-4 w-4" /> Show Today's Log
+                  </Button>
+                  <Button variant="outline" className="w-full gap-2 justify-start" onClick={() => {}}>
+                    <Calendar className="h-4 w-4" /> Show Last 8 Days
+                  </Button>
+                </div>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Transfer Methods</p>
-              <Button
-                variant="outline"
-                className="w-full gap-2 justify-start"
-                onClick={() => handleTransfer('web_services')}
-                disabled={transferring}
-              >
-                <Send className="h-4 w-4" /> Web Services Transfer
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full gap-2 justify-start"
-                onClick={() => handleTransfer('email')}
-                disabled={transferring}
-              >
-                <Mail className="h-4 w-4" /> Email Transfer
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full gap-2 justify-start"
-                onClick={() => handleTransfer('bluetooth')}
-                disabled={transferring}
-              >
-                <Smartphone className="h-4 w-4" /> Bluetooth/USB Transfer
-              </Button>
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Transfer Methods</p>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 justify-start"
+                    onClick={() => handleTransfer('web_services')}
+                    disabled={transferring}
+                  >
+                    <Send className="h-4 w-4" /> Web Services Transfer
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 justify-start"
+                    onClick={() => handleTransfer('email')}
+                    disabled={transferring}
+                  >
+                    <Mail className="h-4 w-4" /> Email Transfer
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 justify-start"
+                    onClick={() => handleTransfer('bluetooth')}
+                    disabled={transferring}
+                  >
+                    <Smartphone className="h-4 w-4" /> Bluetooth/USB Transfer
+                  </Button>
+                </div>
+              </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
+              </DialogFooter>
+            </>
           )}
         </DialogContent>
       </Dialog>
