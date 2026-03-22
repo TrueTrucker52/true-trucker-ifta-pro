@@ -125,6 +125,15 @@ const Onboarding: React.FC = () => {
     }
   };
 
+  const forceDashboardRedirect = () => {
+    navigate('/dashboard', { replace: true });
+    window.setTimeout(() => {
+      if (window.location.pathname === '/onboarding') {
+        window.location.assign('/dashboard');
+      }
+    }, 100);
+  };
+
   const completeNotificationsStepAndExit = async () => {
     stopCameraStream();
 
@@ -134,12 +143,7 @@ const Onboarding: React.FC = () => {
         onboarding.finishOnboarding(),
       ]);
     } finally {
-      navigate('/dashboard', { replace: true });
-      window.setTimeout(() => {
-        if (window.location.pathname === '/onboarding') {
-          window.location.assign('/dashboard');
-        }
-      }, 100);
+      forceDashboardRedirect();
     }
   };
 
@@ -315,11 +319,17 @@ const Onboarding: React.FC = () => {
 
     try {
       if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
+        const permission = await Promise.race<NotificationPermission | 'timeout'>([
+          Notification.requestPermission(),
+          new Promise<'timeout'>((resolve) => window.setTimeout(() => resolve('timeout'), 1500)),
+        ]);
 
         if (permission === 'granted') {
           setNotificationStatus('granted');
           localStorage.setItem('notifications_enabled', 'true');
+        } else if (permission === 'timeout') {
+          setNotificationStatus('unsupported');
+          localStorage.setItem('notifications_enabled', 'false');
         } else {
           setNotificationStatus('denied');
           localStorage.setItem('notifications_enabled', 'false');
