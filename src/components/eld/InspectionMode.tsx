@@ -10,6 +10,8 @@ import { ClipboardList, Calendar, Send, Mail, Smartphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscription } from '@/hooks/useSubscription';
+import ELDUpgradeCard from './ELDUpgradeCard';
 
 interface Props {
   currentStatus: DutyStatus;
@@ -20,6 +22,7 @@ interface Props {
 const InspectionMode: React.FC<Props> = ({ currentStatus, hosSummary, driverName }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { eld_active } = useSubscription();
   const [open, setOpen] = useState(false);
   const [inspectorName, setInspectorName] = useState('');
   const [inspectionCode, setInspectionCode] = useState('');
@@ -59,6 +62,9 @@ const InspectionMode: React.FC<Props> = ({ currentStatus, hosSummary, driverName
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          {!eld_active ? (
+            <ELDUpgradeCard inspectionMode />
+          ) : (
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5" /> DOT INSPECTION MODE
@@ -125,6 +131,7 @@ const InspectionMode: React.FC<Props> = ({ currentStatus, hosSummary, driverName
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
           </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
     </>
