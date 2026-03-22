@@ -2181,6 +2181,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      lookup_fleet_by_invite_code: {
+        Args: { invite_code_input: string }
+        Returns: {
+          company_name: string
+          id: string
+        }[]
+      }
       should_rate_limit: {
         Args: {
           identifier: string
