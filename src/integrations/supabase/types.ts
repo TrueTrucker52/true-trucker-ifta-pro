@@ -65,13 +65,6 @@ export type Database = {
             foreignKeyName: "analytics_reports_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "analytics_reports_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -359,13 +352,6 @@ export type Database = {
             foreignKeyName: "eld_inspections_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eld_inspections_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -450,13 +436,6 @@ export type Database = {
             foreignKeyName: "eld_logs_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eld_logs_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -498,13 +477,6 @@ export type Database = {
           truck_number?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fleet_members_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "fleet_members_fleet_id_fkey"
             columns: ["fleet_id"]
@@ -604,13 +576,6 @@ export type Database = {
             foreignKeyName: "geofence_events_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "geofence_events_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -680,13 +645,6 @@ export type Database = {
           zone_type?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "geofences_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "geofences_fleet_id_fkey"
             columns: ["fleet_id"]
@@ -836,13 +794,6 @@ export type Database = {
             foreignKeyName: "hos_violations_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hos_violations_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -914,13 +865,6 @@ export type Database = {
           year?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "ifta_reports_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "ifta_reports_fleet_id_fkey"
             columns: ["fleet_id"]
@@ -1070,13 +1014,6 @@ export type Database = {
             foreignKeyName: "messages_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -1123,13 +1060,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "notifications_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "notifications_fleet_id_fkey"
             columns: ["fleet_id"]
@@ -1429,13 +1359,6 @@ export type Database = {
             foreignKeyName: "support_tickets_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "support_tickets_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -1704,13 +1627,6 @@ export type Database = {
             foreignKeyName: "trip_routes_fleet_id_fkey"
             columns: ["fleet_id"]
             isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_routes_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
             referencedRelation: "fleets"
             referencedColumns: ["id"]
           },
@@ -1860,13 +1776,6 @@ export type Database = {
           truck_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "truck_locations_fleet_id_fkey"
-            columns: ["fleet_id"]
-            isOneToOne: false
-            referencedRelation: "fleet_member_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "truck_locations_fleet_id_fkey"
             columns: ["fleet_id"]
@@ -2135,30 +2044,19 @@ export type Database = {
       }
     }
     Views: {
-      fleet_member_view: {
-        Row: {
-          company_name: string | null
-          created_at: string | null
-          id: string | null
-          owner_id: string | null
-        }
-        Insert: {
-          company_name?: string | null
-          created_at?: string | null
-          id?: string | null
-          owner_id?: string | null
-        }
-        Update: {
-          company_name?: string | null
-          created_at?: string | null
-          id?: string | null
-          owner_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_demo_user_id: { Args: never; Returns: string }
+      get_driver_fleet_summary: {
+        Args: { target_fleet_id?: string }
+        Returns: {
+          company_name: string
+          created_at: string
+          id: string
+          owner_id: string
+        }[]
+      }
       get_user_fleet_id: { Args: never; Returns: string }
       get_user_role: { Args: never; Returns: string }
       grant_reviewer_role: { Args: { user_email: string }; Returns: undefined }
