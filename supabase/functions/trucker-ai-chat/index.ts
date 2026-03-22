@@ -7,6 +7,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const SAFE_ERROR_MESSAGE = "An error occurred. Please try again or contact support.";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -155,7 +157,7 @@ Then suggest: [NAV:/help|Open Help Center] or email support@true-trucker-ifta-pr
   } catch (e) {
     console.error("trucker-ai-chat error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: SAFE_ERROR_MESSAGE }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

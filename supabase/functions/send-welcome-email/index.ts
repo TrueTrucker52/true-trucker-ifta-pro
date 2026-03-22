@@ -19,6 +19,8 @@ const getCorsHeaders = (req: Request) => {
   };
 };
 
+const SAFE_ERROR_MESSAGE = 'An error occurred. Please try again or contact support.';
+
 const getWelcomeEmail = (userEmail: string) => {
   const subject = "🎉 Welcome to TrueTrucker IFTA Pro - Your 7-day trial starts now!";
 
@@ -219,8 +221,7 @@ serve(async (req) => {
     const corsHeaders = getCorsHeaders(req);
     
     return new Response(JSON.stringify({ 
-      error: "Failed to send welcome email",
-      message: error instanceof Error ? error.message : String(error)
+      error: SAFE_ERROR_MESSAGE,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

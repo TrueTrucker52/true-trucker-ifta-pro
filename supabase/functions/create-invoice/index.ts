@@ -28,6 +28,8 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-INVOICE] ${step}${detailsStr}`);
 };
 
+const SAFE_ERROR_MESSAGE = 'An error occurred. Please try again or contact support.';
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   
@@ -168,17 +170,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error("ERROR in create-invoice", error);
     logStep("ERROR in create-invoice", { error: error instanceof Error ? error.name : 'UnknownError' });
-    
-    // Don't expose internal error details in production
-    const publicError = errorMessage.includes('Authentication') || 
-                       errorMessage.includes('required') || 
-                       errorMessage.includes('Invalid') 
-                       ? errorMessage 
-                       : 'Invoice creation failed. Please try again.';
-    
-    return new Response(JSON.stringify({ error: publicError }), {
+
+    return new Response(JSON.stringify({ error: SAFE_ERROR_MESSAGE }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
