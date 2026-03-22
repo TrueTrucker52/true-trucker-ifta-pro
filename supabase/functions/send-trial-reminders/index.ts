@@ -33,6 +33,8 @@ const logStep = (step: string, details?: any) => {
   console.log(`[TRIAL-REMINDERS] ${step}${detailsStr}`);
 };
 
+const SAFE_ERROR_MESSAGE = 'An error occurred. Please try again or contact support.';
+
 const getTrialReminderEmail = (daysLeft: number, userEmail: string) => {
   const subject = daysLeft === 1 
     ? "⚠️ Last day of your TrueTrucker IFTA Pro trial!" 
@@ -228,12 +230,15 @@ serve(async (req) => {
           emailsSent++;
           logStep("Reminder sent successfully", { email: user.email, daysLeft, messageId: emailResult.data?.id });
         } catch (emailError) {
-          logStep("Failed to send reminder", { email: user.email, error: emailError.message });
+          logStep("Failed to send reminder", {
+            email: user.email,
+            error: emailError instanceof Error ? emailError.message : String(emailError),
+          });
           results.push({
             email: user.email,
             daysLeft,
             sent: false,
-            error: emailError.message
+            error: 'Failed to send reminder'
           });
         }
       }
@@ -252,12 +257,12 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in trial reminders", { message: errorMessage });
+    logStep("ERROR in trial reminders", {
+      message: error instanceof Error ? error.message : String(error),
+    });
     
     return new Response(JSON.stringify({ 
-      error: "Failed to process trial reminders",
-      message: errorMessage 
+      error: SAFE_ERROR_MESSAGE,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
