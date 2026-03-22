@@ -130,12 +130,12 @@ serve(async (req) => {
     }
 
     console.log(`Successfully deleted user ${userId} from auth.users`);
+    console.log('Deletion results:', JSON.stringify(deletionResults));
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Account and all associated data permanently deleted',
-        deletionResults
+        message: 'Account and all associated data permanently deleted'
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
