@@ -121,7 +121,6 @@ export function useTruckerAI() {
           messages: allMessages,
           userContext: {
             userName,
-            userRole: profile?.subscription_tier || 'user',
             fleetName: profile?.company_name || 'Independent',
             currentPage: location.pathname,
           },
