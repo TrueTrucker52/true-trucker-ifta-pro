@@ -22,6 +22,38 @@ const MILESTONES = [
   { target: 10, couponCode: null, type: 'free_year', value: 12 },
 ];
 
+const jsonResponse = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+const isFutureDate = (value?: string | null) => {
+  if (!value) return true;
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.getTime()) && parsed > new Date();
+};
+
+const hasActivePaidSubscription = async (supabaseAdmin: any, userId: string) => {
+  const [{ data: subscriber }, { data: profile }] = await Promise.all([
+    supabaseAdmin
+      .from('subscribers')
+      .select('subscribed, subscription_end')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabaseAdmin
+      .from('profiles')
+      .select('subscription_status, subscription_end')
+      .eq('user_id', userId)
+      .maybeSingle(),
+  ]);
+
+  const subscriberActive = Boolean(subscriber?.subscribed) && isFutureDate(subscriber?.subscription_end as string | null | undefined);
+  const profileActive = profile?.subscription_status === 'active' && isFutureDate(profile?.subscription_end as string | null | undefined);
+
+  return subscriberActive || profileActive;
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -35,10 +67,15 @@ serve(async (req) => {
     );
 
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) throw new Error('No auth header');
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return jsonResponse({ error: 'Unauthorized' }, 401);
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim();
     const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !userData.user) throw new Error('Auth failed');
+    if (userError || !userData.user) {
+      return jsonResponse({ error: 'Unauthorized' }, 401);
+    }
 
     const { action, referral_code, referral_id } = await req.json();
 
@@ -48,19 +85,40 @@ serve(async (req) => {
 
     // Action: check_and_reward — called when a referred user converts to paid
     if (action === 'check_and_reward') {
-      if (!referral_id) throw new Error('referral_id required');
+      if (!referral_id) {
+        return jsonResponse({ error: 'referral_id required' }, 400);
+      }
 
       // Get the referral
       const { data: referral } = await supabaseAdmin
         .from('referrals')
-        .select('*')
+        .select('id, referrer_id, referred_id, reward_applied, status')
         .eq('id', referral_id)
-        .single();
+        .maybeSingle();
 
-      if (!referral || referral.reward_applied) {
-        return new Response(JSON.stringify({ message: 'Already rewarded or not found' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+      if (!referral) {
+        return jsonResponse({ error: 'Referral not found' }, 404);
+      }
+
+      const callerId = userData.user.id;
+      const isReferralParty = callerId === referral.referrer_id || callerId === referral.referred_id;
+      if (!isReferralParty) {
+        return jsonResponse({ error: 'Forbidden' }, 403);
+      }
+
+      if (!referral.referred_id) {
+        return jsonResponse({ error: 'Referral is not linked to a signed-up user yet' }, 409);
+      }
+
+      if (referral.reward_applied) {
+        return jsonResponse({ message: 'Already rewarded' });
+      }
+
+      const referredUserIsPaid = await hasActivePaidSubscription(supabaseAdmin, referral.referred_id);
+      if (!referredUserIsPaid) {
+        return jsonResponse({
+          error: 'Referral rewards are only granted after the referred user has an active paid subscription',
+        }, 403);
       }
 
       // Mark referral as converted and rewarded
@@ -166,12 +224,10 @@ serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({
+      return jsonResponse({
         success: true,
         convertedCount,
         milestoneReached: milestone?.target || null,
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -187,18 +243,12 @@ serve(async (req) => {
         .single();
 
       if (!referrerProfile) {
-        return new Response(JSON.stringify({ error: 'Invalid referral code' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return jsonResponse({ error: 'Invalid referral code' }, 400);
       }
 
       // Don't allow self-referral
       if (referrerProfile.user_id === userData.user.id) {
-        return new Response(JSON.stringify({ error: 'Cannot refer yourself' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return jsonResponse({ error: 'Cannot refer yourself' }, 400);
       }
 
       // Check if already referred
@@ -209,9 +259,7 @@ serve(async (req) => {
         .maybeSingle();
 
       if (existing) {
-        return new Response(JSON.stringify({ message: 'Already referred' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return jsonResponse({ message: 'Already referred' });
       }
 
       // Create or update referral record
@@ -240,21 +288,13 @@ serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({ success: true, referrer: referrerProfile.user_id }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return jsonResponse({ success: true, referrer: referrerProfile.user_id });
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ error: 'Invalid action' }, 400);
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     console.error('process-referral error:', msg);
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ error: 'Internal server error' }, 500);
   }
 });
