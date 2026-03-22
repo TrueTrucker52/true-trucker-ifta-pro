@@ -15,10 +15,13 @@ import CertifyLogDialog from '@/components/eld/CertifyLogDialog';
 import { ArrowLeft, ClipboardList, CheckCircle, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useSubscription } from '@/hooks/useSubscription';
+import ELDUpgradeCard from '@/components/eld/ELDUpgradeCard';
 
 const ELD: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { eld_active, loading: subscriptionLoading } = useSubscription();
   const {
     currentStatus, currentStatusStart, todayLogs, weekLogs,
     hosSummary, activeViolations, loading,
@@ -29,7 +32,34 @@ const ELD: React.FC = () => {
   const today = new Date().toISOString().split('T')[0];
   const todayCertified = todayLogs.some(l => l.is_certified);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading || subscriptionLoading) return <LoadingSpinner />;
+
+  if (!eld_active) {
+    return (
+      <div className="min-h-screen bg-background pb-24">
+        <div className="sticky top-0 z-40 px-4 py-3 border-b bg-background border-border">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="flex items-center gap-2 text-lg font-bold">
+                <ClipboardList className="w-5 h-5 text-primary" />
+                ELD — Electronic Log
+              </h1>
+              <p className="text-xs text-muted-foreground">Upgrade required to unlock ELD compliance.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-2xl px-4 py-6 mx-auto">
+          <ELDUpgradeCard />
+        </div>
+
+        <BottomNavigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">

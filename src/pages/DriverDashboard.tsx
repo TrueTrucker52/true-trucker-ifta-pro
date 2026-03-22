@@ -17,6 +17,8 @@ import {
 import BottomNavigation from '@/components/BottomNavigation';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useSubscription } from '@/hooks/useSubscription';
+import ELDUpgradeBanner from '@/components/eld/ELDUpgradeBanner';
 
 type ReportStatus = 'draft' | 'pending' | 'submitted' | 'rejected';
 
@@ -57,6 +59,7 @@ const DriverDashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { eld_active } = useSubscription();
   const [reportSearch, setReportSearch] = useState('');
   const [bolSearch, setBolSearch] = useState('');
   const [activeTab, setActiveTab] = useState<string>('draft');
@@ -237,6 +240,8 @@ const DriverDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {!eld_active && <ELDUpgradeBanner />}
+
         {/* Stats Bar */}
         <Card>
           <CardContent className="p-4">

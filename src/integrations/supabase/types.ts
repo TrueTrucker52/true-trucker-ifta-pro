@@ -1853,6 +1853,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_addons: {
+        Row: {
+          activated_at: string | null
+          addon_key: string
+          billing_interval: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          status: string
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          addon_key: string
+          billing_interval?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          status?: string
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          addon_key?: string
+          billing_interval?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          status?: string
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

@@ -72,7 +72,10 @@ serve(async (req) => {
       trial_active: false,
       trial_days_remaining: 0,
       trial_end_date: null,
-      subscription_status: 'trial'
+      subscription_status: 'trial',
+      eld_active: false,
+      eld_status: null,
+      eld_billing_interval: null,
     };
 
     if (profile) {
@@ -250,6 +253,19 @@ serve(async (req) => {
       if (!userStatus.subscribed) {
         // If user is not subscribed, they should have 'free' tier unless they have an active trial
         userStatus.subscription_tier = userStatus.trial_active ? (profile.subscription_tier || 'free') : 'free';
+      }
+
+      const { data: eldAddon } = await supabaseClient
+        .from('user_addons')
+        .select('status, billing_interval')
+        .eq('user_id', user.id)
+        .eq('addon_key', 'eld_compliance')
+        .maybeSingle();
+
+      if (eldAddon) {
+        userStatus.eld_status = eldAddon.status;
+        userStatus.eld_billing_interval = eldAddon.billing_interval;
+        userStatus.eld_active = ['active', 'trialing'].includes(eldAddon.status);
       }
     } else {
       // No profile found - this shouldn't happen with our trigger, but handle gracefully
