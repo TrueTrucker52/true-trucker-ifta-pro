@@ -212,7 +212,7 @@ const Referrals: React.FC = () => {
                   <div className="flex items-center gap-3">
                     {getStatusIcon(ref.status)}
                     <div>
-                      <p className="text-sm font-medium text-foreground">{ref.referred_email || 'Unknown'}</p>
+                      <p className="text-sm font-medium text-foreground">{ref.masked_referred_email || 'Referred driver'}</p>
                       <p className="text-xs text-muted-foreground">
                         {ref.converted_at ? `Upgraded ${new Date(ref.converted_at).toLocaleDateString()}` :
                          ref.signed_up_at ? `Signed up ${new Date(ref.signed_up_at).toLocaleDateString()}` :
