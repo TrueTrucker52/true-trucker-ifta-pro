@@ -12,7 +12,6 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { sanitizeInput } from '@/lib/validation';
-import DataSafetySection from '@/components/DataSafetySection';
 import FormProgressBar from '@/components/FormProgressBar';
 import { useFormDraft } from '@/hooks/useFormDraft';
 
@@ -738,9 +737,6 @@ const Account = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Security & Privacy Section */}
-          <DataSafetySection />
 
           {/* Auto-save indicator */}
           {(lastAutoSave || autoSaveError) && (
