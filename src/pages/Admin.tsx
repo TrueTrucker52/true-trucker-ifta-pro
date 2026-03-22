@@ -83,6 +83,21 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
+  const { data: eldAddons = [], isLoading: eldAddonsLoading, refetch: refetchEldAddons } = useQuery({
+    queryKey: ['admin-eld-addons'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_addons')
+        .select('*')
+        .eq('addon_key', 'eld_compliance')
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
   // ─── Lookups ───
   const roleMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -115,6 +130,37 @@ const Admin = () => {
     });
     return m;
   }, [allMembers, fleetMap]);
+
+  const eldAuditRows = useMemo(() => {
+    return eldAddons.map((addon) => {
+      const userProfile = allProfiles.find((profile) => profile.user_id === addon.user_id);
+      const role = roleMap.get(addon.user_id) || 'user';
+      const fleetName = driverFleetMap.get(addon.user_id) || userProfile?.company_name || 'Solo';
+
+      return {
+        ...addon,
+        email: userProfile?.email || 'Unknown user',
+        displayName: userProfile?.company_name || userProfile?.email?.split('@')[0] || 'Unknown',
+        role,
+        fleetName,
+      };
+    });
+  }, [eldAddons, allProfiles, roleMap, driverFleetMap]);
+
+  const eldStats = useMemo(() => {
+    const active = eldAuditRows.filter((addon) => ['active', 'trialing'].includes(addon.status)).length;
+    const monthly = eldAuditRows.filter((addon) => addon.billing_interval === 'month').length;
+    const annual = eldAuditRows.filter((addon) => addon.billing_interval === 'year').length;
+    const pastDue = eldAuditRows.filter((addon) => addon.status === 'past_due').length;
+
+    return {
+      total: eldAuditRows.length,
+      active,
+      monthly,
+      annual,
+      pastDue,
+    };
+  }, [eldAuditRows]);
 
   // ─── Platform Stats ───
   const stats = useMemo(() => {
@@ -209,7 +255,10 @@ const Admin = () => {
                 <p className="text-sm text-muted-foreground">Welcome back, {adminName}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => refetchProfiles()}><RefreshCw className="h-4 w-4 mr-2" /> Refresh</Button>
+            <Button variant="outline" onClick={() => {
+              refetchProfiles();
+              refetchEldAddons();
+            }}><RefreshCw className="h-4 w-4 mr-2" /> Refresh</Button>
           </div>
         </div>
       </div>
@@ -273,6 +322,94 @@ const Admin = () => {
                 <CreditCard className="h-4 w-4 mr-2" /> View Stripe Dashboard
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" /> ELD Add-on Audit
+                </CardTitle>
+                <CardDescription>Internal support view for verifying ELD activations, billing cadence, and account status.</CardDescription>
+              </div>
+              <Badge variant="secondary">{eldStats.total}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs text-muted-foreground">Total ELD Add-ons</p>
+                <p className="text-2xl font-bold text-foreground">{eldStats.total}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-accent">{eldStats.active}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs text-muted-foreground">Monthly</p>
+                <p className="text-2xl font-bold text-primary">{eldStats.monthly}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs text-muted-foreground">Annual</p>
+                <p className="text-2xl font-bold text-secondary">{eldStats.annual}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs text-muted-foreground">Past Due</p>
+                <p className="text-2xl font-bold text-destructive">{eldStats.pastDue}</p>
+              </div>
+            </div>
+
+            {eldAddonsLoading ? (
+              <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-14 w-full" />)}</div>
+            ) : eldAuditRows.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No ELD add-on activations found yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground">
+                      <th className="text-left p-3 font-medium">Account</th>
+                      <th className="text-left p-3 font-medium">Role</th>
+                      <th className="text-left p-3 font-medium">Fleet</th>
+                      <th className="text-left p-3 font-medium">Status</th>
+                      <th className="text-left p-3 font-medium">Billing</th>
+                      <th className="text-left p-3 font-medium">Activated</th>
+                      <th className="text-left p-3 font-medium">Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eldAuditRows.map((addon) => (
+                      <tr key={addon.id} className="border-b hover:bg-muted/40 transition-colors">
+                        <td className="p-3">
+                          <p className="font-medium text-foreground">{addon.displayName}</p>
+                          <p className="text-xs text-muted-foreground break-all">{addon.email}</p>
+                        </td>
+                        <td className="p-3">
+                          <Badge variant="outline" className="text-xs capitalize">{addon.role.replace('_', ' ')}</Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground">{addon.fleetName}</td>
+                        <td className="p-3">
+                          <Badge className={cn(
+                            'text-xs capitalize',
+                            ['active', 'trialing'].includes(addon.status) && 'bg-accent/15 text-accent',
+                            addon.status === 'past_due' && 'bg-destructive/15 text-destructive',
+                            addon.status === 'canceled' && 'bg-secondary/15 text-secondary',
+                            !['active', 'trialing', 'past_due', 'canceled'].includes(addon.status) && 'bg-primary/10 text-primary',
+                          )}>
+                            {addon.status.replace('_', ' ')}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground capitalize">{addon.billing_interval || '—'}</td>
+                        <td className="p-3 text-muted-foreground text-xs">{addon.activated_at ? format(new Date(addon.activated_at), 'MMM d, yyyy') : '—'}</td>
+                        <td className="p-3 text-muted-foreground text-xs">{format(new Date(addon.updated_at), 'MMM d, yyyy')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
 
