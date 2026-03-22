@@ -34,10 +34,7 @@ const isFutureDate = (value?: string | null) => {
   return !Number.isNaN(parsed.getTime()) && parsed > new Date();
 };
 
-const hasActivePaidSubscription = async (
-  supabaseAdmin: ReturnType<typeof createClient>,
-  userId: string,
-) => {
+const hasActivePaidSubscription = async (supabaseAdmin: any, userId: string) => {
   const [{ data: subscriber }, { data: profile }] = await Promise.all([
     supabaseAdmin
       .from('subscribers')
@@ -51,8 +48,8 @@ const hasActivePaidSubscription = async (
       .maybeSingle(),
   ]);
 
-  const subscriberActive = Boolean(subscriber?.subscribed) && isFutureDate(subscriber?.subscription_end);
-  const profileActive = profile?.subscription_status === 'active' && isFutureDate(profile?.subscription_end);
+  const subscriberActive = Boolean(subscriber?.subscribed) && isFutureDate(subscriber?.subscription_end as string | null | undefined);
+  const profileActive = profile?.subscription_status === 'active' && isFutureDate(profile?.subscription_end as string | null | undefined);
 
   return subscriberActive || profileActive;
 };
