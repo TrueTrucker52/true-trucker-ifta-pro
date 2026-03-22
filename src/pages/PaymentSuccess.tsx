@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { hasActiveEldAddon } from '@/lib/eldUpgrade';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { checkSubscription, loading } = useSubscription();
+  const { checkSubscription, loading, eld_active, eld_status } = useSubscription();
   const [isVerifying, setIsVerifying] = useState(true);
   const { toast } = useToast();
 
@@ -51,9 +52,10 @@ const PaymentSuccess = () => {
   }, [user, navigate, checkSubscription, toast]);
 
   const handleContinue = () => {
-    // Always redirect to account setup after payment
-    navigate('/account?flow=setup');
+    navigate(hasActiveEldAddon(eld_status, eld_active) ? '/eld' : '/account?flow=setup');
   };
+
+  const isEldActivated = hasActiveEldAddon(eld_status, eld_active);
 
   if (!user) {
     return null;
@@ -71,12 +73,14 @@ const PaymentSuccess = () => {
             )}
           </div>
           <CardTitle className="text-2xl">
-            {isVerifying ? "Processing Payment..." : "Welcome to TrueTrucker IFTA Pro!"}
+            {isVerifying ? "Processing Payment..." : isEldActivated ? '🎉 ELD Compliance Activated!' : "Welcome to TrueTrucker IFTA Pro!"}
           </CardTitle>
           <CardDescription>
             {isVerifying 
               ? "We're activating your subscription. Please wait a moment."
-              : "Your subscription is active! Please complete your business information to begin your IFTA journey."
+              : isEldActivated
+                ? 'Your account now has full FMCSA certified ELD compliance.'
+                : "Your subscription is active! Please complete your business information to begin your IFTA journey."
             }
           </CardDescription>
         </CardHeader>
@@ -84,22 +88,40 @@ const PaymentSuccess = () => {
           {!isVerifying && (
             <>
               <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-800 mb-2">Your subscription includes:</h3>
-                <ul className="text-sm text-green-700 space-y-1">
-                  <li>✓ Unlimited IFTA calculations</li>
-                  <li>✓ Receipt scanning & management</li>
-                  <li>✓ Automated report generation</li>
-                  <li>✓ Multi-vehicle tracking</li>
-                  <li>✓ Premium support</li>
-                </ul>
+                {isEldActivated ? (
+                  <>
+                    <h3 className="mb-2 font-semibold text-green-800">You are now protected against:</h3>
+                    <ul className="space-y-1 text-sm text-green-700">
+                      <li>✓ $16,000 ELD violation fines</li>
+                      <li>✓ DOT out of service orders</li>
+                      <li>✓ Failed inspection records</li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-green-800 mb-2">Your subscription includes:</h3>
+                    <ul className="text-sm text-green-700 space-y-1">
+                      <li>✓ Unlimited IFTA calculations</li>
+                      <li>✓ Receipt scanning & management</li>
+                      <li>✓ Automated report generation</li>
+                      <li>✓ Multi-vehicle tracking</li>
+                      <li>✓ Premium support</li>
+                    </ul>
+                  </>
+                )}
               </div>
               <Button 
                 onClick={handleContinue} 
                 className="w-full"
                 size="lg"
               >
-                Complete Company Setup
+                {isEldActivated ? '⚖️ Open ELD Dashboard' : 'Complete Company Setup'}
               </Button>
+              {isEldActivated && (
+                <Button variant="outline" onClick={() => navigate('/eld')} className="w-full">
+                  📋 Set Up Your First Log
+                </Button>
+              )}
             </>
           )}
         </CardContent>
