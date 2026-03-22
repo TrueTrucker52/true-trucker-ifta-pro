@@ -125,6 +125,24 @@ const Onboarding: React.FC = () => {
     }
   };
 
+  const completeNotificationsStepAndExit = async () => {
+    stopCameraStream();
+
+    try {
+      await Promise.allSettled([
+        onboarding.completeStep(TOTAL_STEPS),
+        onboarding.finishOnboarding(),
+      ]);
+    } finally {
+      navigate('/dashboard', { replace: true });
+      window.setTimeout(() => {
+        if (window.location.pathname === '/onboarding') {
+          window.location.assign('/dashboard');
+        }
+      }, 100);
+    }
+  };
+
   const handleNext = async () => {
     await onboarding.completeStep(currentStep);
     if (currentStep < TOTAL_STEPS) {
@@ -151,9 +169,17 @@ const Onboarding: React.FC = () => {
     }
 
     if (currentStep === 7) {
-      localStorage.setItem('notifications_enabled', 'false');
-      setNotificationStatus('denied');
-      await finishAndGoToDashboard();
+      setNotificationLoading(true);
+
+      try {
+        localStorage.setItem('notifications_enabled', 'false');
+        setNotificationStatus('denied');
+      } catch {
+        // Continue anyway
+      } finally {
+        setNotificationLoading(false);
+        await completeNotificationsStepAndExit();
+      }
       return;
     }
 
@@ -290,16 +316,7 @@ const Onboarding: React.FC = () => {
     setNotificationLoading(true);
 
     try {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone;
-
-      if (!('Notification' in window)) {
-        setNotificationStatus('unsupported');
-        localStorage.setItem('notifications_enabled', 'false');
-      } else if (isIOS && !isStandalone) {
-        setNotificationStatus('install_required');
-        localStorage.setItem('notifications_enabled', 'false');
-      } else {
+      if ('Notification' in window) {
         const permission = await Notification.requestPermission();
 
         if (permission === 'granted') {
@@ -309,13 +326,16 @@ const Onboarding: React.FC = () => {
           setNotificationStatus('denied');
           localStorage.setItem('notifications_enabled', 'false');
         }
+      } else {
+        setNotificationStatus('unsupported');
+        localStorage.setItem('notifications_enabled', 'false');
       }
     } catch {
       setNotificationStatus('unsupported');
       localStorage.setItem('notifications_enabled', 'false');
     } finally {
       setNotificationLoading(false);
-      await finishAndGoToDashboard();
+      await completeNotificationsStepAndExit();
     }
   };
 
