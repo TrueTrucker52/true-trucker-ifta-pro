@@ -1,8 +1,12 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Check, ClipboardList, Phone } from 'lucide-react';
-import { ELD_CHECKOUT_LINKS, ELD_COUPON, ELD_FEATURES } from '@/lib/eldUpgrade';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { ELD_CHECKOUT_PLANS, ELD_COUPON, ELD_FEATURES } from '@/lib/eldUpgrade';
 
 interface ELDUpgradeCardProps {
   compact?: boolean;
@@ -10,6 +14,25 @@ interface ELDUpgradeCardProps {
 }
 
 export const ELDUpgradeCard = ({ compact = false, inspectionMode = false }: ELDUpgradeCardProps) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { createCheckout } = useSubscription();
+  const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'annual' | null>(null);
+
+  const handleCheckout = async (billing: 'monthly' | 'annual') => {
+    if (!user) {
+      navigate('/auth?mode=signup');
+      return;
+    }
+
+    setLoadingPlan(billing);
+    try {
+      await createCheckout(ELD_CHECKOUT_PLANS[billing], ELD_COUPON.code);
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   if (compact) {
     return (
       <Card className="border-primary/30 bg-primary/5">
@@ -19,8 +42,8 @@ export const ELDUpgradeCard = ({ compact = false, inspectionMode = false }: ELDU
             <p className="text-sm text-muted-foreground">Add ELD compliance to your account — $10/truck/month.</p>
           </div>
           <div className="flex gap-2">
-            <Button asChild size="sm">
-              <a href={ELD_CHECKOUT_LINKS.monthly} target="_blank" rel="noreferrer">Upgrade to ELD</a>
+            <Button size="sm" onClick={() => handleCheckout('monthly')} disabled={loadingPlan === 'monthly'}>
+              {loadingPlan === 'monthly' ? 'Opening…' : 'Upgrade to ELD'}
             </Button>
             <Button asChild variant="outline" size="sm">
               <a href="/pricing#eld-addon">Learn More</a>
@@ -78,11 +101,11 @@ export const ELDUpgradeCard = ({ compact = false, inspectionMode = false }: ELDU
         </div>
 
         <div className="flex flex-col gap-3">
-          <Button asChild size="lg">
-            <a href={ELD_CHECKOUT_LINKS.monthly} target="_blank" rel="noreferrer">🚀 Upgrade Monthly</a>
+          <Button size="lg" onClick={() => handleCheckout('monthly')} disabled={loadingPlan === 'monthly'}>
+            {loadingPlan === 'monthly' ? 'Opening checkout…' : '🚀 Upgrade Monthly'}
           </Button>
-          <Button asChild size="lg" variant="outline">
-            <a href={ELD_CHECKOUT_LINKS.annual} target="_blank" rel="noreferrer">💰 Upgrade Annual — Save 20%</a>
+          <Button size="lg" variant="outline" onClick={() => handleCheckout('annual')} disabled={loadingPlan === 'annual'}>
+            {loadingPlan === 'annual' ? 'Opening checkout…' : '💰 Upgrade Annual — Save 20%'}
           </Button>
           {inspectionMode ? (
             <Button asChild variant="ghost">

@@ -3,9 +3,9 @@ export const ELD_PRICE_IDS = {
   annual: 'price_1TDJyJLwWfF7E7oh35wSnNAS',
 } as const;
 
-export const ELD_CHECKOUT_LINKS = {
-  monthly: 'https://buy.stripe.com/28EdRa3OjcsG7bJ9dfdEs07',
-  annual: 'https://buy.stripe.com/7sY28sfx1eAO53BgFHdEs08',
+export const ELD_CHECKOUT_PLANS = {
+  monthly: 'eld_monthly',
+  annual: 'eld_annual',
 } as const;
 
 export const ELD_COUPON = {

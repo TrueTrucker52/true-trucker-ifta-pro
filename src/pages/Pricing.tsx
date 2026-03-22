@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Switch } from '@/components/ui/switch';
-import { ELD_CHECKOUT_LINKS, ELD_COUPON } from '@/lib/eldUpgrade';
+import { ELD_CHECKOUT_PLANS, ELD_COUPON } from '@/lib/eldUpgrade';
 
 const plans = [
   {
@@ -136,6 +136,21 @@ const Pricing = () => {
     try {
       const suffix = annual ? '_annual' : '';
       await createCheckout(planId + suffix);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleEldCheckout = async (billing: 'monthly' | 'annual') => {
+    if (!user) {
+      navigate('/auth?mode=signup');
+      return;
+    }
+
+    const loadingKey = `eld_${billing}`;
+    setLoading(loadingKey);
+    try {
+      await createCheckout(ELD_CHECKOUT_PLANS[billing], ELD_COUPON.code);
     } finally {
       setLoading(null);
     }
@@ -304,11 +319,11 @@ const Pricing = () => {
             ))}
           </ul>
           <div className="grid gap-3 mt-6 sm:grid-cols-2">
-            <Button asChild size="lg">
-              <a href={ELD_CHECKOUT_LINKS.monthly} target="_blank" rel="noreferrer">Add ELD — Monthly $10/truck</a>
+            <Button size="lg" onClick={() => handleEldCheckout('monthly')} disabled={loading === 'eld_monthly'}>
+              {loading === 'eld_monthly' ? 'Opening checkout…' : 'Add ELD — Monthly $10/truck'}
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <a href={ELD_CHECKOUT_LINKS.annual} target="_blank" rel="noreferrer">Add ELD — Annual $8/truck</a>
+            <Button size="lg" variant="outline" onClick={() => handleEldCheckout('annual')} disabled={loading === 'eld_annual'}>
+              {loading === 'eld_annual' ? 'Opening checkout…' : 'Add ELD — Annual $8/truck'}
             </Button>
           </div>
         </section>

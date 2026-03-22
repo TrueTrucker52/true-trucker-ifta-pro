@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Loader2 } from 'lucide-react';
@@ -11,7 +12,7 @@ import { hasActiveEldAddon } from '@/lib/eldUpgrade';
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { checkSubscription, loading, eld_active, eld_status } = useSubscription();
   const [isVerifying, setIsVerifying] = useState(true);
   const { toast } = useToast();
@@ -24,10 +25,19 @@ const PaymentSuccess = () => {
 
     const verifyPayment = async () => {
       try {
-        // Wait a moment for Stripe to process
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const sessionId = searchParams.get('session_id');
+
+        if (sessionId && session?.access_token) {
+          await supabase.functions.invoke('sync-eld-checkout', {
+            body: { sessionId },
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1200));
         
-        // Check subscription status
         await checkSubscription();
         
         toast({
@@ -49,7 +59,7 @@ const PaymentSuccess = () => {
     };
 
     verifyPayment();
-  }, [user, navigate, checkSubscription, toast]);
+  }, [user, session?.access_token, navigate, checkSubscription, toast, searchParams]);
 
   const handleContinue = () => {
     navigate(hasActiveEldAddon(eld_status, eld_active) ? '/eld' : '/account?flow=setup');
