@@ -73,7 +73,7 @@ const PricingSection = () => {
             return (
               <article
                 key={p.name}
-                className={`rounded-xl border p-6 text-left flex flex-col ${
+                className={`relative rounded-xl border p-6 text-left flex flex-col ${
                   p.highlight
                     ? "border-secondary shadow-lg ring-2 ring-secondary/30 relative"
                     : "border-border bg-card"

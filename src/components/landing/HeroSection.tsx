@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,16 +8,29 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { Shield, Clock, CreditCard, RotateCcw, Star } from "lucide-react";
+import { ArrowDown, Shield, Clock, CreditCard, RotateCcw, Star } from "lucide-react";
 import heroMobile from "@/assets/landing-hero-truck-mobile.webp";
 import heroDesktop from "@/assets/landing-hero-truck-desktop.webp";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [showScrollCue, setShowScrollCue] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => setShowScrollCue(window.scrollY < 48);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToNextSection = () => {
+    document.getElementById("pain-points")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
+    <section className="relative flex min-h-[100dvh] flex-col justify-center overflow-hidden">
       {/* Background image with responsive WebP sources */}
       <div className="absolute inset-0">
         <picture>
@@ -37,7 +50,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--landing-navy))]/90 via-[hsl(var(--landing-navy))]/70 to-[hsl(var(--landing-navy))]/40" />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-24 pb-16 md:pt-32 md:pb-24">
+      <div className="relative container mx-auto px-4 pt-24 pb-28 md:pt-32 md:pb-32">
         <div className="max-w-2xl">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[hsl(var(--landing-navy-foreground))] leading-tight mb-6">
             Stop Losing Money on IFTA.{" "}
@@ -49,11 +62,11 @@ const HeroSection = () => {
             all in one app from $39/month.
           </p>
 
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+          <div className="mb-8 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-center">
             <Button
               variant="hero"
               size="xl"
-              className="min-w-0 justify-center bg-secondary hover:bg-secondary/90 sm:w-auto"
+              className="w-full min-w-0 justify-center bg-secondary hover:bg-secondary/90 md:w-auto"
               onClick={() => navigate("/auth")}
             >
               🚀 Start Free 7‑Day Trial →
@@ -61,7 +74,7 @@ const HeroSection = () => {
             <Button
               variant="outline"
               size="xl"
-              className="min-w-0 justify-center border-2 border-[hsl(var(--landing-navy-foreground))] bg-[hsl(var(--landing-navy-foreground))]/10 text-[hsl(var(--landing-navy-foreground))] shadow-none hover:bg-[hsl(var(--landing-navy-foreground))]/20 hover:text-[hsl(var(--landing-navy-foreground))] sm:w-auto"
+              className="w-full min-w-0 justify-center border-2 border-[hsl(var(--landing-navy-foreground))] bg-[hsl(var(--landing-navy-foreground))]/10 text-[hsl(var(--landing-navy-foreground))] shadow-none hover:bg-[hsl(var(--landing-navy-foreground))]/20 hover:text-[hsl(var(--landing-navy-foreground))] md:w-auto"
               onClick={() => setIsDemoOpen(true)}
             >
               ▶️ Watch 2 Minute Demo
@@ -98,16 +111,39 @@ const HeroSection = () => {
         </div>
       </div>
 
+      {showScrollCue && (
+        <button
+          type="button"
+          aria-label="Scroll to learn more"
+          onClick={scrollToNextSection}
+          className="absolute bottom-16 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-[hsl(var(--landing-navy-foreground))]/80 transition-opacity hover:text-[hsl(var(--landing-navy-foreground))]"
+        >
+          <span className="text-xs font-medium uppercase tracking-[0.24em]">Scroll</span>
+          <ArrowDown className="h-5 w-5 animate-bounce" />
+        </button>
+      )}
+
       <Dialog open={isDemoOpen} onOpenChange={setIsDemoOpen}>
         <DialogContent className="max-w-md border-border bg-background">
           <DialogHeader>
             <DialogTitle className="text-xl text-foreground">
-              🎬 Demo video coming soon!
+              🎬 Demo Video Coming Soon!
             </DialogTitle>
             <DialogDescription className="text-base leading-relaxed text-muted-foreground">
-              Sign up for free to explore the app yourself and see how TrueTrucker handles IFTA, ELD, mileage tracking, and compliance.
+              Want to see TrueTrucker in action?
             </DialogDescription>
           </DialogHeader>
+
+          <div className="space-y-4 pt-2 text-muted-foreground">
+            <p className="text-sm leading-relaxed">
+              Sign up for your FREE 7-day trial and explore every feature yourself!
+            </p>
+            <ul className="space-y-2 text-sm">
+              <li>✅ No credit card required</li>
+              <li>✅ Full access for 7 days</li>
+              <li>✅ Set up in under 5 minutes</li>
+            </ul>
+          </div>
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <Button
@@ -119,7 +155,7 @@ const HeroSection = () => {
                 navigate("/auth");
               }}
             >
-              🚀 Start Free Trial →
+              🚀 Start Free Trial Instead →
             </Button>
             <Button
               variant="outline"
@@ -127,7 +163,7 @@ const HeroSection = () => {
               className="w-full"
               onClick={() => setIsDemoOpen(false)}
             >
-              Close
+              ✕ Close
             </Button>
           </div>
         </DialogContent>

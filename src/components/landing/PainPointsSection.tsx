@@ -10,7 +10,7 @@ const painPoints = [
 const PainPointsSection = () => {
   const navigate = useNavigate();
   return (
-    <section className="bg-[hsl(var(--landing-navy))] py-20 md:py-28">
+    <section id="pain-points" className="bg-[hsl(var(--landing-navy))] py-20 md:py-28">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-extrabold text-[hsl(var(--landing-navy-foreground))] mb-12">
           Sound familiar? 🤔
