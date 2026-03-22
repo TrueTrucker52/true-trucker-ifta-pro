@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ELD_CHECKOUT_LINKS, ELD_DISMISS_KEY, ELD_DISMISS_MS } from '@/lib/eldUpgrade';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { ELD_CHECKOUT_PLANS, ELD_DISMISS_KEY, ELD_DISMISS_MS, ELD_COUPON } from '@/lib/eldUpgrade';
 
 export const ELDUpgradeBanner = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { createCheckout } = useSubscription();
   const [dismissed, setDismissed] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const until = Number(localStorage.getItem(ELD_DISMISS_KEY) || '0');
@@ -15,6 +22,20 @@ export const ELDUpgradeBanner = () => {
   const handleDismiss = () => {
     localStorage.setItem(ELD_DISMISS_KEY, String(Date.now() + ELD_DISMISS_MS));
     setDismissed(true);
+  };
+
+  const handleUpgrade = async () => {
+    if (!user) {
+      navigate('/auth?mode=signup');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createCheckout(ELD_CHECKOUT_PLANS.monthly, ELD_COUPON.code);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (dismissed) return null;
@@ -27,8 +48,8 @@ export const ELDUpgradeBanner = () => {
           <p className="text-sm text-muted-foreground">Add ELD compliance to your account — $10/truck/month.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild size="sm">
-            <a href={ELD_CHECKOUT_LINKS.monthly} target="_blank" rel="noreferrer">Upgrade to ELD</a>
+          <Button size="sm" onClick={handleUpgrade} disabled={isLoading}>
+            {isLoading ? 'Opening…' : 'Upgrade to ELD'}
           </Button>
           <Button asChild size="sm" variant="outline">
             <a href="/pricing#eld-addon">Learn More</a>

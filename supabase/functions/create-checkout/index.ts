@@ -24,8 +24,7 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
-// New pricing: solo, small_fleet, fleet_pro, enterprise (monthly & annual)
-const priceMapping: Record<string, { amount: number; name: string; interval: 'month' | 'year' }> = {
+const subscriptionPriceMapping: Record<string, { amount: number; name: string; interval: 'month' | 'year' }> = {
   // Monthly
   solo:             { amount: 3900,   name: 'Solo',         interval: 'month' },
   small_fleet:      { amount: 7900,   name: 'Small Fleet',  interval: 'month' },
@@ -42,6 +41,21 @@ const priceMapping: Record<string, { amount: number; name: string; interval: 'mo
   large:            { amount: 12900,  name: 'Enterprise Plan (Legacy)', interval: 'month' },
 };
 
+const addonPriceMapping: Record<string, { priceId: string; name: string; interval: 'month' | 'year'; addonKey: 'eld_compliance' }> = {
+  eld_monthly: {
+    priceId: 'price_1TDJy9LwWfF7E7ohwEuCZc6F',
+    name: 'TrueTrucker ELD Compliance Upgrade',
+    interval: 'month',
+    addonKey: 'eld_compliance',
+  },
+  eld_annual: {
+    priceId: 'price_1TDJyJLwWfF7E7oh35wSnNAS',
+    name: 'TrueTrucker ELD Compliance Upgrade (Annual)',
+    interval: 'year',
+    addonKey: 'eld_compliance',
+  },
+};
+
 const validateInput = (plan: string) => {
   logStep("Validating plan input", { received: plan, type: typeof plan });
   if (!plan || typeof plan !== 'string') {
@@ -49,8 +63,8 @@ const validateInput = (plan: string) => {
   }
   const trimmed = plan.trim().toLowerCase();
   if (trimmed.length > 50) throw new Error('Plan name too long');
-  if (!priceMapping[trimmed]) {
-    throw new Error(`Invalid plan: "${trimmed}". Valid plans: ${Object.keys(priceMapping).join(', ')}`);
+  if (!subscriptionPriceMapping[trimmed] && !addonPriceMapping[trimmed]) {
+    throw new Error(`Invalid plan: "${trimmed}". Valid plans: ${[...Object.keys(subscriptionPriceMapping), ...Object.keys(addonPriceMapping)].join(', ')}`);
   }
   return trimmed;
 };
@@ -96,7 +110,9 @@ serve(async (req) => {
       logStep("Found existing customer", { customerId });
     }
 
-    const selectedPlan = priceMapping[validatedPlan];
+    const selectedPlan = subscriptionPriceMapping[validatedPlan];
+    const selectedAddon = addonPriceMapping[validatedPlan];
+    const isAddonCheckout = Boolean(selectedAddon);
 
     const rawOrigin = req.headers.get("origin") || '';
     const safeOrigin = allowedOrigins.includes(rawOrigin) ? rawOrigin : 'https://true-trucker-ifta-pro.com';
@@ -110,6 +126,7 @@ serve(async (req) => {
       'COMEBACK20': 'hWkvax24',
       'EARLYBIRD15': 'A61H8B1V',
       'WINBACK25': 'wjtQTTy0',
+      'ELDUPGRADE': 'jYwbf2RZ',
     };
     let stripeCouponId: string | undefined;
     if (coupon && typeof coupon === 'string') {
@@ -122,35 +139,46 @@ serve(async (req) => {
       }
     }
 
-    logStep("Creating checkout session", { plan: validatedPlan, amount: selectedPlan.amount, interval: selectedPlan.interval, coupon: stripeCouponId });
+    logStep("Creating checkout session", {
+      plan: validatedPlan,
+      amount: selectedPlan?.amount,
+      priceId: selectedAddon?.priceId,
+      interval: selectedPlan?.interval || selectedAddon?.interval,
+      coupon: stripeCouponId,
+      isAddonCheckout,
+    });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: `TrueTrucker IFTA Pro - ${selectedPlan.name}`,
-              description: `IFTA Pro ${selectedPlan.name} Subscription`,
+      line_items: isAddonCheckout
+        ? [{ price: selectedAddon.priceId, quantity: 1 }]
+        : [
+            {
+              price_data: {
+                currency: "usd",
+                product_data: {
+                  name: `TrueTrucker IFTA Pro - ${selectedPlan.name}`,
+                  description: `IFTA Pro ${selectedPlan.name} Subscription`,
+                },
+                unit_amount: selectedPlan.amount,
+                recurring: { interval: selectedPlan.interval },
+              },
+              quantity: 1,
             },
-            unit_amount: selectedPlan.amount,
-            recurring: { interval: selectedPlan.interval },
-          },
-          quantity: 1,
-        },
-      ],
+          ],
       mode: "subscription",
       ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
       subscription_data: {
-        ...(!stripeCouponId ? { trial_period_days: 7 } : {}),
+        ...(!stripeCouponId && !isAddonCheckout ? { trial_period_days: 7 } : {}),
         metadata: {
           source: "truetrucker-ifta-app",
           app_name: "TrueTrucker IFTA Pro",
           user_id: user.id,
-          plan: basePlan,
-          billing_interval: selectedPlan.interval,
+          plan: isAddonCheckout ? selectedAddon.addonKey : basePlan,
+          billing_interval: selectedPlan?.interval || selectedAddon?.interval,
+          purchase_type: isAddonCheckout ? 'eld_addon' : 'subscription',
+          addon_key: isAddonCheckout ? selectedAddon.addonKey : 'none',
           created_from: "app-checkout",
           coupon_applied: stripeCouponId || 'none',
         },
@@ -162,9 +190,10 @@ serve(async (req) => {
         app_name: "TrueTrucker IFTA Pro",
         app_version: "2.0",
         user_id: user.id,
-        plan: basePlan,
-        billing_interval: selectedPlan.interval,
-        purchase_type: "subscription",
+        plan: isAddonCheckout ? selectedAddon.addonKey : basePlan,
+        billing_interval: selectedPlan?.interval || selectedAddon?.interval,
+        purchase_type: isAddonCheckout ? 'eld_addon' : "subscription",
+        addon_key: isAddonCheckout ? selectedAddon.addonKey : 'none',
         purchase_date: new Date().toISOString(),
         user_email: user.email,
       },
