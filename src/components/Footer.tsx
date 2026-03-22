@@ -8,7 +8,7 @@ const Footer = () => {
   const getSupportEmailHref = () => {
     const userId = user?.id || 'not-logged-in';
     const subject = encodeURIComponent(`App Support Request: [${userId}]`);
-    return `mailto:support@true-trucker-ifta-pro.com?subject=${subject}`;
+    return `mailto:support@truetrucker.com?subject=${subject}`;
   };
 
   return (
@@ -74,12 +74,14 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4" />
                 <a href={getSupportEmailHref()} className="text-primary-foreground/80 hover:text-white transition-colors">
-                  support@true-trucker-ifta-pro.com
+                  support@truetrucker.com
                 </a>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4" />
-                <span className="text-primary-foreground/80">Available 24/7</span>
+                <a href="tel:3213959957" className="text-primary-foreground/80 hover:text-white transition-colors">
+                  (321) 395-9957
+                </a>
               </div>
             </div>
           </div>

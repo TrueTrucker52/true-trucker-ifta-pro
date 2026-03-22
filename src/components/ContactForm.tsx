@@ -167,11 +167,15 @@ const ContactForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-              <span>support@true-trucker-ifta-pro.com</span>
+               <a href="mailto:support@truetrucker.com" className="hover:text-foreground transition-colors break-all">
+                 support@truetrucker.com
+               </a>
             </div>
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-primary" />
-              <span>Response within 24 hours</span>
+               <a href="tel:3213959957" className="hover:text-foreground transition-colors">
+                 (321) 395-9957
+               </a>
             </div>
           </div>
         </div>
