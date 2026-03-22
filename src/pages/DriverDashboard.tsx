@@ -86,7 +86,7 @@ const DriverDashboard = () => {
     queryFn: async () => {
       if (!fleetMembership?.fleet_id) return null;
       const { data } = await supabase
-        .from('fleets')
+        .from('fleet_member_view')
         .select('company_name')
         .eq('id', fleetMembership.fleet_id)
         .maybeSingle();
