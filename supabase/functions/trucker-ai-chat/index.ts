@@ -9,6 +9,64 @@ const corsHeaders = {
 
 const SAFE_ERROR_MESSAGE = "An error occurred. Please try again or contact support.";
 
+const ALLOWED_PAGES = new Set([
+  "/dashboard",
+  "/ifta-reports",
+  "/scan-receipt",
+  "/bol-management",
+  "/trips",
+  "/vehicles",
+  "/mileage-tracker",
+  "/reports",
+  "/pricing",
+  "/help",
+  "/fleet-dashboard",
+  "/messages",
+  "/analytics",
+  "/account",
+]);
+
+const ALLOWED_ROLES = new Set(["admin", "fleet_owner", "driver", "moderator", "user"]);
+
+const normalizePromptText = (value: unknown, fallback: string, maxLength = 80) => {
+  if (typeof value !== "string") return fallback;
+
+  const normalized = value
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[{}<>`$\\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+
+  return normalized || fallback;
+};
+
+const normalizeCurrentPage = (value: unknown) => {
+  if (typeof value !== "string") return "/dashboard";
+
+  const [path] = value.trim().split(/[?#]/, 1);
+  return ALLOWED_PAGES.has(path) ? path : "/dashboard";
+};
+
+const normalizeMessages = (value: unknown) => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter(
+      (message): message is { role: string; content: string } =>
+        !!message &&
+        typeof message === "object" &&
+        typeof (message as { role?: unknown }).role === "string" &&
+        typeof (message as { content?: unknown }).content === "string"
+    )
+    .map(({ role, content }) => ({
+      role: role === "assistant" ? "assistant" : "user",
+      content: normalizePromptText(content, "", 4000),
+    }))
+    .filter((message) => message.content.length > 0)
+    .slice(-20);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -53,6 +111,21 @@ serve(async (req) => {
     const { messages, userContext } = await req.json();
     const userId = claimsData.claims.sub;
 
+    const safeMessages = normalizeMessages(messages);
+    const safeUserName = normalizePromptText(userContext?.userName, "Driver");
+    const safeFleetName = normalizePromptText(userContext?.fleetName, "Independent", 120);
+    const safeCurrentPage = normalizeCurrentPage(userContext?.currentPage);
+
+    const { data: derivedRole, error: roleError } = await supabase.rpc("get_user_role");
+    if (roleError) {
+      console.error("Failed to derive user role for AI chat:", roleError);
+    }
+
+    const safeUserRole =
+      typeof derivedRole === "string" && ALLOWED_ROLES.has(derivedRole)
+        ? derivedRole
+        : "user";
+
     const systemPrompt = `You are TruckerAI, an expert IFTA filing assistant for the TrueTrucker IFTA Pro app.
 
 You help truck drivers and fleet owners with:
@@ -66,10 +139,10 @@ You help truck drivers and fleet owners with:
 
 Current user info:
 User ID: ${userId}
-Name: ${userContext?.userName || "Driver"}
-Role: ${userContext?.userRole || "user"}
-Fleet: ${userContext?.fleetName || "Independent"}
-Current page: ${userContext?.currentPage || "/dashboard"}
+Name: ${safeUserName}
+Role: ${safeUserRole}
+Fleet: ${safeFleetName}
+Current page: ${safeCurrentPage}
 
 IFTA DEADLINES (2026):
 - Q1: Due April 30, 2026
@@ -123,7 +196,7 @@ Then suggest: [NAV:/help|Open Help Center] or email support@true-trucker-ifta-pr
           model: "google/gemini-3-flash-preview",
           messages: [
             { role: "system", content: systemPrompt },
-            ...messages,
+            ...safeMessages,
           ],
           stream: true,
         }),
