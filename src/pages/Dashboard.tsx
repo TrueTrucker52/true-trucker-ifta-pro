@@ -12,6 +12,7 @@ import { OptimizedLoadingState } from "@/components/OptimizedLoadingState";
 import { useAutoTracking } from "@/hooks/useAutoTracking";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
+import ELDUpgradeBanner from '@/components/eld/ELDUpgradeBanner';
 
 // Lazy load non-critical dashboard components
 const BottomNavigation = lazy(() => import("@/components/BottomNavigation"));
@@ -54,6 +55,7 @@ const Dashboard = () => {
     subscription_status, 
     subscribed,
     subscription_tier,
+    eld_active,
     createCheckout,
     checkSubscription,
     loading
@@ -114,6 +116,8 @@ const Dashboard = () => {
             <OnboardingBanner />
             <ReferralWidget />
           </Suspense>
+
+          {!eld_active && <ELDUpgradeBanner />}
 
           {cameraTestPending ? (
             <Card className="mb-6 border-border bg-card">
