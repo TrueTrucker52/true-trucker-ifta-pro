@@ -55,7 +55,9 @@ const ContactSection = () => {
                   <Mail className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Email Support</p>
-                    <p className="text-muted-foreground">support@true-trucker-ifta-pro.com</p>
+                    <a href="mailto:support@truetrucker.com" className="text-muted-foreground hover:text-foreground transition-colors break-all">
+                      support@truetrucker.com
+                    </a>
                   </div>
                 </div>
                 
@@ -63,7 +65,9 @@ const ContactSection = () => {
                   <Phone className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Phone Support</p>
-                    <p className="text-muted-foreground">321-395-9957</p>
+                    <a href="tel:3213959957" className="text-muted-foreground hover:text-foreground transition-colors">
+                      (321) 395-9957
+                    </a>
                   </div>
                 </div>
                 
@@ -88,7 +92,7 @@ const ContactSection = () => {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 py-4 h-14"
-                  onClick={() => window.open('mailto:support@true-trucker-ifta-pro.com', '_blank')}
+                  onClick={() => window.open('mailto:support@truetrucker.com', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Contact Support

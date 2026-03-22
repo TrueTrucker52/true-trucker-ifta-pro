@@ -50,7 +50,9 @@ const LandingFooter = () => (
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              <span>1‑800‑TRUCKER</span>
+              <a href="tel:3213959957" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">
+                (321) 395-9957
+              </a>
             </li>
           </ul>
         </div>
