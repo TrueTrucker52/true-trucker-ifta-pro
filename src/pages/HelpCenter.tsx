@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -150,6 +151,15 @@ const HelpCenter: React.FC = () => {
   const escapeHtml = (str: string) =>
     str.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c]!));
 
+  const sanitizeArticleHtml = (html: string) =>
+    DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['a', 'br', 'code', 'em', 'li', 'p', 'pre', 'strong', 'ul', 'ol'],
+      ALLOWED_ATTR: ['href', 'class', 'target', 'rel'],
+      FORBID_TAGS: ['form', 'iframe', 'input', 'object', 'script', 'style'],
+      FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus'],
+      ALLOW_DATA_ATTR: false,
+    });
+
   // Render markdown-like content with sanitized links
   const renderContent = (content: string) => {
     return content.split('\n').map((line, i) => {
@@ -159,16 +169,20 @@ const HelpCenter: React.FC = () => {
       if (line.startsWith('- ')) return <li key={i} className="ml-4 text-muted-foreground mb-1">{line.slice(2)}</li>;
       if (line.startsWith('|')) return <p key={i} className="text-sm text-muted-foreground font-mono mb-1">{line}</p>;
       if (line.trim() === '') return <br key={i} />;
+      const escapedLine = escapeHtml(line);
+
       // Handle inline links with sanitized URLs and escaped labels
-      const withLinks = line.replace(
+      const withLinks = escapedLine.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
         (_, label, url) => {
           const safeUrl = /^https?:\/\//i.test(url) ? escapeHtml(url) : '#';
           const safeLabel = escapeHtml(label);
-          return `<a href="${safeUrl}" class="text-primary underline" rel="noopener noreferrer">${safeLabel}</a>`;
+          return `<a href="${safeUrl}" class="text-primary underline" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
         }
       );
-      return <p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: withLinks }} />;
+      const sanitizedHtml = sanitizeArticleHtml(withLinks);
+
+      return <p key={i} className="text-muted-foreground mb-2" dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
     });
   };
 
