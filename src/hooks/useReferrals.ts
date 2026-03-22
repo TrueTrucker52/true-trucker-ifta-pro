@@ -5,15 +5,11 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Referral {
   id: string;
-  referrer_id: string;
-  referred_id: string | null;
-  referral_code: string;
   status: string;
-  referred_email: string | null;
+  masked_referred_email: string | null;
   signed_up_at: string | null;
   converted_at: string | null;
   reward_applied: boolean;
-  reward_applied_at: string | null;
   created_at: string;
 }
 
@@ -56,7 +52,7 @@ export const useReferrals = () => {
     setLoading(true);
 
     const [refResult, rewardResult] = await Promise.all([
-      supabase.from('referrals').select('*').eq('referrer_id', user.id).order('created_at', { ascending: false }),
+      supabase.rpc('get_my_referrals'),
       supabase.from('referral_rewards').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
     ]);
 

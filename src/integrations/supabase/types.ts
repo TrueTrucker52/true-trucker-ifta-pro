@@ -2057,6 +2057,18 @@ export type Database = {
           owner_id: string
         }[]
       }
+      get_my_referrals: {
+        Args: never
+        Returns: {
+          converted_at: string
+          created_at: string
+          id: string
+          masked_referred_email: string
+          reward_applied: boolean
+          signed_up_at: string
+          status: string
+        }[]
+      }
       get_user_fleet_id: { Args: never; Returns: string }
       get_user_role: { Args: never; Returns: string }
       grant_reviewer_role: { Args: { user_email: string }; Returns: undefined }
