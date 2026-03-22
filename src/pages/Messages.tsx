@@ -51,7 +51,7 @@ const Messages = () => {
       // Check if driver
       const { data: membership } = await supabase.from('fleet_members').select('fleet_id, status').eq('driver_id', user.id).eq('status', 'active').maybeSingle();
       if (membership) {
-        const { data: fleet } = await supabase.from('fleet_member_view').select('*').eq('id', membership.fleet_id).maybeSingle();
+        const { data: fleet } = await supabase.rpc('get_driver_fleet_summary', { target_fleet_id: membership.fleet_id }).maybeSingle();
         return { fleet, role: 'driver' as const };
       }
       return null;

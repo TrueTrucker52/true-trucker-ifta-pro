@@ -85,11 +85,10 @@ const DriverDashboard = () => {
     queryKey: ['driver-fleet-info', fleetMembership?.fleet_id],
     queryFn: async () => {
       if (!fleetMembership?.fleet_id) return null;
-      const { data } = await supabase
-        .from('fleet_member_view')
-        .select('company_name')
-        .eq('id', fleetMembership.fleet_id)
+      const { data, error } = await supabase
+        .rpc('get_driver_fleet_summary', { target_fleet_id: fleetMembership.fleet_id })
         .maybeSingle();
+      if (error) throw error;
       return data;
     },
     enabled: !!fleetMembership?.fleet_id,
