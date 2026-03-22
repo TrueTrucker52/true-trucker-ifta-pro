@@ -80,11 +80,11 @@ const PricingSection = () => {
                 }`}
               >
                 {p.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full">
+                  <span className="absolute right-4 top-4 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                     {p.badge}
                   </span>
                 )}
-                <header className="mb-6">
+                <header className="mb-6 pr-24">
                   <h3 className="mb-1 text-lg font-bold text-card-foreground">{p.name}</h3>
                   <p className="text-sm text-muted-foreground">{p.trucks}</p>
                   <div className="mt-4">

@@ -1,4 +1,12 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { Shield, Clock, CreditCard, RotateCcw, Star } from "lucide-react";
 import heroMobile from "@/assets/landing-hero-truck-mobile.webp";
@@ -6,6 +14,7 @@ import heroDesktop from "@/assets/landing-hero-truck-desktop.webp";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
@@ -40,22 +49,22 @@ const HeroSection = () => {
             all in one app from $39/month.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
             <Button
               variant="hero"
               size="xl"
-              className="bg-secondary hover:bg-secondary/90"
+              className="min-w-0 justify-center bg-secondary hover:bg-secondary/90 sm:w-auto"
               onClick={() => navigate("/auth")}
             >
               🚀 Start Free 7‑Day Trial →
             </Button>
             <Button
               variant="outline"
-              size="lg"
-              className="border-[hsl(var(--landing-navy-foreground))]/30 text-[hsl(var(--landing-navy-foreground))] hover:bg-[hsl(var(--landing-navy-foreground))]/10"
-              onClick={() => navigate("/demo")}
+              size="xl"
+              className="min-w-0 justify-center border-2 border-[hsl(var(--landing-navy-foreground))] bg-[hsl(var(--landing-navy-foreground))]/10 text-[hsl(var(--landing-navy-foreground))] shadow-none hover:bg-[hsl(var(--landing-navy-foreground))]/20 hover:text-[hsl(var(--landing-navy-foreground))] sm:w-auto"
+              onClick={() => setIsDemoOpen(true)}
             >
-              ▶️ Watch 2‑Minute Demo
+              ▶️ Watch 2 Minute Demo
             </Button>
           </div>
 
@@ -88,6 +97,41 @@ const HeroSection = () => {
           </span>
         </div>
       </div>
+
+      <Dialog open={isDemoOpen} onOpenChange={setIsDemoOpen}>
+        <DialogContent className="max-w-md border-border bg-background">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-foreground">
+              🎬 Demo video coming soon!
+            </DialogTitle>
+            <DialogDescription className="text-base leading-relaxed text-muted-foreground">
+              Sign up for free to explore the app yourself and see how TrueTrucker handles IFTA, ELD, mileage tracking, and compliance.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+            <Button
+              variant="hero"
+              size="lg"
+              className="w-full bg-secondary hover:bg-secondary/90"
+              onClick={() => {
+                setIsDemoOpen(false);
+                navigate("/auth");
+              }}
+            >
+              🚀 Start Free Trial →
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => setIsDemoOpen(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
