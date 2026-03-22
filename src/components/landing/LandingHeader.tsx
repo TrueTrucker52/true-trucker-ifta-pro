@@ -60,7 +60,7 @@ const LandingHeader = () => {
           <Button
             variant="hero"
             size="sm"
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate("/auth?mode=signup")}
             className="bg-secondary hover:bg-secondary/90"
           >
             Start Free Trial →
@@ -83,7 +83,7 @@ const LandingHeader = () => {
           <button onClick={() => scrollTo("features")} className="block w-full text-left text-[hsl(var(--landing-navy-foreground))]/80 py-2">Features</button>
           <button onClick={() => scrollTo("pricing")} className="block w-full text-left text-[hsl(var(--landing-navy-foreground))]/80 py-2">Pricing</button>
           <button onClick={() => { setMobileOpen(false); navigate("/auth"); }} className="block w-full text-left text-[hsl(var(--landing-navy-foreground))]/80 py-2">Login</button>
-          <Button variant="hero" size="default" className="w-full bg-secondary hover:bg-secondary/90" onClick={() => { setMobileOpen(false); navigate("/auth"); }}>
+          <Button variant="hero" size="default" className="w-full bg-secondary hover:bg-secondary/90" onClick={() => { setMobileOpen(false); navigate("/auth?mode=signup"); }}>
             Start Free Trial →
           </Button>
         </div>
