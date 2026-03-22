@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import BottomNavigation from '@/components/BottomNavigation';
 import { cn } from '@/lib/utils';
+import { useSubscription } from '@/hooks/useSubscription';
+import ELDUpgradeBanner from '@/components/eld/ELDUpgradeBanner';
 
 function getQuarterLabel(dateStr: string) {
   const d = new Date(dateStr);
@@ -28,6 +30,7 @@ const formatDate = (d: string) =>
 
 const FleetDashboard = () => {
   const { user } = useAuth();
+  const { eld_active } = useSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -304,6 +307,7 @@ const FleetDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {!eld_active && <ELDUpgradeBanner />}
 
         {/* ─── Fleet Stats ─── */}
         <Card>

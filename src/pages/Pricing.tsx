@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Switch } from '@/components/ui/switch';
+import { ELD_CHECKOUT_LINKS, ELD_COUPON } from '@/lib/eldUpgrade';
 
 const plans = [
   {
@@ -96,7 +97,7 @@ const featureRows = [
   { feature: 'IFTA Quarterly Reports', tiers: [true, true, true, true] },
   { feature: 'Receipt Scanning', tiers: [true, true, true, true] },
   { feature: 'GPS Tracking', tiers: [true, true, true, true] },
-  { feature: 'ELD Integration', tiers: [true, true, true, true] },
+  { feature: 'ELD Compliance', tiers: ['+$10 add-on', '+$10/truck', '+$10/truck', '+$10/truck'] },
   { feature: 'Voice Commands', tiers: [true, true, true, true] },
   { feature: 'BOL Management', tiers: [true, true, true, true] },
   { feature: 'Fleet Dashboard', tiers: [false, true, true, true] },
@@ -277,7 +278,9 @@ const Pricing = () => {
               {featureRows.map((row) => (
                 <li key={row.feature} className="flex items-center justify-between text-sm">
                   <span className="text-foreground">{row.feature}</span>
-                  {row.tiers[comparisonTab] ? (
+                  {typeof row.tiers[comparisonTab] === 'string' ? (
+                    <span className="text-xs font-medium text-primary">{row.tiers[comparisonTab]}</span>
+                  ) : row.tiers[comparisonTab] ? (
                     <Check className="h-5 w-5 text-primary flex-shrink-0" />
                   ) : (
                     <span className="text-muted-foreground/40 text-xs">—</span>
@@ -285,6 +288,28 @@ const Pricing = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section id="eld-addon" className="max-w-3xl mx-auto mb-16 rounded-2xl border bg-card p-6">
+          <p className="mb-2 text-sm font-semibold tracking-wide text-primary">⚖️ ADD ELD COMPLIANCE TO ANY PLAN</p>
+          <h2 className="text-2xl font-bold">Already have a plan? Add full FMCSA certified ELD compliance.</h2>
+          <p className="mt-2 text-muted-foreground">$10/truck/month or $96/truck/year. Use code <span className="font-semibold text-foreground">{ELD_COUPON.code}</span> for 30% off your first 3 months.</p>
+          <ul className="grid gap-2 mt-5 sm:grid-cols-2">
+            {['FMCSA certified ELD', 'HOS tracking and alerts', 'DOT inspection mode', 'Log transfer to inspector', '8 day history', 'Safety score'].map((feature) => (
+              <li key={feature} className="flex items-start gap-2 text-sm">
+                <Check className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="grid gap-3 mt-6 sm:grid-cols-2">
+            <Button asChild size="lg">
+              <a href={ELD_CHECKOUT_LINKS.monthly} target="_blank" rel="noreferrer">Add ELD — Monthly $10/truck</a>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <a href={ELD_CHECKOUT_LINKS.annual} target="_blank" rel="noreferrer">Add ELD — Annual $8/truck</a>
+            </Button>
           </div>
         </section>
 
