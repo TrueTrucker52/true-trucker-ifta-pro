@@ -115,9 +115,7 @@ const Auth = () => {
 
     // Look up fleet by invite code
     const { data: fleet, error: fleetError } = await supabase
-      .from('fleets')
-      .select('id, company_name')
-      .eq('invite_code', trimmedCode)
+      .rpc('lookup_fleet_by_invite_code', { invite_code_input: trimmedCode })
       .maybeSingle();
 
     if (fleetError || !fleet) {

@@ -241,9 +241,7 @@ const Onboarding: React.FC = () => {
     try {
       const code = inviteCode.toUpperCase().trim();
       const { data: fleet } = await supabase
-        .from('fleets')
-        .select('id, company_name')
-        .eq('invite_code', code)
+        .rpc('lookup_fleet_by_invite_code', { invite_code_input: code })
         .maybeSingle();
 
       if (fleet) {
