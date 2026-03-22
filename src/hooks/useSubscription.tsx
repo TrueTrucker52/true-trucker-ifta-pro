@@ -15,6 +15,9 @@ interface SubscriptionData {
   trial_days_remaining: number;
   trial_end_date: string | null;
   subscription_status: string;
+  eld_active: boolean;
+  eld_status: string | null;
+  eld_billing_interval: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -31,6 +34,9 @@ export const useSubscription = () => {
     trial_days_remaining: 0,
     trial_end_date: null,
     subscription_status: 'trial',
+    eld_active: false,
+    eld_status: null,
+    eld_billing_interval: null,
     loading: true,
     error: null,
   });
@@ -62,6 +68,9 @@ export const useSubscription = () => {
         trial_days_remaining: 0,
         trial_end_date: null,
         subscription_status: 'admin',
+        eld_active: true,
+        eld_status: 'active',
+        eld_billing_interval: 'month',
         loading: false,
         error: null,
       });
@@ -97,6 +106,9 @@ export const useSubscription = () => {
           trial_days_remaining: 0,
           trial_end_date: null,
           subscription_status: 'trial',
+          eld_active: false,
+          eld_status: null,
+          eld_billing_interval: null,
           loading: false,
           error: null,
         });
@@ -153,6 +165,9 @@ export const useSubscription = () => {
             trial_days_remaining: retryResponse.data.trial_days_remaining || 0,
             trial_end_date: retryResponse.data.trial_end_date,
             subscription_status: retryResponse.data.subscription_status || 'trial',
+            eld_active: retryResponse.data.eld_active || false,
+            eld_status: retryResponse.data.eld_status || null,
+            eld_billing_interval: retryResponse.data.eld_billing_interval || null,
             loading: false,
             error: null,
           });
@@ -171,6 +186,9 @@ export const useSubscription = () => {
         trial_days_remaining: data.trial_days_remaining || 0,
         trial_end_date: data.trial_end_date,
         subscription_status: data.subscription_status || 'trial',
+        eld_active: data.eld_active || false,
+        eld_status: data.eld_status || null,
+        eld_billing_interval: data.eld_billing_interval || null,
         loading: false,
         error: null,
       });
@@ -189,6 +207,9 @@ export const useSubscription = () => {
         subscribed: false,
         subscription_tier: 'free',
         subscription_status: 'error',
+        eld_active: false,
+        eld_status: null,
+        eld_billing_interval: null,
         loading: false,
         error: retryCountRef.current >= MAX_RETRY_COUNT 
           ? `Failed after ${MAX_RETRY_COUNT} attempts` 
