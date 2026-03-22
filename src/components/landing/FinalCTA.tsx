@@ -4,6 +4,7 @@ import { Shield, Clock, RotateCcw, CreditCard, Smartphone, Award } from "lucide-
 
 const FinalCTA = () => {
   const navigate = useNavigate();
+
   return (
     <section className="bg-[hsl(var(--landing-navy))] py-20 md:py-28">
       <div className="container mx-auto px-4 text-center max-w-3xl">
@@ -17,7 +18,12 @@ const FinalCTA = () => {
           <Button variant="hero" size="xl" className="bg-secondary hover:bg-secondary/90" onClick={() => navigate("/auth")}>
             🚀 Start Free 7‑Day Trial →
           </Button>
-          <Button variant="outline" size="lg" className="border-[hsl(var(--landing-navy-foreground))]/30 text-[hsl(var(--landing-navy-foreground))] hover:bg-[hsl(var(--landing-navy-foreground))]/10" onClick={() => navigate("/contact")}>
+          <Button
+            variant="outline"
+            size="xl"
+            className="border-2 border-[hsl(var(--landing-navy-foreground))] bg-transparent text-[hsl(var(--landing-navy-foreground))] shadow-none hover:bg-[hsl(var(--landing-navy-foreground))]/10 hover:text-[hsl(var(--landing-navy-foreground))]"
+            onClick={() => navigate("/contact")}
+          >
             💬 Talk to a Real Person
           </Button>
         </div>
