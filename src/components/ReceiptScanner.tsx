@@ -94,7 +94,20 @@ export const ReceiptScanner = () => {
       : '';
   };
 
+  const isMobileDevice = () => {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      ('ontouchstart' in window && window.innerWidth < 1024) ||
+      (navigator.maxTouchPoints > 0 && window.innerWidth < 1024);
+  };
+
   const startCamera = async () => {
+    // On mobile, use native file input with capture attribute for photo mode
+    if (isMobileDevice()) {
+      mobileCameraRef.current?.click();
+      return;
+    }
+
+    // Desktop: use getUserMedia for live viewfinder
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' } 
