@@ -110,7 +110,7 @@ export const useReferrals = () => {
 
   const getReferralLink = useCallback(() => {
     if (!referralCode) return '';
-    return `https://true-trucker-ifta-pro.lovable.app/ref/${referralCode}`;
+    return `https://true-trucker-ifta-pro.com/ref/${referralCode}`;
   }, [referralCode]);
 
   const copyCode = useCallback(async () => {
