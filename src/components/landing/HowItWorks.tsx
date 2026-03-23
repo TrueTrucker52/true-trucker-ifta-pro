@@ -12,7 +12,8 @@ const HowItWorks = () => {
   return (
     <section className="bg-[hsl(var(--landing-gray))] py-20 md:py-28">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-14">
+        <h3 className="text-lg font-semibold text-destructive mb-4">⚠️ Quarter One IFTA Deadline: April 30 — File on time with TrueTrucker</h3>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
           Up and running in 5 minutes ⏱️
         </h2>
         <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
