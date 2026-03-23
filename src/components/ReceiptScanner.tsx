@@ -468,6 +468,14 @@ export const ReceiptScanner = () => {
                 onChange={handleFileUpload}
                 className="hidden"
               />
+              <input
+                ref={mobileCameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </div>
           )}
           
