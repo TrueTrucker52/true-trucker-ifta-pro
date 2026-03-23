@@ -47,6 +47,7 @@ export const ReceiptScanner = () => {
   const { toast } = useToast();
   const { saveWithOfflineSupport, isOnline } = useOfflineSync();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mobileCameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
