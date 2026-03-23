@@ -34,7 +34,9 @@ interface BOLData {
 }
 
 const isMobileDevice = () => {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    ('ontouchstart' in window && window.innerWidth < 1024) ||
+    (navigator.maxTouchPoints > 0 && window.innerWidth < 1024);
 };
 
 export const BOLScanner = () => {
