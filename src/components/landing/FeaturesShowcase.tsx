@@ -36,11 +36,14 @@ const features = [
 const FeaturesShowcase = () => (
   <section id="features" className="bg-background py-20 md:py-28">
     <div className="container mx-auto px-4 text-center">
-      <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-        Everything you need. Nothing you don't. 🚛
+      <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
+        Automatic IFTA Filing for Truck Drivers
       </h2>
+      <h3 className="text-xl md:text-2xl font-bold text-foreground/80 mb-2">
+        ELD Compliance Made Simple · GPS Fleet Tracking for Owner Operators
+      </h3>
       <p className="text-muted-foreground mb-14 max-w-xl mx-auto">
-        One app to replace your entire compliance stack.
+        BOL Scanner for Truck Drivers — one app to replace your entire compliance stack.
       </p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
         {features.map((f) => (

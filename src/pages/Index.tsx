@@ -44,16 +44,14 @@ const Index = () => {
               {
                 "@type": "SoftwareApplication",
                 name: "TrueTrucker IFTA Pro",
+                description: "IFTA filing and fleet management app for truck drivers",
+                url: "https://true-trucker-ifta-pro.com",
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Android, iOS, Web",
-                description:
-                  "Automate IFTA filing, track miles by state, scan BOLs, and stay ELD compliant. Built for truck drivers.",
                 offers: {
-                  "@type": "AggregateOffer",
-                  lowPrice: "39",
-                  highPrice: "199",
+                  "@type": "Offer",
+                  price: "39.00",
                   priceCurrency: "USD",
-                  offerCount: 4,
                 },
                 aggregateRating: {
                   "@type": "AggregateRating",
@@ -61,16 +59,36 @@ const Index = () => {
                   reviewCount: "500",
                   bestRating: "5",
                 },
+                author: {
+                  "@type": "Person",
+                  name: "George Williams",
+                },
               },
               {
                 "@type": "FAQPage",
                 mainEntity: [
                   {
                     "@type": "Question",
-                    name: "Do I need a credit card to start?",
+                    name: "What is IFTA?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "No! Start your 7-day free trial with just your email address.",
+                      text: "IFTA stands for International Fuel Tax Agreement. It requires commercial truck drivers who operate in multiple states to file quarterly fuel tax reports.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "When is the IFTA deadline?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "IFTA is filed quarterly: Q1 due April 30, Q2 due July 31, Q3 due October 31, Q4 due January 31.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "How much does IFTA filing cost?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "TrueTrucker IFTA Pro starts at $39 per month for solo owner operators with a 7-day free trial.",
                     },
                   },
                   {
@@ -78,7 +96,15 @@ const Index = () => {
                     name: "Is TrueTrucker ELD FMCSA certified?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Yes. TrueTrucker meets all FMCSA 49 CFR Part 395 requirements.",
+                      text: "Yes. TrueTrucker meets all FMCSA 49 CFR Part 395 requirements for electronic logging devices.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Does TrueTrucker work on iPhone?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Yes. TrueTrucker works on iPhone, Android, and desktop computers.",
                     },
                   },
                   {
