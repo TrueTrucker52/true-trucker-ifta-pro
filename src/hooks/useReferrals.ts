@@ -105,7 +105,7 @@ export const useReferrals = () => {
 
   const getShareText = useCallback(() => {
     if (!referralCode) return '';
-    return `Hey! I've been using TrueTrucker for IFTA filing and it's amazing. Way better than doing it manually. Sign up with my code ${referralCode} and we both get a free month! truetrucker.com/ref/${referralCode}`;
+    return `Hey! I've been using TrueTrucker for IFTA filing and it's amazing. Way better than doing it manually. Sign up with my code ${referralCode} and we both get a free month! https://true-trucker-ifta-pro.com/ref/${referralCode}`;
   }, [referralCode]);
 
   const getReferralLink = useCallback(() => {
