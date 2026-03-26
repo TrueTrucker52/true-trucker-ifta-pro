@@ -1,4 +1,4 @@
-import { Truck, Mail, MapPin, HelpCircle } from "lucide-react";
+import { Truck, Mail, MapPin, HelpCircle, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
