@@ -124,6 +124,7 @@ const App: React.FC = () => {
                   <Route path="/eld" element={<ProtectedRoute><ELD /></ProtectedRoute>} />
                   <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
                   <Route path="/learn" element={<Learn />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
