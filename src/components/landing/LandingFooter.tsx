@@ -1,4 +1,4 @@
-import { Truck, Mail, Phone } from "lucide-react";
+import { Truck, Mail, Phone, ShoppingCart } from "lucide-react";
 
 const LandingFooter = () => (
   <footer className="bg-[hsl(var(--landing-navy))] border-t border-[hsl(var(--landing-navy-foreground))]/10 pt-16 pb-8">
@@ -25,6 +25,12 @@ const LandingFooter = () => (
             <li><a href="#pricing" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">Pricing</a></li>
             <li><a href="/help" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">Help Center</a></li>
             <li><a href="/install" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">Install App</a></li>
+            <li>
+              <a href="https://truetruckingtv.com" target="_blank" rel="noopener noreferrer" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors flex items-center gap-1.5 font-semibold text-secondary">
+                <ShoppingCart className="h-3.5 w-3.5" />
+                Shop Merch
+              </a>
+            </li>
           </ul>
         </div>
 

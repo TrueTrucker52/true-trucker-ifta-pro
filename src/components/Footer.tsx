@@ -1,4 +1,4 @@
-import { Truck, Mail, MapPin, HelpCircle } from "lucide-react";
+import { Truck, Mail, MapPin, HelpCircle, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
@@ -49,6 +49,12 @@ const Footer = () => {
               <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
               <li><a href="https://apps.apple.com/search?term=trucking%20apps" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Mobile App</a></li>
               <li><a href="/dashboard" className="hover:text-white transition-colors">Desktop App</a></li>
+              <li>
+                <a href="https://truetruckingtv.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5 font-semibold text-secondary">
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  Shop Merch
+                </a>
+              </li>
             </ul>
           </div>
 
