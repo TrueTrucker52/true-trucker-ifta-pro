@@ -1,4 +1,4 @@
-import { Truck, Mail, Phone } from "lucide-react";
+import { Truck, Mail, Phone, ShoppingCart } from "lucide-react";
 
 const LandingFooter = () => (
   <footer className="bg-[hsl(var(--landing-navy))] border-t border-[hsl(var(--landing-navy-foreground))]/10 pt-16 pb-8">
