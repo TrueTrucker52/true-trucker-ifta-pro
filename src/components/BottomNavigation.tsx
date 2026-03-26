@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Camera, FileText, Newspaper } from 'lucide-react';
+import { MapPin, Camera, FileText, Newspaper, ShoppingCart } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 
