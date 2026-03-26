@@ -40,6 +40,9 @@ const Header = () => {
             <a href="mailto:support@true-trucker-ifta-pro.com" className="text-foreground hover:text-primary transition-colors">
               Contact
             </a>
+            <a href="https://truetruckingtv.com" target="_blank" rel="noopener noreferrer" className="text-secondary font-semibold hover:text-secondary/80 transition-colors">
+              🛒 Shop Merch
+            </a>
             <button onClick={() => navigate('/help')} className="text-foreground hover:text-primary transition-colors">
               ❓ Help
             </button>
