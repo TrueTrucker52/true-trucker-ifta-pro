@@ -53,6 +53,7 @@ const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const ELD = lazy(() => import("./pages/ELD"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const Learn = lazy(() => import("./pages/Learn"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Lazy loaded global overlays
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
