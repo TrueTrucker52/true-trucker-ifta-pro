@@ -53,6 +53,7 @@ const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const ELD = lazy(() => import("./pages/ELD"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const Learn = lazy(() => import("./pages/Learn"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Lazy loaded global overlays
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
@@ -123,6 +124,7 @@ const App: React.FC = () => {
                   <Route path="/eld" element={<ProtectedRoute><ELD /></ProtectedRoute>} />
                   <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
                   <Route path="/learn" element={<Learn />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
