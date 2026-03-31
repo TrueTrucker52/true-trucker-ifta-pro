@@ -8,7 +8,7 @@ const Footer = () => {
   const getSupportEmailHref = () => {
     const userId = user?.id || 'not-logged-in';
     const subject = encodeURIComponent(`App Support Request: [${userId}]`);
-    return `mailto:support@truetrucker.com?subject=${subject}`;
+    return `mailto:support@truetruckingtv.com?subject=${subject}`;
   };
 
   return (
