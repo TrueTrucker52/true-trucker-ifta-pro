@@ -55,8 +55,8 @@ const ContactSection = () => {
                   <Mail className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Email Support</p>
-                    <a href="mailto:support@truetrucker.com" className="text-muted-foreground hover:text-foreground transition-colors break-all">
-                      support@truetrucker.com
+                    <a href="mailto:support@truetruckingtv.com" className="text-muted-foreground hover:text-foreground transition-colors break-all">
+                      support@truetruckingtv.com
                     </a>
                   </div>
                 </div>
@@ -92,7 +92,7 @@ const ContactSection = () => {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 py-4 h-14"
-                  onClick={() => window.open('mailto:support@truetrucker.com', '_blank')}
+                  onClick={() => window.open('mailto:support@truetruckingtv.com', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Contact Support

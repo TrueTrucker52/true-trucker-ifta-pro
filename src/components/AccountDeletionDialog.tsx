@@ -69,7 +69,7 @@ const AccountDeletionDialog = () => {
       console.error('Account deletion error:', error);
       toast({
         title: 'Deletion failed',
-        description: 'Unable to complete account deletion. Please contact support at support@truetrucker.com.',
+        description: 'Unable to complete account deletion. Please contact support at support@truetruckingtv.com.',
         variant: 'destructive',
       });
     } finally {

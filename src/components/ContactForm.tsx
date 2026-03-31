@@ -167,8 +167,8 @@ const ContactForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-               <a href="mailto:support@truetrucker.com" className="hover:text-foreground transition-colors break-all">
-                 support@truetrucker.com
+               <a href="mailto:support@truetruckingtv.com" className="hover:text-foreground transition-colors break-all">
+                 support@truetruckingtv.com
                </a>
             </div>
             <div className="flex items-center gap-2">
