@@ -55,8 +55,8 @@ const ContactSection = () => {
                   <Mail className="h-6 w-6 text-primary mr-4 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-card-foreground">Email Support</p>
-                    <a href="mailto:support@truetrucker.com" className="text-muted-foreground hover:text-foreground transition-colors break-all">
-                      support@truetrucker.com
+                    <a href="mailto:support@truetruckingtv.com" className="text-muted-foreground hover:text-foreground transition-colors break-all">
+                      support@truetruckingtv.com
                     </a>
                   </div>
                 </div>
