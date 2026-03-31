@@ -92,7 +92,7 @@ const ContactSection = () => {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 py-4 h-14"
-                  onClick={() => window.open('mailto:support@truetrucker.com', '_blank')}
+                  onClick={() => window.open('mailto:support@truetruckingtv.com', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Contact Support

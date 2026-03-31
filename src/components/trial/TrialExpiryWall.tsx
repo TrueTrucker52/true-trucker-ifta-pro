@@ -71,8 +71,10 @@ const TrialExpiryWall: React.FC = () => {
             <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate('/pricing')}>
               View All Plans
             </Button>
-            <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate('/help')}>
-              <MessageSquare className="h-4 w-4 mr-1" /> Talk to Support
+            <Button variant="ghost" size="sm" className="flex-1" asChild>
+              <a href="mailto:support@truetruckingtv.com">
+                <MessageSquare className="h-4 w-4 mr-1" /> Talk to Support
+              </a>
             </Button>
           </div>
         </CardContent>
