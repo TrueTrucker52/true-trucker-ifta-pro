@@ -80,7 +80,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4" />
                 <a href={getSupportEmailHref()} className="text-primary-foreground/80 hover:text-white transition-colors">
-                  support@truetrucker.com
+                  support@truetruckingtv.com
                 </a>
               </div>
               <div className="flex items-center space-x-3">

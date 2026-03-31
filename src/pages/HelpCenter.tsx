@@ -415,7 +415,7 @@ const HelpCenter: React.FC = () => {
 
               <div className="grid gap-4 md:grid-cols-2 mb-8">
                 {[
-                  { icon: Mail, title: 'Email Support', desc: 'We reply within 24 hours', detail: 'support@truetrucker.com', action: () => window.open('mailto:support@truetrucker.com') },
+                  { icon: Mail, title: 'Email Support', desc: 'We reply within 24 hours', detail: 'support@truetruckingtv.com', action: () => window.open('mailto:support@truetruckingtv.com') },
                   { icon: Phone, title: 'Phone Support', desc: 'Mon-Fri 9AM-5PM EST', detail: '1-800-TRUCKER', action: () => window.open('tel:1-800-8782537') },
                 ].map((opt, i) => (
                   <Card key={i} className="cursor-pointer hover:border-primary transition-colors" onClick={opt.action}>

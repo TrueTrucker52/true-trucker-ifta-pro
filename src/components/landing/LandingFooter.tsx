@@ -50,8 +50,8 @@ const LandingFooter = () => (
           <ul className="space-y-2 text-sm text-[hsl(var(--landing-navy-foreground))]/60">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              <a href="mailto:support@truetrucker.com" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">
-                support@truetrucker.com
+              <a href="mailto:support@truetruckingtv.com" className="hover:text-[hsl(var(--landing-navy-foreground))] transition-colors">
+                support@truetruckingtv.com
               </a>
             </li>
             <li className="flex items-center gap-2">
