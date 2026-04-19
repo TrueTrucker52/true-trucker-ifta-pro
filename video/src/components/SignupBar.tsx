@@ -33,18 +33,19 @@ export const SignupBar: React.FC = () => {
       {/* URL */}
       <div
         style={{
-          fontSize: 26,
+          fontSize: 24,
           fontWeight: 800,
           color: COLORS.white,
           fontFamily: "sans-serif",
           letterSpacing: "0.01em",
+          lineHeight: 1.3,
         }}
       >
-        🚛{" "}
-        <span style={{ color: COLORS.primary }}>
-          true-trucker-ifta-pro.com
+        📲 <span style={{ color: COLORS.primary }}>Scan QR Code</span> to Sign Up Free
+        <br />
+        <span style={{ fontSize: 18, fontWeight: 500, color: COLORS.gray }}>
+          true-trucker-ifta-pro.com/signup
         </span>
-        <span style={{ color: COLORS.gray, fontWeight: 500 }}>/signup</span>
       </div>
 
       {/* Divider */}

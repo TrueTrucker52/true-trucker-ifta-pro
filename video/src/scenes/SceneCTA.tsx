@@ -169,21 +169,22 @@ export const SceneCTA: React.FC = () => {
           <div>
             <div
               style={{
-                fontSize: 20,
-                fontWeight: 600,
-                color: COLORS.gray,
+                fontSize: 32,
+                fontWeight: 900,
+                color: COLORS.white,
                 fontFamily: "sans-serif",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                marginBottom: 8,
+                lineHeight: 1.15,
+                marginBottom: 10,
               }}
             >
-              Scan to sign up now
+              📲 Scan the QR Code
+              <br />
+              <span style={{ color: COLORS.primary }}>to Start Today!</span>
             </div>
             <div
               style={{
-                fontSize: 26,
-                fontWeight: 800,
+                fontSize: 22,
+                fontWeight: 700,
                 color: COLORS.primary,
                 fontFamily: "sans-serif",
                 letterSpacing: "-0.01em",
@@ -193,13 +194,13 @@ export const SceneCTA: React.FC = () => {
             </div>
             <div
               style={{
-                fontSize: 19,
+                fontSize: 18,
                 color: COLORS.gray,
                 fontFamily: "sans-serif",
-                marginTop: 6,
+                marginTop: 4,
               }}
             >
-              /signup
+              /signup — FREE 7-day trial
             </div>
 
             {/* Mini trust badges */}
