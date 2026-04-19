@@ -1,0 +1,16 @@
+export const COLORS = {
+  primary: "#FF6B00",
+  primaryDark: "#CC5500",
+  primaryLight: "#FF8C33",
+  dark: "#0A0A0F",
+  darkCard: "#12121A",
+  darkBorder: "#1E1E2E",
+  white: "#FFFFFF",
+  gray: "#94A3B8",
+  grayLight: "#CBD5E1",
+  green: "#22C55E",
+  yellow: "#FACC15",
+  blue: "#3B82F6",
+  gradient1: "#FF6B00",
+  gradient2: "#FF3366",
+};
