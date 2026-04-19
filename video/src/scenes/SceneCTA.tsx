@@ -1,8 +1,10 @@
 import React from "react";
 import {
   AbsoluteFill,
+  Audio,
   interpolate,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -21,9 +23,19 @@ export const SceneCTA: React.FC = () => {
   });
 
   const ctaScale = spring({
-    frame: frame - 30,
+    frame: frame - 20,
     fps,
     config: { damping: 8, stiffness: 150, mass: 0.6 },
+  });
+
+  const qrOpacity = interpolate(frame, [40, 70], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const qrScale = spring({
+    frame: frame - 40,
+    fps,
+    config: { damping: 12, stiffness: 130, mass: 0.7 },
   });
 
   const urlOpacity = interpolate(frame, [60, 90], [0, 1], {
@@ -31,25 +43,13 @@ export const SceneCTA: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  const urlY = interpolate(frame, [60, 90], [30, 0], {
+  const buttonPulse = 1 + 0.025 * Math.sin(frame / 8);
+
+  const particleRadius = interpolate(frame, [0, 40], [0, 350], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-
-  const badgesOpacity = interpolate(frame, [80, 110], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Pulsing button
-  const buttonPulse = 1 + 0.03 * Math.sin(frame / 8);
-
-  // Particle burst
-  const particleRadius = interpolate(frame, [0, 40], [0, 300], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const particleOpacity = interpolate(frame, [0, 40], [0.8, 0], {
+  const particleOpacity = interpolate(frame, [0, 40], [0.6, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -58,8 +58,11 @@ export const SceneCTA: React.FC = () => {
     <AbsoluteFill>
       <Background variant="gradient" />
 
+      {/* Audio track — drop voiceover.mp3 into video/public/ to enable */}
+      {/* <Audio src={staticFile("voiceover.mp3")} /> */}
+
       {/* Burst rings */}
-      {[1, 1.5, 2].map((mult, i) => (
+      {[1, 1.6, 2.2].map((mult, i) => (
         <div
           key={i}
           style={{
@@ -71,7 +74,7 @@ export const SceneCTA: React.FC = () => {
             marginTop: -(particleRadius * mult),
             marginLeft: -(particleRadius * mult),
             borderRadius: "50%",
-            border: `3px solid ${COLORS.primary}`,
+            border: `2px solid ${COLORS.primary}`,
             opacity: particleOpacity / mult,
           }}
         />
@@ -83,18 +86,13 @@ export const SceneCTA: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "60px",
+          padding: "40px 60px 160px",
           gap: 0,
         }}
       >
         {/* Logo */}
-        <div
-          style={{
-            transform: `scale(${logoScale})`,
-            marginBottom: 48,
-          }}
-        >
-          <Logo size={110} delay={5} showText={true} />
+        <div style={{ transform: `scale(${logoScale})`, marginBottom: 32 }}>
+          <Logo size={100} delay={5} showText={true} />
         </div>
 
         {/* CTA Button */}
@@ -103,15 +101,15 @@ export const SceneCTA: React.FC = () => {
             transform: `scale(${ctaScale * buttonPulse})`,
             background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.primaryDark})`,
             borderRadius: 20,
-            padding: "32px 56px",
+            padding: "28px 52px",
             textAlign: "center",
             boxShadow: `0 0 60px ${COLORS.primary}60, 0 20px 40px ${COLORS.primary}40`,
-            marginBottom: 40,
+            marginBottom: 36,
           }}
         >
           <div
             style={{
-              fontSize: 50,
+              fontSize: 48,
               fontWeight: 900,
               color: COLORS.white,
               fontFamily: "sans-serif",
@@ -120,88 +118,137 @@ export const SceneCTA: React.FC = () => {
             }}
           >
             TRY FREE
-            <br />7 DAYS
+            <br />
+            7 DAYS
           </div>
           <div
             style={{
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 500,
               color: "rgba(255,255,255,0.85)",
               fontFamily: "sans-serif",
-              marginTop: 8,
-              letterSpacing: "0.05em",
+              marginTop: 6,
             }}
           >
             No credit card required
           </div>
         </div>
 
-        {/* Website URL */}
+        {/* QR Code + URL side by side */}
         <div
           style={{
-            opacity: urlOpacity,
-            transform: `translateY(${urlY}px)`,
-            textAlign: "center",
+            opacity: qrOpacity,
+            transform: `scale(${qrScale})`,
+            display: "flex",
+            alignItems: "center",
+            gap: 28,
+            background: `${COLORS.darkCard}EE`,
+            border: `2px solid ${COLORS.primary}60`,
+            borderRadius: 24,
+            padding: "20px 32px",
           }}
         >
+          {/* QR Code */}
           <div
             style={{
-              fontSize: 30,
-              fontWeight: 700,
-              color: COLORS.white,
-              fontFamily: "sans-serif",
-              background: `${COLORS.darkCard}CC`,
-              border: `1px solid ${COLORS.primary}50`,
-              borderRadius: 14,
-              padding: "14px 32px",
-              letterSpacing: "0.02em",
+              background: COLORS.dark,
+              borderRadius: 16,
+              padding: 10,
+              border: `2px solid ${COLORS.primary}40`,
             }}
           >
-            true-trucker-ifta-pro.com
+            <img
+              src={staticFile("qr-signup.svg")}
+              width={130}
+              height={130}
+              style={{ display: "block" }}
+            />
+          </div>
+
+          {/* Right side text */}
+          <div>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 600,
+                color: COLORS.gray,
+                fontFamily: "sans-serif",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              Scan to sign up now
+            </div>
+            <div
+              style={{
+                fontSize: 26,
+                fontWeight: 800,
+                color: COLORS.primary,
+                fontFamily: "sans-serif",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              true-trucker-ifta-pro.com
+            </div>
+            <div
+              style={{
+                fontSize: 19,
+                color: COLORS.gray,
+                fontFamily: "sans-serif",
+                marginTop: 6,
+              }}
+            >
+              /signup
+            </div>
+
+            {/* Mini trust badges */}
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                marginTop: 14,
+                flexWrap: "wrap",
+              }}
+            >
+              {["🔒 FMCSA Cert", "✅ 30-day Guarantee", "⚡ 5 min setup"].map(
+                (b) => (
+                  <span
+                    key={b}
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: COLORS.grayLight,
+                      fontFamily: "sans-serif",
+                      background: `${COLORS.darkBorder}CC`,
+                      padding: "4px 10px",
+                      borderRadius: 20,
+                    }}
+                  >
+                    {b}
+                  </span>
+                )
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Trust badges */}
+        {/* URL text fallback */}
         <div
           style={{
-            opacity: badgesOpacity,
-            display: "flex",
-            gap: 24,
-            marginTop: 36,
-            flexWrap: "wrap",
-            justifyContent: "center",
+            opacity: urlOpacity,
+            marginTop: 20,
+            fontSize: 22,
+            fontWeight: 600,
+            color: COLORS.gray,
+            fontFamily: "sans-serif",
+            letterSpacing: "0.02em",
           }}
         >
-          {[
-            { icon: "🔒", text: "FMCSA Certified" },
-            { icon: "✅", text: "30-day Guarantee" },
-            { icon: "⚡", text: "Setup in 5 min" },
-          ].map((b) => (
-            <div
-              key={b.text}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                background: `${COLORS.darkCard}CC`,
-                border: `1px solid ${COLORS.darkBorder}`,
-                borderRadius: 40,
-                padding: "10px 20px",
-              }}
-            >
-              <span style={{ fontSize: 22 }}>{b.icon}</span>
-              <span
-                style={{
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: COLORS.grayLight,
-                  fontFamily: "sans-serif",
-                }}
-              >
-                {b.text}
-              </span>
-            </div>
-          ))}
+          Or visit{" "}
+          <span style={{ color: COLORS.primary, fontWeight: 800 }}>
+            true-trucker-ifta-pro.com/signup
+          </span>
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
