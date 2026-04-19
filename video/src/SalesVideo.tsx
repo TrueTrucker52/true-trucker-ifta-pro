@@ -25,7 +25,7 @@ export const VIDEO_HEIGHT = 1920;
 
 export const SalesVideo: React.FC = () => {
   // Set VOICEOVER=true after dropping voiceover.mp3 into video/public/
-  const VOICEOVER = false;
+  const VOICEOVER = true;
 
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.dark }}>
