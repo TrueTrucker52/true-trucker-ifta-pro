@@ -1,23 +1,15 @@
-import { Audio, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Audio, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C } from "../colors";
 import { HEADING, BODY } from "../fonts";
 import { fadeIn, slideUp, expandW, stamp } from "../utils";
 import { SceneBase } from "../components/SceneBase";
+import { ScenePhoto } from "../components/ScenePhoto";
 
 type Props = { durationInFrames: number };
-
-const RadioWaves: React.FC<{ opacity: number }> = ({ opacity }) => (
-  <svg style={{ position: "absolute", right: -40, top: "50%", transform: "translateY(-50%)", opacity }} width="420" height="420" viewBox="0 0 420 420">
-    {[60, 110, 165, 225, 290].map((r, i) => (
-      <circle key={i} cx="420" cy="210" r={r} fill="none" stroke={C.gold} strokeWidth="2" opacity={0.12 - i * 0.015} />
-    ))}
-  </svg>
-);
 
 export const Scene5GoldenAge: React.FC<Props> = ({ durationInFrames }) => {
   const frame = useCurrentFrame();
 
-  const waveOpacity = fadeIn(frame, 10, 40);
   const eraOpacity = fadeIn(frame, 0, 18);
   const eraScale = stamp(frame, 0, 18);
   const lineW = expandW(frame, 22, 30);
@@ -31,57 +23,66 @@ export const Scene5GoldenAge: React.FC<Props> = ({ durationInFrames }) => {
   const factY = slideUp(frame, 168, 25, 30);
 
   const audioVolume = (f: number) =>
-    interpolate(
-      f,
-      [0, 8, durationInFrames - 20, durationInFrames - 2],
-      [0, 1, 1, 0],
-      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-    );
+    interpolate(f, [0, 8, durationInFrames - 20, durationInFrames - 2], [0, 1, 1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
 
   return (
     <SceneBase bg={C.scene5bg}>
       <Audio src={staticFile("voiceover/scene5.mp3")} volume={audioVolume} />
 
-      <RadioWaves opacity={waveOpacity} />
+      {/* Classic chrome 18-wheeler on open road */}
+      <ScenePhoto src="scene5.jpg" frame={frame} gradientStyle="bottom-heavy" kenBurns />
 
-      <div
+      {/* Warm amber tint overlay — golden age feel */}
+      <AbsoluteFill
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 160,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "0 80px",
+          background: "linear-gradient(to bottom, rgba(40,20,0,0.30) 0%, transparent 50%)",
+          pointerEvents: "none",
         }}
-      >
-        <div style={{ opacity: eraOpacity, transform: `scale(${eraScale})`, transformOrigin: "left center", fontFamily: HEADING, fontWeight: 700, fontSize: 160, lineHeight: 1, color: C.goldLight, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          1970s–80s
-        </div>
+      />
 
-        <div style={{ width: `${lineW * 100}%`, height: 4, backgroundColor: C.gold, marginBottom: 36 }} />
+      <AbsoluteFill>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 130,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 72px",
+          }}
+        >
+          <div style={{ opacity: eraOpacity, transform: `scale(${eraScale})`, transformOrigin: "left center", fontFamily: HEADING, fontWeight: 700, fontSize: 148, lineHeight: 1, color: C.goldLight, letterSpacing: "-0.03em", marginBottom: 4, textShadow: "0 4px 24px rgba(0,0,0,0.9)" }}>
+            1970s–80s
+          </div>
 
-        <div style={{ opacity: h1Opacity, transform: `translateY(${h1Y}px)`, fontFamily: HEADING, fontWeight: 700, fontSize: 82, lineHeight: 1.1, color: C.white, letterSpacing: "-0.01em", marginBottom: 40 }}>
-          THE GOLDEN AGE OF TRUCKING
-        </div>
+          <div style={{ width: `${lineW * 100}%`, height: 4, background: `linear-gradient(to right, ${C.brand}, ${C.brandLight})`, marginBottom: 32 }} />
 
-        <div style={{ opacity: b1Opacity, transform: `translateY(${b1Y}px)`, fontFamily: BODY, fontSize: 44, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 20 }}>
-          CB radios crackled. 18-wheelers ruled the open road. Smokey & the Bandit made truckers American folk heroes.
-        </div>
+          <div style={{ opacity: h1Opacity, transform: `translateY(${h1Y}px)`, fontFamily: HEADING, fontWeight: 700, fontSize: 78, lineHeight: 1.1, color: C.white, letterSpacing: "-0.01em", marginBottom: 36, textShadow: "0 2px 16px rgba(0,0,0,0.8)" }}>
+            THE GOLDEN AGE OF TRUCKING
+          </div>
 
-        <div style={{ opacity: b2Opacity, transform: `translateY(${b2Y}px)`, fontFamily: BODY, fontSize: 44, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 32 }}>
-          Deregulation in 1980 unlocked competition. More trucks. More routes. More freedom.
-        </div>
+          <div style={{ opacity: b1Opacity, transform: `translateY(${b1Y}px)`, fontFamily: BODY, fontSize: 42, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 18, textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
+            CB radios crackled. 18-wheelers ruled the open road. Smokey & the Bandit made truckers folk heroes.
+          </div>
 
-        <div style={{ opacity: factOpacity, transform: `translateY(${factY}px)`, display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 6, height: 60, backgroundColor: C.rust, flexShrink: 0 }} />
-          <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 40, color: C.goldLight, lineHeight: 1.4 }}>
-            "Convoy" hit #1 on the Billboard charts in 1975.
+          <div style={{ opacity: b2Opacity, transform: `translateY(${b2Y}px)`, fontFamily: BODY, fontSize: 42, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 28, textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
+            Deregulation in 1980 unlocked competition. More trucks. More routes. More freedom.
+          </div>
+
+          <div style={{ opacity: factOpacity, transform: `translateY(${factY}px)`, display: "flex", alignItems: "center", gap: 18 }}>
+            <div style={{ width: 5, height: 56, backgroundColor: C.rust, flexShrink: 0 }} />
+            <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 38, color: C.goldLight, lineHeight: 1.4 }}>
+              "Convoy" hit #1 on the Billboard charts in 1975.
+            </div>
           </div>
         </div>
-      </div>
+      </AbsoluteFill>
     </SceneBase>
   );
 };

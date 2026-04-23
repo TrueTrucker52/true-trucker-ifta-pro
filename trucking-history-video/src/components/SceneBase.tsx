@@ -1,7 +1,5 @@
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { C } from "../colors";
-import { BODY } from "../fonts";
-import { fadeIn } from "../utils";
+import { AbsoluteFill } from "remotion";
+import { BrandBar } from "./BrandBar";
 
 type Props = {
   bg?: string;
@@ -10,43 +8,14 @@ type Props = {
 };
 
 export const SceneBase: React.FC<Props> = ({
-  bg = C.bg,
+  bg = "#080C14",
   children,
   episode = "EP. 1",
 }) => {
-  const frame = useCurrentFrame();
-
   return (
     <AbsoluteFill style={{ backgroundColor: bg }}>
-      {/* Radial vignette overlay */}
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(0,0,0,0.65) 100%)",
-          pointerEvents: "none",
-        }}
-      />
-
       {children}
-
-      {/* Bottom series branding */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 80,
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          fontFamily: BODY,
-          fontSize: 26,
-          fontWeight: 600,
-          letterSpacing: "0.22em",
-          color: C.muted,
-          opacity: fadeIn(frame, 20, 25),
-        }}
-      >
-        HISTORY OF TRUCKING &nbsp;•&nbsp; {episode}
-      </div>
+      <BrandBar episode={episode} />
     </AbsoluteFill>
   );
 };
