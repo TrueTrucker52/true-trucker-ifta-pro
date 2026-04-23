@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>History of Trucking – EP.1 Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.15em;
+      color: #F5A623;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #5A6E7D;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      margin-bottom: 48px;
+    }
+    .timeline {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .scene-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .scene-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: #5A6E7D;
+      text-align: center;
+    }
+    /* 9:16 phone frame */
+    .phone {
+      width: 200px;
+      height: 355px;
+      border-radius: 24px;
+      border: 2px solid #333;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .scene {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 16px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(0,0,0,0.65) 100%);
+      pointer-events: none;
+    }
+    .era {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      position: relative;
+      z-index: 1;
+    }
+    .divider {
+      height: 3px;
+      background: #F5A623;
+      margin: 8px 0 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .headline {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: #F5F0EB;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 10px;
+    }
+    .body-text {
+      font-size: 9px;
+      line-height: 1.5;
+      color: #B8C5D0;
+      position: relative;
+      z-index: 1;
+    }
+    .fact {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .fact-bar { width: 3px; flex-shrink: 0; background: #F5A623; }
+    .fact-text { font-size: 8px; color: #F5A623; line-height: 1.4; font-weight: 600; }
+    .branding {
+      position: absolute;
+      bottom: 10px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      color: #3A4E5D;
+      z-index: 2;
+    }
+    .stat-block { margin-bottom: 8px; position: relative; z-index: 1; }
+    .stat-number {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .stat-label { font-size: 7px; color: #B8C5D0; letter-spacing: 0.08em; margin-top: 2px; font-weight: 600; }
+    .stat-line { height: 2px; width: 50px; opacity: 0.5; margin-top: 4px; }
+
+    /* CTA scene */
+    .cta-series { font-size: 7px; letter-spacing: 0.2em; color: #5A6E7D; font-weight: 600; margin-bottom: 6px; }
+    .cta-main { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.1; color: #F5F0EB; margin-bottom: 8px; }
+    .cta-sub { font-size: 8px; color: #B8C5D0; line-height: 1.5; margin-bottom: 10px; }
+    .dots { display: flex; gap: 4px; align-items: center; margin-bottom: 8px; }
+    .dot { height: 5px; border-radius: 3px; }
+    .ep2 { font-family: 'Oswald', sans-serif; font-size: 12px; color: #F5A623; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .follow { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: #F5A623; }
+    .chevron { font-size: 14px; color: #F5A623; margin-bottom: 2px; }
+
+    /* Road SVG in scene 4 */
+    .road-svg {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 120px;
+      opacity: 0.7;
+    }
+    .gradient-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 160px;
+      background: linear-gradient(to bottom, transparent, rgba(8,14,26,0.95));
+    }
+
+    /* Radio waves in scene 5 */
+    .radio-waves {
+      position: absolute;
+      right: -20px; top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.4;
+    }
+    /* Top stripe scene 3 */
+    .top-stripe {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: #C73B0A;
+    }
+    /* Top stripe scene 7 */
+    .top-stripe-gold {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: #F5A623;
+    }
+
+    /* Mobile collapse to vertical scroll */
+    @media (max-width: 600px) {
+      .timeline { flex-direction: column; align-items: center; }
+    }
+    .note {
+      text-align: center;
+      color: #3A4E5D;
+      font-size: 12px;
+      margin-top: 40px;
+      line-height: 1.8;
+    }
+    .note a { color: #F5A623; }
+    .cmd {
+      background: #0F1825;
+      border: 1px solid #1E3A5C;
+      border-radius: 6px;
+      padding: 12px 20px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #F5A623;
+      text-align: center;
+      margin: 20px auto;
+      max-width: 480px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<h1>HISTORY OF TRUCKING</h1>
+<div class="subtitle">EPISODE 1 — 60 SECOND HOOK • 9:16 VERTICAL (1080×1920) • 30 FPS</div>
+
+<div class="timeline">
+
+  <!-- SCENE 1: HOOK -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#080C14; justify-content:center;">
+        <div class="vignette"></div>
+        <div style="margin-bottom:14px; position:relative; z-index:1;">
+          <div style="font-family:'Oswald',sans-serif; font-weight:700; font-size:20px; color:#F5F0EB; line-height:1.1;">BEFORE AMAZON.</div>
+          <div style="font-family:'Oswald',sans-serif; font-weight:700; font-size:20px; color:#F5F0EB; line-height:1.1;">BEFORE WALMART.</div>
+          <div style="font-family:'Oswald',sans-serif; font-weight:700; font-size:20px; color:#F5F0EB; line-height:1.1;">BEFORE GPS.</div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-family:'Oswald',sans-serif; font-weight:700; font-size:14px; color:#F5A623; line-height:1.2; position:relative; z-index:1;">EVERYTHING YOU OWN ARRIVED ON A TRUCK.</div>
+        <div style="font-size:8px; color:#B8C5D0; margin-top:8px; line-height:1.5; position:relative; z-index:1;">The story of how 18 wheels changed civilization starts here.</div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 1<br>0:00 – 0:07<br>THE HOOK</div>
+  </div>
+
+  <!-- SCENE 2: 1896 -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#120E08; justify-content:center;">
+        <div class="vignette"></div>
+        <div class="era" style="font-size:44px; color:#F5A623; margin-bottom:4px;">1896</div>
+        <div class="divider"></div>
+        <div class="headline" style="font-size:15px; margin-bottom:8px;">THE FIRST MOTOR TRUCK</div>
+        <div class="body-text">Gottlieb Daimler unveiled a purpose-built motor truck powered by a 2-cylinder engine.</div>
+        <div class="body-text" style="margin-top:6px;">4 horsepower. 10 mph. The world would never move the same way again.</div>
+        <div class="fact" style="margin-top:10px;">
+          <div class="fact-bar" style="height:28px; background:#C73B0A;"></div>
+          <div class="fact-text">Mack Brothers followed in 1900. An American icon was born.</div>
+        </div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 2<br>0:07 – 0:17<br>1896</div>
+  </div>
+
+  <!-- SCENE 3: WARS -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#0A100A; justify-content:center;">
+        <div class="top-stripe"></div>
+        <div class="vignette"></div>
+        <div class="era" style="font-size:28px; color:#C73B0A; margin-bottom:4px;">1916–1945</div>
+        <div class="divider"></div>
+        <div class="headline" style="font-size:13px; margin-bottom:8px;">WAR BUILT THE TRUCKING INDUSTRY</div>
+        <div class="body-text">WWI forced the military to move massive cargo across impossible terrain. Trucks stepped up — and delivered.</div>
+        <div class="body-text" style="margin-top:6px;">By WWII, American factories produced over 2.4 million military trucks.</div>
+        <div class="fact" style="margin-top:8px;">
+          <div class="fact-bar" style="height:28px;"></div>
+          <div class="fact-text">First federal highway regulations for trucks? 1935.</div>
+        </div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 3<br>0:17 – 0:26<br>1916–1945</div>
+  </div>
+
+  <!-- SCENE 4: INTERSTATE -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#080E1A; justify-content:flex-start; padding-top:20px;">
+        <!-- Road SVG -->
+        <svg class="road-svg" viewBox="0 0 200 120" preserveAspectRatio="none">
+          <polygon points="100,0 0,120 200,120" fill="rgba(20,30,50,0.8)"/>
+          <line x1="100" y1="0" x2="0" y2="120" stroke="#F5A623" stroke-width="1" opacity="0.6"/>
+          <line x1="100" y1="0" x2="200" y2="120" stroke="#F5A623" stroke-width="1" opacity="0.6"/>
+          <rect x="93" y="20" width="14" height="5" fill="#FFD166" opacity="0.7"/>
+          <rect x="87" y="45" width="26" height="7" fill="#FFD166" opacity="0.7"/>
+          <rect x="78" y="75" width="44" height="8" fill="#FFD166" opacity="0.7"/>
+        </svg>
+        <div class="gradient-overlay"></div>
+        <div class="vignette"></div>
+        <div class="era" style="font-size:44px; color:#F5A623; margin-bottom:4px; position:relative; z-index:2;">1956</div>
+        <div class="divider" style="position:relative; z-index:2;"></div>
+        <div class="headline" style="font-size:13px; margin-bottom:8px; position:relative; z-index:2;">EISENHOWER'S HIGHWAY ACT</div>
+        <div class="body-text" style="position:relative; z-index:2;">41,000 miles of interstate highway, built in a single act of Congress.</div>
+        <div class="body-text" style="margin-top:6px; position:relative; z-index:2;">A truck could now drive coast to coast without hitting a single stoplight.</div>
+        <div class="fact" style="margin-top:8px; position:relative; z-index:2;">
+          <div class="fact-bar" style="height:28px;"></div>
+          <div class="fact-text">Trucking revenue doubled within a decade of the Act passing.</div>
+        </div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 4<br>0:26 – 0:36<br>1956</div>
+  </div>
+
+  <!-- SCENE 5: GOLDEN AGE -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#130B05; justify-content:center;">
+        <!-- Radio waves -->
+        <svg class="radio-waves" width="100" height="100" viewBox="0 0 200 200">
+          <circle cx="200" cy="100" r="40" fill="none" stroke="#F5A623" stroke-width="1" opacity="0.2"/>
+          <circle cx="200" cy="100" r="70" fill="none" stroke="#F5A623" stroke-width="1" opacity="0.15"/>
+          <circle cx="200" cy="100" r="105" fill="none" stroke="#F5A623" stroke-width="1" opacity="0.1"/>
+        </svg>
+        <div class="vignette"></div>
+        <div class="era" style="font-size:26px; color:#FFD166; margin-bottom:4px;">1970s–80s</div>
+        <div class="divider"></div>
+        <div class="headline" style="font-size:13px; margin-bottom:8px;">THE GOLDEN AGE OF TRUCKING</div>
+        <div class="body-text">CB radios crackled. 18-wheelers ruled the open road. Smokey &amp; the Bandit made truckers American folk heroes.</div>
+        <div class="body-text" style="margin-top:6px;">Deregulation in 1980 unlocked competition. More trucks. More routes. More freedom.</div>
+        <div class="fact" style="margin-top:8px;">
+          <div class="fact-bar" style="height:28px; background:#C73B0A;"></div>
+          <div class="fact-text" style="color:#FFD166;">"Convoy" hit #1 on the Billboard charts in 1975.</div>
+        </div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 5<br>0:36 – 0:45<br>1970s–80s</div>
+  </div>
+
+  <!-- SCENE 6: TODAY -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#060C14; justify-content:center;">
+        <div class="vignette"></div>
+        <div style="font-family:'Oswald',sans-serif; font-weight:700; font-size:16px; letter-spacing:0.12em; color:#5A6E7D; margin-bottom:4px; position:relative; z-index:1;">TODAY</div>
+        <div class="divider"></div>
+        <div class="stat-block">
+          <div class="stat-number" style="font-size:40px; color:#F5A623;">3.5M</div>
+          <div class="stat-label">PROFESSIONAL TRUCK DRIVERS</div>
+          <div class="stat-line" style="background:#F5A623;"></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" style="font-size:40px; color:#FFD166;">70%</div>
+          <div class="stat-label">OF ALL US FREIGHT MOVES BY TRUCK</div>
+          <div class="stat-line" style="background:#FFD166;"></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" style="font-size:40px; color:#C73B0A;">$940B</div>
+          <div class="stat-label">DOLLAR TRUCKING INDUSTRY</div>
+          <div class="stat-line" style="background:#C73B0A;"></div>
+        </div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 6<br>0:45 – 0:53<br>TODAY</div>
+  </div>
+
+  <!-- SCENE 7: CTA -->
+  <div class="scene-wrap">
+    <div class="phone">
+      <div class="scene" style="background:#08080E; justify-content:center; align-items:center; text-align:center;">
+        <div class="top-stripe-gold"></div>
+        <div class="vignette"></div>
+        <div class="cta-series">HISTORY OF TRUCKING</div>
+        <div style="width:100px; height:2px; background:#F5A623; margin:0 auto 14px; position:relative; z-index:1;"></div>
+        <div class="cta-main" style="position:relative; z-index:1;">THE FULL STORY STARTS NOW</div>
+        <div class="cta-sub" style="position:relative; z-index:1;">We're just getting started. Every era. Every legend. Every mile.</div>
+        <div class="dots" style="justify-content:center; position:relative; z-index:1;">
+          <div class="dot" style="width:16px; background:#F5A623;"></div>
+          <div class="dot" style="width:5px; background:#5A6E7D; opacity:0.4;"></div>
+          <div class="dot" style="width:5px; background:#5A6E7D; opacity:0.4;"></div>
+          <div class="dot" style="width:5px; background:#5A6E7D; opacity:0.4;"></div>
+          <div class="dot" style="width:5px; background:#5A6E7D; opacity:0.4;"></div>
+          <div class="dot" style="width:5px; background:#5A6E7D; opacity:0.4;"></div>
+        </div>
+        <div class="ep2" style="position:relative; z-index:1;">EPISODE 2 DROPS FRIDAY</div>
+        <div class="chevron" style="position:relative; z-index:1;">&#x2304;</div>
+        <div class="follow" style="position:relative; z-index:1;">FOLLOW NOW</div>
+        <div class="branding">HISTORY OF TRUCKING • EP. 1</div>
+      </div>
+    </div>
+    <div class="scene-label">SCENE 7<br>0:53 – 1:00<br>CTA</div>
+  </div>
+
+</div>
+
+<div class="note">
+  <strong style="color:#F5A623;">Transitions:</strong> Scenes 1–5 use a <em>slide-from-right</em> wipe. Scenes 5→6 and 6→7 use a <em>fade</em>.<br>
+  All text animates in with slide-up + fade. Era dates <em>stamp-scale</em> onto screen. Gold divider lines sweep left-to-right.<br>
+  Stats in Scene 6 count up from 0. Chevron in Scene 7 bounces continuously.<br><br>
+  <strong style="color:#F5A623;">To render the actual video:</strong>
+  <code class="cmd">cd trucking-history-video &amp;&amp; npx remotion render TruckingHistory-Ep1 out/ep1.mp4</code>
+</div>
+
+</body>
+</html>
