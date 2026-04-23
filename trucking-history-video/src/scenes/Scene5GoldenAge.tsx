@@ -1,39 +1,20 @@
-import { useCurrentFrame } from "remotion";
+import { Audio, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C } from "../colors";
 import { HEADING, BODY } from "../fonts";
 import { fadeIn, slideUp, expandW, stamp } from "../utils";
 import { SceneBase } from "../components/SceneBase";
 
-// Retro radio wave SVG as a background decoration
+type Props = { durationInFrames: number };
+
 const RadioWaves: React.FC<{ opacity: number }> = ({ opacity }) => (
-  <svg
-    style={{
-      position: "absolute",
-      right: -40,
-      top: "50%",
-      transform: "translateY(-50%)",
-      opacity,
-    }}
-    width="420"
-    height="420"
-    viewBox="0 0 420 420"
-  >
+  <svg style={{ position: "absolute", right: -40, top: "50%", transform: "translateY(-50%)", opacity }} width="420" height="420" viewBox="0 0 420 420">
     {[60, 110, 165, 225, 290].map((r, i) => (
-      <circle
-        key={i}
-        cx="420"
-        cy="210"
-        r={r}
-        fill="none"
-        stroke={C.gold}
-        strokeWidth="2"
-        opacity={0.12 - i * 0.015}
-      />
+      <circle key={i} cx="420" cy="210" r={r} fill="none" stroke={C.gold} strokeWidth="2" opacity={0.12 - i * 0.015} />
     ))}
   </svg>
 );
 
-export const Scene5GoldenAge: React.FC = () => {
+export const Scene5GoldenAge: React.FC<Props> = ({ durationInFrames }) => {
   const frame = useCurrentFrame();
 
   const waveOpacity = fadeIn(frame, 10, 40);
@@ -49,8 +30,18 @@ export const Scene5GoldenAge: React.FC = () => {
   const factOpacity = fadeIn(frame, 168, 22);
   const factY = slideUp(frame, 168, 25, 30);
 
+  const audioVolume = (f: number) =>
+    interpolate(
+      f,
+      [0, 8, durationInFrames - 20, durationInFrames - 2],
+      [0, 1, 1, 0],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    );
+
   return (
     <SceneBase bg={C.scene5bg}>
+      <Audio src={staticFile("voiceover/scene5.mp3")} volume={audioVolume} />
+
       <RadioWaves opacity={waveOpacity} />
 
       <div
@@ -66,102 +57,28 @@ export const Scene5GoldenAge: React.FC = () => {
           padding: "0 80px",
         }}
       >
-        {/* Era stamp — warm amber for golden age */}
-        <div
-          style={{
-            opacity: eraOpacity,
-            transform: `scale(${eraScale})`,
-            transformOrigin: "left center",
-            fontFamily: HEADING,
-            fontWeight: 700,
-            fontSize: 160,
-            lineHeight: 1,
-            color: C.goldLight,
-            letterSpacing: "-0.03em",
-            marginBottom: 8,
-          }}
-        >
+        <div style={{ opacity: eraOpacity, transform: `scale(${eraScale})`, transformOrigin: "left center", fontFamily: HEADING, fontWeight: 700, fontSize: 160, lineHeight: 1, color: C.goldLight, letterSpacing: "-0.03em", marginBottom: 8 }}>
           1970s–80s
         </div>
 
-        {/* Gold divider */}
-        <div
-          style={{
-            width: `${lineW * 100}%`,
-            height: 4,
-            backgroundColor: C.gold,
-            marginBottom: 36,
-          }}
-        />
+        <div style={{ width: `${lineW * 100}%`, height: 4, backgroundColor: C.gold, marginBottom: 36 }} />
 
-        {/* Headline */}
-        <div
-          style={{
-            opacity: h1Opacity,
-            transform: `translateY(${h1Y}px)`,
-            fontFamily: HEADING,
-            fontWeight: 700,
-            fontSize: 82,
-            lineHeight: 1.1,
-            color: C.white,
-            letterSpacing: "-0.01em",
-            marginBottom: 40,
-          }}
-        >
+        <div style={{ opacity: h1Opacity, transform: `translateY(${h1Y}px)`, fontFamily: HEADING, fontWeight: 700, fontSize: 82, lineHeight: 1.1, color: C.white, letterSpacing: "-0.01em", marginBottom: 40 }}>
           THE GOLDEN AGE OF TRUCKING
         </div>
 
-        <div
-          style={{
-            opacity: b1Opacity,
-            transform: `translateY(${b1Y}px)`,
-            fontFamily: BODY,
-            fontWeight: 400,
-            fontSize: 44,
-            lineHeight: 1.55,
-            color: C.whiteMuted,
-            marginBottom: 20,
-          }}
-        >
+        <div style={{ opacity: b1Opacity, transform: `translateY(${b1Y}px)`, fontFamily: BODY, fontSize: 44, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 20 }}>
           CB radios crackled. 18-wheelers ruled the open road. Smokey & the Bandit made truckers American folk heroes.
         </div>
 
-        <div
-          style={{
-            opacity: b2Opacity,
-            transform: `translateY(${b2Y}px)`,
-            fontFamily: BODY,
-            fontWeight: 400,
-            fontSize: 44,
-            lineHeight: 1.55,
-            color: C.whiteMuted,
-            marginBottom: 32,
-          }}
-        >
+        <div style={{ opacity: b2Opacity, transform: `translateY(${b2Y}px)`, fontFamily: BODY, fontSize: 44, lineHeight: 1.55, color: C.whiteMuted, marginBottom: 32 }}>
           Deregulation in 1980 unlocked competition. More trucks. More routes. More freedom.
         </div>
 
-        {/* Fact callout */}
-        <div
-          style={{
-            opacity: factOpacity,
-            transform: `translateY(${factY}px)`,
-            display: "flex",
-            alignItems: "center",
-            gap: 20,
-          }}
-        >
+        <div style={{ opacity: factOpacity, transform: `translateY(${factY}px)`, display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 6, height: 60, backgroundColor: C.rust, flexShrink: 0 }} />
-          <div
-            style={{
-              fontFamily: BODY,
-              fontWeight: 600,
-              fontSize: 40,
-              color: C.goldLight,
-              lineHeight: 1.4,
-            }}
-          >
-            "Convoy" hit #1 on the Billboard charts in 1975. C.W. McCall made truckers legends.
+          <div style={{ fontFamily: BODY, fontWeight: 600, fontSize: 40, color: C.goldLight, lineHeight: 1.4 }}>
+            "Convoy" hit #1 on the Billboard charts in 1975.
           </div>
         </div>
       </div>

@@ -10,26 +10,23 @@ import { Scene5GoldenAge } from "./scenes/Scene5GoldenAge";
 import { Scene6Today } from "./scenes/Scene6Today";
 import { Scene7CTA } from "./scenes/Scene7CTA";
 
-// Scene durations in frames (30 fps)
-// 7 scenes − 6 transitions × 15 frames = 1890 − 90 = 1800 frames (60s)
-const S1 = 210; // Hook       — 7s
-const S2 = 300; // 1896       — 10s
-const S3 = 270; // Wars       — 9s
-const S4 = 300; // Interstate — 10s
-const S5 = 270; // Golden Age — 9s
-const S6 = 240; // Today      — 8s
-const S7 = 300; // CTA        — 10s
+export type TruckingHistoryProps = {
+  sceneDurations: number[]; // per-scene frame counts, driven by audio durations
+};
 
 const TD = 15; // transition overlap in frames
-
 const forward = slide({ direction: "from-right" });
 
-export const TruckingHistory: React.FC = () => {
+export const TruckingHistory: React.FC<TruckingHistoryProps> = ({
+  sceneDurations,
+}) => {
+  const [s1, s2, s3, s4, s5, s6, s7] = sceneDurations;
+
   return (
     <AbsoluteFill>
       <TransitionSeries>
-        <TransitionSeries.Sequence durationInFrames={S1}>
-          <Scene1Hook />
+        <TransitionSeries.Sequence durationInFrames={s1}>
+          <Scene1Hook durationInFrames={s1} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -37,8 +34,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S2}>
-          <Scene2FirstTruck />
+        <TransitionSeries.Sequence durationInFrames={s2}>
+          <Scene2FirstTruck durationInFrames={s2} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -46,8 +43,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S3}>
-          <Scene3Wars />
+        <TransitionSeries.Sequence durationInFrames={s3}>
+          <Scene3Wars durationInFrames={s3} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -55,8 +52,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S4}>
-          <Scene4Interstate />
+        <TransitionSeries.Sequence durationInFrames={s4}>
+          <Scene4Interstate durationInFrames={s4} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -64,8 +61,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S5}>
-          <Scene5GoldenAge />
+        <TransitionSeries.Sequence durationInFrames={s5}>
+          <Scene5GoldenAge durationInFrames={s5} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -73,8 +70,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S6}>
-          <Scene6Today />
+        <TransitionSeries.Sequence durationInFrames={s6}>
+          <Scene6Today durationInFrames={s6} />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
@@ -82,8 +79,8 @@ export const TruckingHistory: React.FC = () => {
           timing={linearTiming({ durationInFrames: TD })}
         />
 
-        <TransitionSeries.Sequence durationInFrames={S7}>
-          <Scene7CTA />
+        <TransitionSeries.Sequence durationInFrames={s7}>
+          <Scene7CTA durationInFrames={s7} />
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>
