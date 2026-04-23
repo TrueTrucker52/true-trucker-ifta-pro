@@ -26,7 +26,11 @@
   },
   "scripts": {
     "dev": "remotion studio",
+    "studio": "remotion studio",
+    "voiceover": "npx tsx generate-voiceover.ts",
+    "preview": "npx tsx generate-voiceover.ts && remotion studio",
     "build": "remotion bundle",
+    "render": "remotion render TruckingHistory-Ep1 out/ep1.mp4",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"
   },
