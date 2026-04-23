@@ -337,6 +337,9 @@ const Dashboard = () => {
                 <Button onClick={() => navigate('/bol-management')} variant="outline" size="xl" className="h-20 border-2">
                   <FileText className="mr-3 h-7 w-7" /><span className="text-lg">BOL Manager</span>
                 </Button>
+                <Button onClick={() => navigate('/dispatch')} variant="outline" size="xl" className="h-20 border-2 border-primary/40 bg-primary/5 hover:bg-primary/10">
+                  <Truck className="mr-3 h-7 w-7 text-primary" /><span className="text-lg text-primary font-bold">Dispatch</span>
+                </Button>
               </div>
             </CardContent>
           </Card>
