@@ -170,8 +170,20 @@ serve(async (req) => {
 
   const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+  const runId = crypto.randomUUID();
+  const JOB_NAME = "send-trial-reminders";
+
+  const logEmail = async (row: Record<string, unknown>) => {
+    const { error } = await supabaseClient.from("email_send_log").insert({
+      job_name: JOB_NAME,
+      run_id: runId,
+      ...row,
+    });
+    if (error) logStep("Email log insert failed", { error: error.message });
+  };
+
   try {
-    logStep("Starting trial reminder process");
+    logStep("Starting trial reminder process", { runId });
 
     const now = new Date();
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -181,7 +193,7 @@ serve(async (req) => {
     // Find users whose trials expire in 1, 3, or 5 days
     const { data: usersToRemind, error } = await supabaseClient
       .from("profiles")
-      .select("email, trial_end_date, subscription_status")
+      .select("user_id, email, trial_end_date, subscription_status")
       .eq("subscription_status", "trial")
       .or(`trial_end_date.eq.${tomorrow.toISOString().split('T')[0]},trial_end_date.eq.${threeDaysFromNow.toISOString().split('T')[0]},trial_end_date.eq.${fiveDaysFromNow.toISOString().split('T')[0]}`);
 
@@ -192,6 +204,11 @@ serve(async (req) => {
     logStep("Found users to remind", { count: usersToRemind?.length || 0 });
 
     if (!usersToRemind || usersToRemind.length === 0) {
+      await logEmail({
+        recipient_email: "n/a",
+        status: "run_summary",
+        metadata: { matched: 0, sent: 0, failed: 0 },
+      });
       return new Response(JSON.stringify({ 
         success: true, 
         message: "No trial reminders to send",
@@ -203,6 +220,7 @@ serve(async (req) => {
     }
 
     let emailsSent = 0;
+    let emailsFailed = 0;
     const results = [];
 
     for (const user of usersToRemind) {
@@ -229,22 +247,43 @@ serve(async (req) => {
 
           emailsSent++;
           logStep("Reminder sent successfully", { email: user.email, daysLeft, messageId: emailResult.data?.id });
-        } catch (emailError) {
-          logStep("Failed to send reminder", {
-            email: user.email,
-            error: emailError instanceof Error ? emailError.message : String(emailError),
+          await logEmail({
+            recipient_email: user.email,
+            user_id: user.user_id ?? null,
+            subject,
+            status: "sent",
+            provider_message_id: emailResult.data?.id ?? null,
+            metadata: { days_left: daysLeft },
           });
+        } catch (emailError) {
+          const message = emailError instanceof Error ? emailError.message : String(emailError);
+          emailsFailed++;
+          logStep("Failed to send reminder", { email: user.email, error: message });
           results.push({
             email: user.email,
             daysLeft,
             sent: false,
             error: 'Failed to send reminder'
           });
+          await logEmail({
+            recipient_email: user.email,
+            user_id: user.user_id ?? null,
+            subject,
+            status: "failed",
+            error_message: message.slice(0, 500),
+            metadata: { days_left: daysLeft },
+          });
         }
       }
     }
 
     logStep("Trial reminders process completed", { totalSent: emailsSent });
+
+    await logEmail({
+      recipient_email: "n/a",
+      status: "run_summary",
+      metadata: { matched: usersToRemind.length, sent: emailsSent, failed: emailsFailed },
+    });
 
     return new Response(JSON.stringify({ 
       success: true, 

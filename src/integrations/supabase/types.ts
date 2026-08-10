@@ -502,6 +502,48 @@ export type Database = {
           },
         ]
       }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          job_name: string
+          metadata: Json
+          provider_message_id: string | null
+          recipient_email: string
+          run_id: string
+          status: string
+          subject: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_name: string
+          metadata?: Json
+          provider_message_id?: string | null
+          recipient_email: string
+          run_id: string
+          status?: string
+          subject?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          job_name?: string
+          metadata?: Json
+          provider_message_id?: string | null
+          recipient_email?: string
+          run_id?: string
+          status?: string
+          subject?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       fleet_members: {
         Row: {
           driver_id: string

@@ -110,13 +110,24 @@ serve(async (req) => {
     { auth: { persistSession: false } },
   );
   const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+  const runId = crypto.randomUUID();
+  const JOB_NAME = "send-ifta-deadline-reminders";
+
+  const logEmail = async (row: Record<string, unknown>) => {
+    const { error } = await supabase.from("email_send_log").insert({
+      job_name: JOB_NAME,
+      run_id: runId,
+      ...row,
+    });
+    if (error) logStep("Email log insert failed", { error: error.message });
+  };
 
   try {
     const todayIso = new Date().toISOString().slice(0, 10);
     const deadline = getNextDeadline(todayIso);
     const daysUntil = daysBetween(todayIso, deadline.dueDate);
 
-    logStep("Next deadline resolved", { todayIso, ...deadline, daysUntil });
+    logStep("Next deadline resolved", { todayIso, ...deadline, daysUntil, runId });
 
     if (!ALLOWED_LEAD_DAYS.includes(daysUntil)) {
       return new Response(
@@ -136,6 +147,11 @@ serve(async (req) => {
 
     const userIds = (settings ?? []).map((s) => s.user_id as string);
     if (userIds.length === 0) {
+      await logEmail({
+        recipient_email: "n/a",
+        status: "run_summary",
+        metadata: { lead_days: daysUntil, deadline: deadline.dueDate, matched: 0, sent: 0, failed: 0 },
+      });
       return new Response(
         JSON.stringify({ success: true, message: "No subscribers for this milestone", sent: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
@@ -155,6 +171,18 @@ serve(async (req) => {
 
     const pendingIds = userIds.filter((id) => !sentSet.has(id));
     if (pendingIds.length === 0) {
+      await logEmail({
+        recipient_email: "n/a",
+        status: "run_summary",
+        metadata: {
+          lead_days: daysUntil,
+          deadline: deadline.dueDate,
+          matched: userIds.length,
+          sent: 0,
+          failed: 0,
+          note: "all reminders already sent",
+        },
+      });
       return new Response(
         JSON.stringify({ success: true, message: "All reminders already sent", sent: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
@@ -181,7 +209,7 @@ serve(async (req) => {
     for (const profile of profiles ?? []) {
       if (!profile.email) continue;
       try {
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: "TrueTrucker IFTA Pro <noreply@true-trucker-ifta-pro.com>",
           to: [profile.email as string],
           subject,
@@ -198,15 +226,42 @@ serve(async (req) => {
         if (insertError) logStep("Log insert failed", { error: insertError.message });
 
         sent++;
+        await logEmail({
+          recipient_email: profile.email,
+          user_id: profile.user_id,
+          subject,
+          status: "sent",
+          provider_message_id: emailResult.data?.id ?? null,
+          metadata: { lead_days: daysUntil, deadline: deadline.dueDate },
+        });
       } catch (emailError) {
         failed++;
-        logStep("Send failed", {
-          error: emailError instanceof Error ? emailError.message : String(emailError),
+        const message = emailError instanceof Error ? emailError.message : String(emailError);
+        logStep("Send failed", { error: message });
+        await logEmail({
+          recipient_email: profile.email,
+          user_id: profile.user_id,
+          subject,
+          status: "failed",
+          error_message: message.slice(0, 500),
+          metadata: { lead_days: daysUntil, deadline: deadline.dueDate },
         });
       }
     }
 
     logStep("Run complete", { sent, failed, leadDays: daysUntil });
+
+    await logEmail({
+      recipient_email: "n/a",
+      status: "run_summary",
+      metadata: {
+        lead_days: daysUntil,
+        deadline: deadline.dueDate,
+        matched: pendingIds.length,
+        sent,
+        failed,
+      },
+    });
 
     return new Response(
       JSON.stringify({ success: true, sent, failed, leadDays: daysUntil, deadline: deadline.dueDate }),
