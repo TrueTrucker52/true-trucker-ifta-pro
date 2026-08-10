@@ -47,9 +47,11 @@ const ReceiptScan = () => {
             <TabsContent value="bulk">
               <BulkReceiptUpload />
             </TabsContent>
-            <TabsContent value="review">
+            <TabsContent value="review" className="space-y-6">
               <AutoAssignedReview />
+              <AssignmentHistory />
             </TabsContent>
+
           </Tabs>
         </div>
       </main>
