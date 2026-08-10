@@ -14,6 +14,7 @@ import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
+import { findBestTripMatch, type TripMatch } from '@/lib/tripMatch';
 
 interface ReceiptData {
   date: string;
