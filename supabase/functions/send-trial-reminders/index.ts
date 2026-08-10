@@ -247,22 +247,43 @@ serve(async (req) => {
 
           emailsSent++;
           logStep("Reminder sent successfully", { email: user.email, daysLeft, messageId: emailResult.data?.id });
-        } catch (emailError) {
-          logStep("Failed to send reminder", {
-            email: user.email,
-            error: emailError instanceof Error ? emailError.message : String(emailError),
+          await logEmail({
+            recipient_email: user.email,
+            user_id: user.user_id ?? null,
+            subject,
+            status: "sent",
+            provider_message_id: emailResult.data?.id ?? null,
+            metadata: { days_left: daysLeft },
           });
+        } catch (emailError) {
+          const message = emailError instanceof Error ? emailError.message : String(emailError);
+          emailsFailed++;
+          logStep("Failed to send reminder", { email: user.email, error: message });
           results.push({
             email: user.email,
             daysLeft,
             sent: false,
             error: 'Failed to send reminder'
           });
+          await logEmail({
+            recipient_email: user.email,
+            user_id: user.user_id ?? null,
+            subject,
+            status: "failed",
+            error_message: message.slice(0, 500),
+            metadata: { days_left: daysLeft },
+          });
         }
       }
     }
 
     logStep("Trial reminders process completed", { totalSent: emailsSent });
+
+    await logEmail({
+      recipient_email: "n/a",
+      status: "run_summary",
+      metadata: { matched: usersToRemind.length, sent: emailsSent, failed: emailsFailed },
+    });
 
     return new Response(JSON.stringify({ 
       success: true, 
