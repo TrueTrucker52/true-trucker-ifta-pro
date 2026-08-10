@@ -1874,6 +1874,7 @@ export type Database = {
           email: string
           id: string
           payment_method_type: string | null
+          plan_key: string | null
           purchased_at: string | null
           stripe_customer_id: string | null
           stripe_payment_intent_id: string | null
@@ -1889,6 +1890,7 @@ export type Database = {
           email: string
           id?: string
           payment_method_type?: string | null
+          plan_key?: string | null
           purchased_at?: string | null
           stripe_customer_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -1904,6 +1906,7 @@ export type Database = {
           email?: string
           id?: string
           payment_method_type?: string | null
+          plan_key?: string | null
           purchased_at?: string | null
           stripe_customer_id?: string | null
           stripe_payment_intent_id?: string | null
