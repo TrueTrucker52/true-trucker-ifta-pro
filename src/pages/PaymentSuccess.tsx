@@ -69,7 +69,7 @@ const PaymentSuccess = () => {
     };
 
     verifyPayment();
-  }, [user, session?.access_token, navigate, checkSubscription, toast, searchParams]);
+  }, [user, session?.access_token, navigate, checkSubscription, toast, searchParams, isAnnual]);
 
   const handleContinue = () => {
     navigate(hasActiveEldAddon(eld_status, eld_active) ? '/eld' : '/account?flow=setup');
@@ -80,6 +80,20 @@ const PaymentSuccess = () => {
   if (!user) {
     return null;
   }
+
+  if (isAnnual && annualPlanParam && isAnnualPlanKey(annualPlanParam)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+        <AnnualPurchaseConfirmation
+          planKey={annualPlanParam}
+          userId={user.id}
+          onAccessGranted={checkSubscription}
+        />
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
