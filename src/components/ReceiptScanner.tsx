@@ -929,7 +929,7 @@ export const ReceiptScanner = () => {
                       </ul>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {selectedTripId !== tripSuggestion.trip.id && (
                       <Button
                         size="sm"
@@ -952,7 +952,121 @@ export const ReceiptScanner = () => {
                     >
                       Not this trip
                     </Button>
+                    {alternatives.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowAlternatives((v) => !v)}
+                      >
+                        <ListOrdered className="h-4 w-4 mr-2" />
+                        {showAlternatives ? 'Hide alternatives' : `Show top alternatives (${alternatives.length})`}
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => setEditingMatchFields((v) => !v)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      {editingMatchFields ? 'Done editing' : 'Edit suggested match fields'}
+                    </Button>
                   </div>
+
+                  {editingMatchFields && (
+                    <div className="rounded-md border border-border bg-background p-3 space-y-3">
+                      <p className="text-xs text-muted-foreground">
+                        Correct what the matcher uses. Changes here re-score the suggestion but don't touch the
+                        receipt fields above.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label htmlFor="match-date" className="text-xs">Fuel date</Label>
+                          <Input
+                            id="match-date"
+                            type="date"
+                            value={matchInput.date}
+                            onChange={(e) => setMatchOverrides((p) => ({ ...p, date: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="match-state" className="text-xs">State</Label>
+                          <Input
+                            id="match-state"
+                            value={matchInput.stateCode}
+                            maxLength={2}
+                            onChange={(e) =>
+                              setMatchOverrides((p) => ({ ...p, stateCode: e.target.value.toUpperCase() }))
+                            }
+                            placeholder="TX"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="match-gallons" className="text-xs">Gallons</Label>
+                          <Input
+                            id="match-gallons"
+                            type="number"
+                            step="0.01"
+                            value={matchInput.gallons}
+                            onChange={(e) => setMatchOverrides((p) => ({ ...p, gallons: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!matchFieldsEdited}
+                          onClick={() => setMatchOverrides({})}
+                        >
+                          Reset to scanned values
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={!matchFieldsEdited}
+                          onClick={() => {
+                            setReceiptData((prev) => ({
+                              ...prev,
+                              date: matchInput.date,
+                              stateCode: matchInput.stateCode,
+                              gallons: matchInput.gallons,
+                            }));
+                            setMatchOverrides({});
+                            toast({ title: 'Receipt fields updated', description: 'Your corrections were copied onto the receipt.' });
+                          }}
+                        >
+                          Apply to receipt fields
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {showAlternatives && alternatives.length > 0 && (
+                    <div className="rounded-md border border-border bg-background p-3 space-y-2">
+                      <p className="text-xs font-medium">Other close trips</p>
+                      {alternatives.map((alt) => (
+                        <div key={alt.trip.id} className="flex flex-wrap items-center gap-2 text-xs">
+                          <Badge variant={alt.confidence === 'high' ? 'default' : 'secondary'}>
+                            {alt.score}%
+                          </Badge>
+                          <span className="text-muted-foreground truncate">{tripLabel(alt.trip)}</span>
+                          <span className="text-muted-foreground">
+                            {alt.signalDetails.map((s) => `${s.label} +${s.points}`).join(' · ')}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="ml-auto h-7"
+                            disabled={selectedTripId === alt.trip.id}
+                            onClick={() => {
+                              setSuggestionDismissed(true);
+                              setSelectedTripId(alt.trip.id);
+                              toast({ title: 'Trip changed', description: tripLabel(alt.trip) });
+                            }}
+                          >
+                            {selectedTripId === alt.trip.id ? 'Selected' : 'Use this trip'}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 pt-1 border-t border-primary/20">
                     <span className="text-xs text-muted-foreground">Was this match right?</span>
                     <Button
