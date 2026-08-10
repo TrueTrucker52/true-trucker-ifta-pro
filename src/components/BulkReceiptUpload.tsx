@@ -417,17 +417,30 @@ export const BulkReceiptUpload = () => {
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
+                {failedCount > 0 && (
+                  <Button variant="outline" onClick={retryAllFailed} disabled={isProcessing || isSaving}>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Retry Failed ({failedCount})
+                  </Button>
+                )}
                 <span className="text-sm text-muted-foreground">
-                  {rows.length} uploaded · {savedCount} saved
+                  {rows.length} uploaded · {savedCount} saved{failedCount > 0 ? ` · ${failedCount} failed` : ''}
                 </span>
               </>
             )}
           </div>
 
           {isProcessing && (
-            <div className="space-y-2">
-              <Progress value={progress} />
-              <p className="text-sm text-muted-foreground">Scanning receipts… {progress}%</p>
+            <div className="space-y-2" aria-live="polite">
+              <Progress value={overallProgress} />
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Processing {Math.min(queueDone + 1, queueTotal)} of {queueTotal}
+                  {currentFile ? ` — ${currentFile}` : ''}
+                </span>
+                <span>{overallProgress}%</span>
+              </div>
             </div>
           )}
 
