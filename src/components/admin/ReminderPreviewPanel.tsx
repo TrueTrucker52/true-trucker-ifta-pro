@@ -20,11 +20,20 @@ type PreviewRecipient = {
   reason: string;
 };
 
+type PreviewTemplate = {
+  lead_days: number;
+  subject: string;
+  html: string;
+  recipient_count: number;
+  recipients: string[];
+};
+
 type PreviewResult = {
   window: { start_date: string; end_date: string; today: string };
   lead_days: number[];
   counts: { matched: number; would_send: number; skipped: number };
   recipients: PreviewRecipient[];
+  templates?: PreviewTemplate[];
 };
 
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
