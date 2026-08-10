@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTrialConversion } from '@/hooks/useTrialConversion';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Clock, Shield, Gift, MessageSquare, Check } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney, startAnnualCheckout } from '@/lib/annualPlans';
