@@ -28,6 +28,7 @@ interface BulkFields {
 }
 
 type RowStatus = 'queued' | 'scanning' | 'ready' | 'saving' | 'saved' | 'error';
+type RowPhase = 'waiting' | 'ocr' | 'enhancing' | 'done';
 
 interface BulkRow {
   id: string;
@@ -38,7 +39,19 @@ interface BulkRow {
   confidence: Partial<Record<keyof BulkFields, number>>;
   status: RowStatus;
   error?: string;
+  /** Non-blocking notice, e.g. AI enhancement unavailable */
+  warning?: string;
+  /** 0-100 progress for the current row */
+  progress: number;
+  phase: RowPhase;
 }
+
+const PHASE_LABEL: Record<RowPhase, string> = {
+  waiting: 'Waiting in queue',
+  ocr: 'Reading text (OCR)',
+  enhancing: 'Enhancing with AI',
+  done: 'Finished',
+};
 
 const emptyFields = (): BulkFields => ({
   date: '',
