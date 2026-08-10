@@ -461,14 +461,27 @@ export const ReceiptScanner = () => {
         }
         
         // Save receipt data to database with sanitized inputs
-        const { error } = await supabase
+        const { data: inserted, error } = await supabase
           .from('receipts')
           .insert({
             ...receiptDbData,
             receipt_image_url: imageUrl,
-          });
+          })
+          .select('id')
+          .single();
         
         if (error) throw error;
+
+        // Audit trail so the assignment can be reviewed or undone later
+        if (inserted?.id) {
+          await logAssignment(user.id, {
+            receiptId: inserted.id,
+            tripId,
+            source: receiptDbData.trip_auto_assigned ? 'auto' : 'manual',
+            matchScore: receiptDbData.trip_match_score,
+          });
+        }
+
 
         // Roll the fuel purchase into the trip's fuel line
         if (tripId && addToTripFuel) {
