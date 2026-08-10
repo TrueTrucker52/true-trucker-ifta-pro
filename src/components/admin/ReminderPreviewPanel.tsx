@@ -67,6 +67,7 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
   const [endDate, setEndDate] = useState(iso(addDays(new Date(), 6)));
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PreviewResult | null>(null);
+  const [sendingTest, setSendingTest] = useState<number | null>(null);
 
   const runPreview = async () => {
     setLoading(true);
