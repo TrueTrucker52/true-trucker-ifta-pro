@@ -12,6 +12,8 @@ export interface TripOption {
   destination_city: string;
   destination_state: string;
   start_date: string;
+  end_date: string | null;
+  total_miles: number | null;
   fuel_gallons: number | null;
   fuel_cost: number | null;
 }
