@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap, ThumbsUp, ThumbsDown, ListOrdered, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,12 +14,14 @@ import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
-import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
+import { findBestTripMatch, rankTripMatches, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Fuel, Check, Minus, X, Wand2 } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 import { useAutoAcceptMatch } from '@/hooks/useAutoAcceptMatch';
 import { AutoAcceptSettings } from '@/components/receipts/AutoAcceptSettings';
+import { logAssignment } from '@/hooks/useAssignmentHistory';
+
 
 interface ReceiptData {
   date: string;
