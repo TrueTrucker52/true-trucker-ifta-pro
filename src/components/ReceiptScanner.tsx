@@ -841,6 +841,53 @@ export const ReceiptScanner = () => {
                       Not this trip
                     </Button>
                   </div>
+                  <div className="flex items-center gap-2 pt-1 border-t border-primary/20">
+                    <span className="text-xs text-muted-foreground">Was this match right?</span>
+                    <Button
+                      size="sm"
+                      variant={feedbackByTrip[tripSuggestion.trip.id] === true ? 'default' : 'ghost'}
+                      className="h-7 px-2"
+                      aria-label="Good match"
+                      disabled={tripSuggestion.trip.id in feedbackByTrip}
+                      onClick={async () => {
+                        setFeedbackByTrip((p) => ({ ...p, [tripSuggestion.trip.id]: true }));
+                        await submitFeedback({
+                          helpful: true,
+                          suggestedTripId: tripSuggestion.trip.id,
+                          chosenTripId: selectedTripId === UNASSIGNED ? null : selectedTripId,
+                          matchScore: tripSuggestion.score,
+                          signals: tripSuggestion.signals,
+                        });
+                        toast({ title: 'Thanks — noted', description: 'Future suggestions will lean on these signals more.' });
+                      }}
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={feedbackByTrip[tripSuggestion.trip.id] === false ? 'default' : 'ghost'}
+                      className="h-7 px-2"
+                      aria-label="Bad match"
+                      disabled={tripSuggestion.trip.id in feedbackByTrip}
+                      onClick={async () => {
+                        setFeedbackByTrip((p) => ({ ...p, [tripSuggestion.trip.id]: false }));
+                        await submitFeedback({
+                          helpful: false,
+                          suggestedTripId: tripSuggestion.trip.id,
+                          chosenTripId: selectedTripId === UNASSIGNED ? null : selectedTripId,
+                          matchScore: tripSuggestion.score,
+                          signals: tripSuggestion.signals,
+                        });
+                        toast({ title: 'Got it', description: 'This kind of match will be suggested less often.' });
+                      }}
+                    >
+                      <ThumbsDown className="h-4 w-4" />
+                    </Button>
+                    {tripSuggestion.trip.id in feedbackByTrip && (
+                      <span className="text-xs text-muted-foreground">Feedback saved</span>
+                    )}
+                  </div>
+                </div>
                 </div>
               )}
               <TripAssignSelect
