@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { hasActiveEldAddon } from '@/lib/eldUpgrade';
+import AnnualPurchaseConfirmation from '@/components/AnnualPurchaseConfirmation';
+import { isAnnualPlanKey } from '@/lib/annualPlans';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +18,10 @@ const PaymentSuccess = () => {
   const { checkSubscription, loading, eld_active, eld_status } = useSubscription();
   const [isVerifying, setIsVerifying] = useState(true);
   const { toast } = useToast();
+
+  const annualPlanParam = searchParams.get('plan');
+  const isAnnual = searchParams.get('billing') === 'annual' && isAnnualPlanKey(annualPlanParam);
+
 
   useEffect(() => {
     if (!user) {
