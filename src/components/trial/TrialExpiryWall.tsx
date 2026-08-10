@@ -6,11 +6,36 @@ import { Badge } from '@/components/ui/badge';
 import { useTrialConversion } from '@/hooks/useTrialConversion';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Clock, Shield, Gift, MessageSquare, Check } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney, startAnnualCheckout } from '@/lib/annualPlans';
 
 const TrialExpiryWall: React.FC = () => {
   const navigate = useNavigate();
   const { tracking } = useTrialConversion();
   const { subscription_status, subscribed, createCheckout } = useSubscription();
+  const { session } = useAuth();
+  const { toast } = useToast();
+  const [annual, setAnnual] = React.useState(false);
+
+  const handleSelect = async (planId: string) => {
+    if (annual) {
+      try {
+        if (!session?.access_token) throw new Error('Not signed in');
+        await startAnnualCheckout(planId as AnnualPlanKey, session.access_token);
+      } catch {
+        toast({
+          title: 'Error',
+          description: 'Failed to create checkout session. Please try again.',
+          variant: 'destructive',
+        });
+      }
+      return;
+    }
+    // Monthly keeps the comeback discount; annual pricing is the offer itself.
+    createCheckout(planId, 'COMEBACK20');
+  };
 
   // Only show when trial is expired and not subscribed
   if (subscribed || subscription_status !== 'trial_expired') return null;
@@ -39,32 +64,66 @@ const TrialExpiryWall: React.FC = () => {
             <span className="text-green-700">Your data is safe and waiting — upgrade now to regain full access instantly.</span>
           </div>
 
+          <div className="flex items-center justify-center gap-3">
+            <span className={`text-sm font-medium ${!annual ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
+            <Switch checked={annual} onCheckedChange={setAnnual} />
+            <span className={`text-sm font-medium ${annual ? 'text-foreground' : 'text-muted-foreground'}`}>Annual</span>
+            {annual && (
+              <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/30">{ANNUAL_LABEL}</Badge>
+            )}
+          </div>
+
           <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
             <Gift className="h-5 w-5 text-primary shrink-0" />
-            <div>
-              <p className="font-semibold text-primary">Special comeback offer: 20% off first month!</p>
-              <p className="text-xs text-muted-foreground">Valid for 48 hours only</p>
-            </div>
+            {annual ? (
+              <div>
+                <p className="font-semibold text-primary">Go annual and get {ANNUAL_LABEL}</p>
+                <p className="text-xs text-muted-foreground">Split it with Klarna or Affirm at checkout</p>
+              </div>
+            ) : (
+              <div>
+                <p className="font-semibold text-primary">Special comeback offer: 20% off first month!</p>
+                <p className="text-xs text-muted-foreground">Valid for 48 hours only</p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
-            {plans.slice(0, 2).map(plan => (
-              <Button
-                key={plan.id}
-                className="w-full justify-between min-h-[52px]"
-                variant={plan.id === 'solo' ? 'default' : 'outline'}
-                onClick={() => createCheckout(plan.id, 'COMEBACK20')}
-              >
-                <div className="text-left">
-                  <span className="font-bold">{plan.name}</span>
-                  <span className="text-xs ml-2 opacity-80">{plan.desc}</span>
+            {plans.slice(0, 2).map(plan => {
+              const annualPlan = ANNUAL_PLANS[plan.id as AnnualPlanKey];
+              return (
+                <div key={plan.id} className="space-y-1">
+                  <Button
+                    className="w-full justify-between min-h-[52px]"
+                    variant={plan.id === 'solo' ? 'default' : 'outline'}
+                    onClick={() => handleSelect(plan.id)}
+                  >
+                    <div className="text-left">
+                      <span className="font-bold">{plan.name}</span>
+                      <span className="text-xs ml-2 opacity-80">{plan.desc}</span>
+                    </div>
+                    <div className="text-right">
+                      {annual ? (
+                        <>
+                          <span className="line-through text-xs opacity-60 mr-1">${formatMoney(plan.price * 12)}</span>
+                          <span className="font-bold">${formatMoney(annualPlan.annualPrice)}/yr</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="line-through text-xs opacity-60 mr-1">${plan.price}</span>
+                          <span className="font-bold">${plan.discountPrice}</span>
+                        </>
+                      )}
+                    </div>
+                  </Button>
+                  {annual && (
+                    <p className="text-xs text-center text-muted-foreground">
+                      Saves ${formatMoney(annualPlan.savings)} vs monthly · {financingCopy(annualPlan)}
+                    </p>
+                  )}
                 </div>
-                <div className="text-right">
-                  <span className="line-through text-xs opacity-60 mr-1">${plan.price}</span>
-                  <span className="font-bold">${plan.discountPrice}</span>
-                </div>
-              </Button>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex gap-2">
