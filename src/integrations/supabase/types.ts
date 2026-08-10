@@ -1353,6 +1353,7 @@ export type Database = {
           receipt_time: string | null
           state_code: string | null
           total_amount: number | null
+          trip_id: string | null
           updated_at: string
           user_id: string
           vendor: string | null
@@ -1370,6 +1371,7 @@ export type Database = {
           receipt_time?: string | null
           state_code?: string | null
           total_amount?: number | null
+          trip_id?: string | null
           updated_at?: string
           user_id: string
           vendor?: string | null
@@ -1387,11 +1389,20 @@ export type Database = {
           receipt_time?: string | null
           state_code?: string | null
           total_amount?: number | null
+          trip_id?: string | null
           updated_at?: string
           user_id?: string
           vendor?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "receipts_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referral_rewards: {
         Row: {
