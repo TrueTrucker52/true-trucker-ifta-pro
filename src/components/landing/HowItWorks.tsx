@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getNextIftaDeadline, quarterName } from "@/lib/iftaDeadlines";
 
 const steps = [
   { num: "1", emoji: "🚀", title: "Sign Up Free", desc: "Create your account in 60 seconds. No credit card needed to start." },
@@ -9,13 +11,32 @@ const steps = [
 
 const HowItWorks = () => {
   const navigate = useNavigate();
+  const deadline = useMemo(() => getNextIftaDeadline(), []);
+  const countdown =
+    deadline.daysRemaining === 0
+      ? "due today"
+      : deadline.daysRemaining === 1
+        ? "1 day left"
+        : `${deadline.daysRemaining} days left`;
+
   return (
     <section className="bg-[hsl(var(--landing-gray))] py-20 md:py-28">
       <div className="container mx-auto px-4 text-center">
-        <h3 className="text-lg font-semibold text-destructive mb-4">⚠️ Quarter One IFTA Deadline: April 30 — File on time with TrueTrucker</h3>
+        <h3
+          className={
+            deadline.isUrgent
+              ? "inline-flex flex-wrap items-center justify-center gap-2 mb-4 rounded-full border border-destructive bg-destructive/10 px-4 py-2 text-base font-bold text-destructive animate-pulse"
+              : "text-lg font-semibold text-muted-foreground mb-4"
+          }
+        >
+          <span aria-hidden="true">{deadline.isUrgent ? "🚨" : "📅"}</span>
+          {quarterName(deadline.quarter)} {deadline.quarterYear} IFTA Deadline: {deadline.dueDateLabel} —{" "}
+          {deadline.isUrgent ? `${countdown}. ` : ""}File on time with TrueTrucker
+        </h3>
         <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-14">
           Up and running in 5 minutes ⏱️
         </h2>
+
         <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
           {steps.map((s) => (
             <div key={s.num} className="flex flex-col items-center">
