@@ -72,9 +72,14 @@ export const ReceiptScanner = () => {
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
   const [feedbackByTrip, setFeedbackByTrip] = useState<Record<string, boolean>>({});
   const [autoAccepted, setAutoAccepted] = useState(false);
+  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [editingMatchFields, setEditingMatchFields] = useState(false);
+  /** Manual corrections to the fields used for matching (OCR can misread them) */
+  const [matchOverrides, setMatchOverrides] = useState<{ date?: string; stateCode?: string; gallons?: string }>({});
   const { weights, submitFeedback } = useMatchFeedback();
   const { settings: autoAccept } = useAutoAcceptMatch();
   const { trips } = useTrips();
+
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
     date: '',
