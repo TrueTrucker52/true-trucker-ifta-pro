@@ -262,6 +262,60 @@ export type Database = {
           },
         ]
       }
+      courier_requests: {
+        Row: {
+          company_name: string
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string
+          created_at: string | null
+          dropoff_address: string
+          id: string
+          notes: string | null
+          pickup_address: string
+          preferred_date: string | null
+          preferred_time: string | null
+          status: string
+          transport_type: string
+          updated_at: string | null
+          urgency: string
+        }
+        Insert: {
+          company_name: string
+          contact_email?: string | null
+          contact_name: string
+          contact_phone: string
+          created_at?: string | null
+          dropoff_address: string
+          id?: string
+          notes?: string | null
+          pickup_address: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          status?: string
+          transport_type: string
+          updated_at?: string | null
+          urgency?: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string | null
+          dropoff_address?: string
+          id?: string
+          notes?: string | null
+          pickup_address?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          status?: string
+          transport_type?: string
+          updated_at?: string | null
+          urgency?: string
+        }
+        Relationships: []
+      }
       driver_onboarding: {
         Row: {
           completed_at: string | null
@@ -966,6 +1020,63 @@ export type Database = {
         }
         Relationships: []
       }
+      loads: {
+        Row: {
+          broker_name: string | null
+          carrier_name: string
+          created_at: string | null
+          delivery_date: string | null
+          destination: string | null
+          id: string
+          load_number: string | null
+          notes: string | null
+          origin: string | null
+          pickup_date: string | null
+          rate_amount: number | null
+          rate_con_filename: string | null
+          rate_con_url: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          broker_name?: string | null
+          carrier_name?: string
+          created_at?: string | null
+          delivery_date?: string | null
+          destination?: string | null
+          id?: string
+          load_number?: string | null
+          notes?: string | null
+          origin?: string | null
+          pickup_date?: string | null
+          rate_amount?: number | null
+          rate_con_filename?: string | null
+          rate_con_url?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          broker_name?: string | null
+          carrier_name?: string
+          created_at?: string | null
+          delivery_date?: string | null
+          destination?: string | null
+          id?: string
+          load_number?: string | null
+          notes?: string | null
+          origin?: string | null
+          pickup_date?: string | null
+          rate_amount?: number | null
+          rate_con_filename?: string | null
+          rate_con_url?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           attachment_name: string | null
@@ -1272,12 +1383,500 @@ export type Database = {
         }
         Relationships: []
       }
+      rr_defects: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          inspection_id: string | null
+          photo_path: string | null
+          reported_by: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          tire_position: string | null
+          truck_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          inspection_id?: string | null
+          photo_path?: string | null
+          reported_by?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          tire_position?: string | null
+          truck_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          inspection_id?: string | null
+          photo_path?: string | null
+          reported_by?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          tire_position?: string | null
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_defects_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "rr_inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rr_defects_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_inspections: {
+        Row: {
+          completed_at: string
+          driver_id: string
+          id: string
+          items: Json
+          notes: string | null
+          odometer: number | null
+          photos: Json
+          signature_name: string | null
+          status: string
+          trailer_id: string | null
+          truck_id: string
+          type: string
+        }
+        Insert: {
+          completed_at?: string
+          driver_id?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          odometer?: number | null
+          photos?: Json
+          signature_name?: string | null
+          status: string
+          trailer_id?: string | null
+          truck_id: string
+          type: string
+        }
+        Update: {
+          completed_at?: string
+          driver_id?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          odometer?: number | null
+          photos?: Json
+          signature_name?: string | null
+          status?: string
+          trailer_id?: string | null
+          truck_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_inspections_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rr_inspections_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_loads: {
+        Row: {
+          broker: string | null
+          created_at: string
+          delivered_at: string | null
+          delivery_photos: Json
+          destination: string | null
+          id: string
+          load_ref: string
+          notes: string | null
+          origin: string | null
+          owner_id: string
+          picked_up_at: string
+          pickup_photos: Json
+          status: string
+          trailer_id: string | null
+          truck_id: string | null
+        }
+        Insert: {
+          broker?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_photos?: Json
+          destination?: string | null
+          id?: string
+          load_ref: string
+          notes?: string | null
+          origin?: string | null
+          owner_id?: string
+          picked_up_at?: string
+          pickup_photos?: Json
+          status?: string
+          trailer_id?: string | null
+          truck_id?: string | null
+        }
+        Update: {
+          broker?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_photos?: Json
+          destination?: string | null
+          id?: string
+          load_ref?: string
+          notes?: string | null
+          origin?: string | null
+          owner_id?: string
+          picked_up_at?: string
+          pickup_photos?: Json
+          status?: string
+          trailer_id?: string | null
+          truck_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_loads_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rr_loads_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_maintenance_schedules: {
+        Row: {
+          created_at: string
+          id: string
+          interval_days: number | null
+          interval_miles: number | null
+          last_done_date: string | null
+          last_done_odometer: number | null
+          notes: string | null
+          task: string
+          truck_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interval_days?: number | null
+          interval_miles?: number | null
+          last_done_date?: string | null
+          last_done_odometer?: number | null
+          notes?: string | null
+          task: string
+          truck_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interval_days?: number | null
+          interval_miles?: number | null
+          last_done_date?: string | null
+          last_done_odometer?: number | null
+          notes?: string | null
+          task?: string
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_maintenance_schedules_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_receipts: {
+        Row: {
+          amount: number | null
+          category: string
+          created_at: string
+          id: string
+          notes: string | null
+          photo_path: string | null
+          receipt_date: string
+          truck_id: string | null
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          amount?: number | null
+          category?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_path?: string | null
+          receipt_date?: string
+          truck_id?: string | null
+          user_id?: string
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number | null
+          category?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_path?: string | null
+          receipt_date?: string
+          truck_id?: string | null
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_receipts_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_shops: {
+        Row: {
+          city: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          owner_id: string
+          phone: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          owner_id?: string
+          phone?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          owner_id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      rr_subscriptions: {
+        Row: {
+          created_at: string
+          ghl_contact_id: string | null
+          ghl_stage: string | null
+          plan: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string
+          trial_reminder_sent_at: string | null
+          truck_limit: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ghl_contact_id?: string | null
+          ghl_stage?: string | null
+          plan?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
+          trial_reminder_sent_at?: string | null
+          truck_limit?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ghl_contact_id?: string | null
+          ghl_stage?: string | null
+          plan?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
+          trial_reminder_sent_at?: string | null
+          truck_limit?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rr_tires: {
+        Row: {
+          brand: string | null
+          id: string
+          last_changed_date: string | null
+          last_changed_odometer: number | null
+          notes: string | null
+          owner_id: string
+          position: string
+          trailer_id: string | null
+          truck_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          brand?: string | null
+          id?: string
+          last_changed_date?: string | null
+          last_changed_odometer?: number | null
+          notes?: string | null
+          owner_id?: string
+          position: string
+          trailer_id?: string | null
+          truck_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          brand?: string | null
+          id?: string
+          last_changed_date?: string | null
+          last_changed_odometer?: number | null
+          notes?: string | null
+          owner_id?: string
+          position?: string
+          trailer_id?: string | null
+          truck_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rr_tires_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rr_tires_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "rr_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rr_trailers: {
+        Row: {
+          created_at: string
+          id: string
+          nickname: string
+          owner_id: string
+          plate: string | null
+          trailer_type: string
+          vin: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nickname: string
+          owner_id?: string
+          plate?: string | null
+          trailer_type?: string
+          vin?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nickname?: string
+          owner_id?: string
+          plate?: string | null
+          trailer_type?: string
+          vin?: string | null
+        }
+        Relationships: []
+      }
+      rr_trucks: {
+        Row: {
+          created_at: string
+          current_odometer: number | null
+          id: string
+          make: string | null
+          model: string | null
+          nickname: string
+          owner_id: string
+          plate: string | null
+          vehicle_type: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_odometer?: number | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          nickname: string
+          owner_id?: string
+          plate?: string | null
+          vehicle_type?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_odometer?: number | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          nickname?: string
+          owner_id?: string
+          plate?: string | null
+          vehicle_type?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
+          billing_period: string | null
           created_at: string
           email: string
           id: string
+          payment_method_type: string | null
+          purchased_at: string | null
           stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
           subscribed: boolean
           subscription_end: string | null
           subscription_tier: string | null
@@ -1285,10 +1884,14 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          billing_period?: string | null
           created_at?: string
           email: string
           id?: string
+          payment_method_type?: string | null
+          purchased_at?: string | null
           stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           subscribed?: boolean
           subscription_end?: string | null
           subscription_tier?: string | null
@@ -1296,10 +1899,14 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          billing_period?: string | null
           created_at?: string
           email?: string
           id?: string
+          payment_method_type?: string | null
+          purchased_at?: string | null
           stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           subscribed?: boolean
           subscription_end?: string | null
           subscription_tier?: string | null
@@ -2072,6 +2679,7 @@ export type Database = {
       get_user_fleet_id: { Args: never; Returns: string }
       get_user_role: { Args: never; Returns: string }
       grant_reviewer_role: { Args: { user_email: string }; Returns: undefined }
+      has_active_plan: { Args: { p_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2098,6 +2706,7 @@ export type Database = {
           id: string
         }[]
       }
+      rr_run_ghl_daily_sync: { Args: never; Returns: undefined }
       should_rate_limit: {
         Args: {
           identifier: string
