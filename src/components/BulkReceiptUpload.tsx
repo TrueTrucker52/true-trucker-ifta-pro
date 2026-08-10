@@ -106,39 +106,109 @@ export const BulkReceiptUpload = () => {
 
   const [rows, setRows] = useState<BulkRow[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [queueTotal, setQueueTotal] = useState(0);
+  const [queueDone, setQueueDone] = useState(0);
+  const [currentFile, setCurrentFile] = useState<string>('');
+  const [currentRowProgress, setCurrentRowProgress] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+
+  const overallProgress =
+    queueTotal === 0 ? 0 : Math.min(100, Math.round(((queueDone + currentRowProgress / 100) / queueTotal) * 100));
 
   const updateRow = (id: string, patch: Partial<BulkRow>) =>
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
   const scanRow = async (row: BulkRow) => {
-    updateRow(row.id, { status: 'scanning' });
+    setCurrentFile(row.fileName);
+    setCurrentRowProgress(0);
+    updateRow(row.id, { status: 'scanning', phase: 'ocr', progress: 0, error: undefined, warning: undefined });
+
+    let ocrText = '';
     try {
-      const { data: { text } } = await Tesseract.recognize(row.imageData, 'eng');
-      const ocrText = sanitizeOcrText(text);
-      const basic = basicExtract(ocrText);
-      let fields: BulkFields = { ...emptyFields(), ...basic };
-      let confidence: Partial<Record<keyof BulkFields, number>> = {};
-
-      try {
-        const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
-          body: { ocrText: stripPotentialPII(ocrText), extractedData: basic },
-        });
-        if (error) throw error;
-        if (data?.enhancedData) {
-          const { confidence: conf, ...enhanced } = data.enhancedData;
-          fields = { ...fields, ...enhanced };
-          if (conf) confidence = conf;
-        }
-      } catch (e) {
-        console.error('AI enhancement failed for bulk row, using basic extraction:', e);
-      }
-
-      updateRow(row.id, { ocrText, fields, confidence, status: 'ready' });
+      const { data: { text } } = await Tesseract.recognize(row.imageData, 'eng', {
+        logger: (m: { status?: string; progress?: number }) => {
+          if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+            // OCR occupies the first 80% of a row's progress
+            const pct = Math.round(m.progress * 80);
+            setCurrentRowProgress(pct);
+            updateRow(row.id, { progress: pct, phase: 'ocr' });
+          }
+        },
+      });
+      ocrText = sanitizeOcrText(text);
     } catch (e) {
-      updateRow(row.id, { status: 'error', error: 'Could not read this image' });
+      console.error('OCR failed for bulk row:', e);
+      updateRow(row.id, {
+        status: 'error',
+        phase: 'done',
+        progress: 100,
+        error: `Couldn't read text from ${row.fileName}. Try a sharper, well-lit photo, then retry.`,
+      });
+      setCurrentRowProgress(100);
+      return;
     }
+
+    if (!ocrText.trim()) {
+      updateRow(row.id, {
+        status: 'error',
+        phase: 'done',
+        progress: 100,
+        error: 'No text found on this image. Retake the photo so the whole receipt is in frame, then retry.',
+      });
+      setCurrentRowProgress(100);
+      return;
+    }
+
+    const basic = basicExtract(ocrText);
+    let fields: BulkFields = { ...emptyFields(), ...basic };
+    let confidence: Partial<Record<keyof BulkFields, number>> = {};
+    let warning: string | undefined;
+
+    setCurrentRowProgress(85);
+    updateRow(row.id, { phase: 'enhancing', progress: 85 });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
+        body: { ocrText: stripPotentialPII(ocrText), extractedData: basic },
+      });
+      if (error) throw error;
+      if (data?.enhancedData) {
+        const { confidence: conf, ...enhanced } = data.enhancedData;
+        fields = { ...fields, ...enhanced };
+        if (conf) confidence = conf;
+      }
+    } catch (e) {
+      console.error('AI enhancement failed for bulk row, using basic extraction:', e);
+      warning = 'AI enhancement unavailable — basic text extraction used. Double-check every field.';
+    }
+
+    setCurrentRowProgress(100);
+    updateRow(row.id, { ocrText, fields, confidence, status: 'ready', phase: 'done', progress: 100, warning });
+  };
+
+  const processQueue = async (queue: BulkRow[]) => {
+    setIsProcessing(true);
+    setQueueTotal(queue.length);
+    setQueueDone(0);
+    for (let i = 0; i < queue.length; i++) {
+      await scanRow(queue[i]);
+      setQueueDone(i + 1);
+      setCurrentRowProgress(0);
+    }
+    setIsProcessing(false);
+    setCurrentFile('');
+    setCurrentRowProgress(0);
+  };
+
+  const retryRow = async (row: BulkRow) => {
+    if (isProcessing || isSaving) return;
+    await processQueue([{ ...row, status: 'queued', phase: 'waiting', progress: 0 }]);
+  };
+
+  const retryAllFailed = async () => {
+    const failed = rows.filter((r) => r.status === 'error');
+    if (failed.length === 0) return;
+    await processQueue(failed.map((r) => ({ ...r, status: 'queued', phase: 'waiting', progress: 0 })));
   };
 
   const handleFiles = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,22 +240,19 @@ export const BulkReceiptUpload = () => {
         fields: emptyFields(),
         confidence: {},
         status: 'queued',
+        phase: 'waiting',
+        progress: 0,
       });
     }
 
     if (newRows.length === 0) return;
     setRows((prev) => [...prev, ...newRows]);
 
-    setIsProcessing(true);
-    setProgress(0);
-    for (let i = 0; i < newRows.length; i++) {
-      await scanRow(newRows[i]);
-      setProgress(Math.round(((i + 1) / newRows.length) * 100));
-    }
-    setIsProcessing(false);
+    await processQueue(newRows);
+
     toast({
       title: 'Receipts scanned',
-      description: `${newRows.length} receipt${newRows.length > 1 ? 's' : ''} ready for review. Check highlighted fields before saving.`,
+      description: `${newRows.length} receipt${newRows.length > 1 ? 's' : ''} processed. Check highlighted fields before saving.`,
     });
   };
 
