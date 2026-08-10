@@ -14,7 +14,9 @@ import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
-import { findBestTripMatch, type TripMatch } from '@/lib/tripMatch';
+import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, MapPin, Fuel, Check, Minus, X } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 
 interface ReceiptData {
