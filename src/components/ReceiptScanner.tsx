@@ -99,13 +99,15 @@ export const ReceiptScanner = () => {
     }
     const match = findBestTripMatch(
       { date: receiptData.date, stateCode: receiptData.stateCode, gallons: receiptData.gallons },
-      trips
+      trips,
+      weights
     );
     setTripSuggestion(match);
+    setFeedbackGiven(null);
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
     }
-  }, [trips, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
+  }, [trips, weights, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
 
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
