@@ -214,7 +214,7 @@ serve(async (req) => {
         
         try {
           const emailResult = await resend.emails.send({
-            from: "TrueTrucker IFTA Pro <noreply@truetrucker.com>",
+            from: "TrueTrucker IFTA Pro <noreply@true-trucker-ifta-pro.com>",
             to: [user.email],
             subject,
             html,

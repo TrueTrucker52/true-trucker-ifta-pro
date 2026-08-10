@@ -182,7 +182,7 @@ serve(async (req) => {
       if (!profile.email) continue;
       try {
         await resend.emails.send({
-          from: "TrueTrucker IFTA Pro <noreply@truetrucker.com>",
+          from: "TrueTrucker IFTA Pro <noreply@true-trucker-ifta-pro.com>",
           to: [profile.email as string],
           subject,
           html,
