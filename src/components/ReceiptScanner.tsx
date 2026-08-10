@@ -565,6 +565,9 @@ export const ReceiptScanner = () => {
       });
       setCapturedImage(null);
       setOcrText('');
+      setMatchOverrides({});
+      setEditingMatchFields(false);
+      setShowAlternatives(false);
     }
   };
 
