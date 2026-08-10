@@ -557,6 +557,9 @@ const Admin = () => {
           </CardContent>
         </Card>
 
+        {/* ─── Email Reminder Log ─── */}
+        <EmailLogPanel enabled={isAdmin} />
+
         {/* ─── System Health ─── */}
         <Card>
           <CardHeader className="pb-3">
