@@ -91,6 +91,23 @@ export const ReceiptScanner = () => {
     fuelType: 1
   });
 
+  // Auto-match: suggest (and preselect) the most likely trip from date/state/gallons
+  useEffect(() => {
+    if (!trips.length || !receiptData.date) {
+      setTripSuggestion(null);
+      return;
+    }
+    const match = findBestTripMatch(
+      { date: receiptData.date, stateCode: receiptData.stateCode, gallons: receiptData.gallons },
+      trips
+    );
+    setTripSuggestion(match);
+    if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
+      setSelectedTripId(match.trip.id);
+    }
+  }, [trips, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
+
+
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
     return confidenceScores[field] < LOW_CONFIDENCE_THRESHOLD;
   };
