@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -20,11 +21,20 @@ type PreviewRecipient = {
   reason: string;
 };
 
+type PreviewTemplate = {
+  lead_days: number;
+  subject: string;
+  html: string;
+  recipient_count: number;
+  recipients: string[];
+};
+
 type PreviewResult = {
   window: { start_date: string; end_date: string; today: string };
   lead_days: number[];
   counts: { matched: number; would_send: number; skipped: number };
   recipients: PreviewRecipient[];
+  templates?: PreviewTemplate[];
 };
 
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
@@ -203,6 +213,45 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
                 </table>
               </div>
             )}
+
+            {result.templates && result.templates.length > 0 && (
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Mail className="h-4 w-4 text-primary" /> Email preview by reminder tier
+                </div>
+                <Tabs defaultValue={String(result.templates[0].lead_days)}>
+                  <TabsList>
+                    {result.templates.map((t) => (
+                      <TabsTrigger key={t.lead_days} value={String(t.lead_days)}>
+                        {t.lead_days} day{t.lead_days === 1 ? '' : 's'} ({t.recipient_count})
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  {result.templates.map((t) => (
+                    <TabsContent key={t.lead_days} value={String(t.lead_days)} className="space-y-2">
+                      <div className="border rounded-md p-3 space-y-1">
+                        <p className="text-xs text-muted-foreground">Subject</p>
+                        <p className="text-sm font-medium break-words">{t.subject}</p>
+                        <p className="text-xs text-muted-foreground pt-1">
+                          {t.recipient_count === 0
+                            ? 'No recipients in this window for this tier.'
+                            : `Goes to: ${t.recipients.join(', ')}`}
+                        </p>
+                      </div>
+                      <div className="border rounded-md overflow-hidden bg-background">
+                        <iframe
+                          title={`Reminder email body — ${t.lead_days} day`}
+                          srcDoc={t.html}
+                          sandbox=""
+                          className="w-full h-[420px] border-0"
+                        />
+                      </div>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              </div>
+            )}
+
             <p className="text-xs text-muted-foreground">
               Evaluated against today ({result.window.today}) — "days left" drives the send decision.
             </p>

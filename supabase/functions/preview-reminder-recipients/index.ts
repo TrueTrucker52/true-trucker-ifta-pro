@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getTrialReminderEmail } from "../_shared/trialReminderEmail.ts";
 
 const allowedOrigins = [
   "https://true-trucker-ifta-pro.lovable.app",
@@ -125,6 +126,19 @@ serve(async (req) => {
 
     const wouldSend = recipients.filter((r) => r.would_send);
 
+    // Render the exact email each reminder tier would send, for admin review
+    const templates = TRIAL_LEAD_DAYS.map((leadDays) => {
+      const { subject, html } = getTrialReminderEmail(leadDays);
+      const tierRecipients = wouldSend.filter((r) => r.days_left === leadDays);
+      return {
+        lead_days: leadDays,
+        subject,
+        html,
+        recipient_count: tierRecipients.length,
+        recipients: tierRecipients.map((r) => r.email),
+      };
+    });
+
     return json({
       success: true,
       preview: true,
@@ -136,6 +150,7 @@ serve(async (req) => {
         skipped: recipients.length - wouldSend.length,
       },
       recipients,
+      templates,
     });
   } catch (error) {
     logStep("ERROR", { message: error instanceof Error ? error.message : String(error) });
