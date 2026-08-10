@@ -860,6 +860,60 @@ export type Database = {
           },
         ]
       }
+      ifta_reminder_log: {
+        Row: {
+          deadline_date: string
+          id: string
+          lead_days: number
+          quarter: number
+          quarter_year: number
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          deadline_date: string
+          id?: string
+          lead_days: number
+          quarter: number
+          quarter_year: number
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          deadline_date?: string
+          id?: string
+          lead_days?: number
+          quarter?: number
+          quarter_year?: number
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ifta_reminder_settings: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          lead_days: number[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          lead_days?: number[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          lead_days?: number[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ifta_reports: {
         Row: {
           confirmation_number: string | null
