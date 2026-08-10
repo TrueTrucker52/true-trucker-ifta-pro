@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { hasActiveEldAddon } from '@/lib/eldUpgrade';
+import AnnualPurchaseConfirmation from '@/components/AnnualPurchaseConfirmation';
+import { isAnnualPlanKey } from '@/lib/annualPlans';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -17,15 +19,23 @@ const PaymentSuccess = () => {
   const [isVerifying, setIsVerifying] = useState(true);
   const { toast } = useToast();
 
+  const annualPlanParam = searchParams.get('plan');
+  const isAnnual = searchParams.get('billing') === 'annual' && isAnnualPlanKey(annualPlanParam);
+
+
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
 
+    // Annual one-time purchases are confirmed by AnnualPurchaseConfirmation instead
+    if (isAnnual) return;
+
     const verifyPayment = async () => {
       try {
         const sessionId = searchParams.get('session_id');
+
 
         if (sessionId && session?.access_token) {
           await supabase.functions.invoke('sync-eld-checkout', {
@@ -59,7 +69,7 @@ const PaymentSuccess = () => {
     };
 
     verifyPayment();
-  }, [user, session?.access_token, navigate, checkSubscription, toast, searchParams]);
+  }, [user, session?.access_token, navigate, checkSubscription, toast, searchParams, isAnnual]);
 
   const handleContinue = () => {
     navigate(hasActiveEldAddon(eld_status, eld_active) ? '/eld' : '/account?flow=setup');
@@ -70,6 +80,20 @@ const PaymentSuccess = () => {
   if (!user) {
     return null;
   }
+
+  if (isAnnual && annualPlanParam && isAnnualPlanKey(annualPlanParam)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+        <AnnualPurchaseConfirmation
+          planKey={annualPlanParam}
+          userId={user.id}
+          onAccessGranted={checkSubscription}
+        />
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
