@@ -104,6 +104,28 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
       description: `${result.recipients.length} recipient${result.recipients.length === 1 ? '' : 's'} downloaded.`,
     });
   };
+  const sendTest = async (leadDays: number) => {
+    setSendingTest(leadDays);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-test-reminder-email', {
+        body: { lead_days: leadDays, start_date: startDate, end_date: endDate },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: 'Test email sent',
+        description: `The ${leadDays}-day reminder was sent to ${data.sent_to}.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Test email failed',
+        description: err instanceof Error ? err.message : 'Could not send the test email.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingTest(null);
+    }
+  };
 
 
 
