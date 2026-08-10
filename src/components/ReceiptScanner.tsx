@@ -15,6 +15,7 @@ import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation'
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 import { findBestTripMatch, type TripMatch } from '@/lib/tripMatch';
+import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 
 interface ReceiptData {
   date: string;
