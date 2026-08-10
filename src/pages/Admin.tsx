@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { format, subDays, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import EmailLogPanel from '@/components/admin/EmailLogPanel';
+import ReminderPreviewPanel from '@/components/admin/ReminderPreviewPanel';
 
 const Admin = () => {
   const { user, profile } = useAuth();
@@ -556,6 +557,9 @@ const Admin = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* ─── Email Reminder Log ─── */}
+        <ReminderPreviewPanel enabled={isAdmin} />
 
         {/* ─── Email Reminder Log ─── */}
         <EmailLogPanel enabled={isAdmin} />

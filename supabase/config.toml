@@ -114,3 +114,6 @@ verify_jwt = false
 
 [functions.send-ifta-deadline-reminders]
 verify_jwt = false
+
+[functions.preview-reminder-recipients]
+verify_jwt = true
