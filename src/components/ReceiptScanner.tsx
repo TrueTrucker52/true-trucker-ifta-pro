@@ -16,8 +16,10 @@ import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Fuel, Check, Minus, X } from 'lucide-react';
+import { CalendarDays, MapPin, Fuel, Check, Minus, X, Wand2 } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
+import { useAutoAcceptMatch } from '@/hooks/useAutoAcceptMatch';
+import { AutoAcceptSettings } from '@/components/receipts/AutoAcceptSettings';
 
 interface ReceiptData {
   date: string;
@@ -67,7 +69,9 @@ export const ReceiptScanner = () => {
   const [tripSuggestion, setTripSuggestion] = useState<TripMatch | null>(null);
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
   const [feedbackByTrip, setFeedbackByTrip] = useState<Record<string, boolean>>({});
+  const [autoAccepted, setAutoAccepted] = useState(false);
   const { weights, submitFeedback } = useMatchFeedback();
+  const { settings: autoAccept } = useAutoAcceptMatch();
   const { trips } = useTrips();
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
@@ -100,6 +104,7 @@ export const ReceiptScanner = () => {
   useEffect(() => {
     if (!trips.length || !receiptData.date) {
       setTripSuggestion(null);
+      setAutoAccepted(false);
       return;
     }
     const match = findBestTripMatch(
@@ -111,7 +116,21 @@ export const ReceiptScanner = () => {
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
     }
-  }, [trips, weights, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
+    const accepted =
+      !!match && !suggestionDismissed && autoAccept.enabled && match.score >= autoAccept.threshold;
+    setAutoAccepted(accepted);
+  }, [
+    trips,
+    weights,
+    receiptData.date,
+    receiptData.stateCode,
+    receiptData.gallons,
+    suggestionDismissed,
+    selectedTripId,
+    autoAccept.enabled,
+    autoAccept.threshold,
+  ]);
+
 
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
@@ -414,7 +433,11 @@ export const ReceiptScanner = () => {
       total_amount: totalValue,
       fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
       state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
-      raw_ocr_text: sanitizeOcrText(ocrText)
+      raw_ocr_text: sanitizeOcrText(ocrText),
+      // Flag auto-accepted matches so they show up in the review list later
+      trip_auto_assigned: !!tripId && autoAccepted && tripSuggestion?.trip.id === tripId,
+      trip_match_score:
+        tripSuggestion && tripSuggestion.trip.id === tripId ? tripSuggestion.score : null,
     };
 
     const result = await saveWithOfflineSupport(
@@ -800,6 +823,21 @@ export const ReceiptScanner = () => {
               </div>
             )}
             <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+              <AutoAcceptSettings />
+              {autoAccepted && tripSuggestion && (
+                <div className="rounded-md border border-primary/40 bg-primary/10 p-3 text-sm flex items-start gap-2">
+                  <Wand2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">
+                      Auto-accepted at {tripSuggestion.score}% — above your {autoAccept.threshold}% threshold
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      Saved to {tripLabel(tripSuggestion.trip)}. It's flagged under "Review auto-matched" so you
+                      can change it later.
+                    </p>
+                  </div>
+                </div>
+              )}
               {tripSuggestion && (
                 <div className="rounded-md border border-primary/40 bg-primary/5 p-3 space-y-2">
                   <div className="flex items-start gap-2">

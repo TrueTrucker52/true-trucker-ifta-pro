@@ -1407,7 +1407,9 @@ export type Database = {
           receipt_time: string | null
           state_code: string | null
           total_amount: number | null
+          trip_auto_assigned: boolean
           trip_id: string | null
+          trip_match_score: number | null
           updated_at: string
           user_id: string
           vendor: string | null
@@ -1425,7 +1427,9 @@ export type Database = {
           receipt_time?: string | null
           state_code?: string | null
           total_amount?: number | null
+          trip_auto_assigned?: boolean
           trip_id?: string | null
+          trip_match_score?: number | null
           updated_at?: string
           user_id: string
           vendor?: string | null
@@ -1443,7 +1447,9 @@ export type Database = {
           receipt_time?: string | null
           state_code?: string | null
           total_amount?: number | null
+          trip_auto_assigned?: boolean
           trip_id?: string | null
+          trip_match_score?: number | null
           updated_at?: string
           user_id?: string
           vendor?: string | null
