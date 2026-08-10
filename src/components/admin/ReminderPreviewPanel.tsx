@@ -134,6 +134,13 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
           <Button onClick={runPreview} disabled={loading}>
             {loading ? 'Checking…' : 'Preview recipients'}
           </Button>
+          <Button
+            variant="outline"
+            onClick={downloadCsv}
+            disabled={loading || !result || result.recipients.length === 0}
+          >
+            <Download className="h-4 w-4 mr-2" /> Export CSV
+          </Button>
         </div>
 
         {loading && (
