@@ -113,7 +113,7 @@ serve(async (req) => {
       payment_method_types: ["card", "klarna", "affirm"],
 
       allow_promotion_codes: true,
-      success_url: `${safeOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${safeOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}&billing=annual&plan=${tierKey}`,
       cancel_url: `${safeOrigin}/pricing`,
 
       // The webhook reads these to grant access.
