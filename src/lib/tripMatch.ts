@@ -217,11 +217,24 @@ export const findBestTripMatch = (
   trips: TripOption[],
   weights: MatchWeights = DEFAULT_WEIGHTS
 ): TripMatch | null => {
-  if (!trips.length) return null;
+  const best = rankTripMatches(receipt, trips, weights)[0];
+  if (!best || best.score < AUTO_MATCH_THRESHOLD) return null;
+  return best;
+};
+
+/**
+ * All trips scored and ordered best-first. Unlike findBestTripMatch this ignores
+ * the threshold so the UI can offer runner-up trips as alternatives.
+ */
+export const rankTripMatches = (
+  receipt: ReceiptMatchInput,
+  trips: TripOption[],
+  weights: MatchWeights = DEFAULT_WEIGHTS,
+  limit?: number
+): TripMatch[] => {
+  if (!trips.length) return [];
   const scored = trips
     .map((t) => scoreTripMatch(receipt, t, weights))
     .sort((a, b) => b.score - a.score);
-  const best = scored[0];
-  if (!best || best.score < AUTO_MATCH_THRESHOLD) return null;
-  return best;
+  return limit ? scored.slice(0, limit) : scored;
 };

@@ -1339,6 +1339,61 @@ export type Database = {
         }
         Relationships: []
       }
+      receipt_assignment_history: {
+        Row: {
+          created_at: string
+          id: string
+          match_score: number | null
+          previous_trip_id: string | null
+          receipt_id: string
+          source: string
+          trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_score?: number | null
+          previous_trip_id?: string | null
+          receipt_id: string
+          source: string
+          trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_score?: number | null
+          previous_trip_id?: string | null
+          receipt_id?: string
+          source?: string
+          trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_assignment_history_previous_trip_id_fkey"
+            columns: ["previous_trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_assignment_history_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_assignment_history_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipt_match_feedback: {
         Row: {
           chosen_trip_id: string | null

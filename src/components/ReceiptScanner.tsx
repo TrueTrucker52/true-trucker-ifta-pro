@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap, ThumbsUp, ThumbsDown, ListOrdered, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,12 +14,14 @@ import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
-import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
+import { findBestTripMatch, rankTripMatches, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Fuel, Check, Minus, X, Wand2 } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 import { useAutoAcceptMatch } from '@/hooks/useAutoAcceptMatch';
 import { AutoAcceptSettings } from '@/components/receipts/AutoAcceptSettings';
+import { logAssignment } from '@/hooks/useAssignmentHistory';
+
 
 interface ReceiptData {
   date: string;
@@ -70,9 +72,14 @@ export const ReceiptScanner = () => {
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
   const [feedbackByTrip, setFeedbackByTrip] = useState<Record<string, boolean>>({});
   const [autoAccepted, setAutoAccepted] = useState(false);
+  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [editingMatchFields, setEditingMatchFields] = useState(false);
+  /** Manual corrections to the fields used for matching (OCR can misread them) */
+  const [matchOverrides, setMatchOverrides] = useState<{ date?: string; stateCode?: string; gallons?: string }>({});
   const { weights, submitFeedback } = useMatchFeedback();
   const { settings: autoAccept } = useAutoAcceptMatch();
   const { trips } = useTrips();
+
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
     date: '',
@@ -100,18 +107,29 @@ export const ReceiptScanner = () => {
     fuelType: 1
   });
 
+  /** Fields the matcher uses — manual overrides win over the OCR values */
+  const matchInput = useMemo(
+    () => ({
+      date: matchOverrides.date ?? receiptData.date,
+      stateCode: matchOverrides.stateCode ?? receiptData.stateCode,
+      gallons: matchOverrides.gallons ?? receiptData.gallons,
+    }),
+    [matchOverrides, receiptData.date, receiptData.stateCode, receiptData.gallons]
+  );
+
+  const matchFieldsEdited =
+    matchOverrides.date !== undefined ||
+    matchOverrides.stateCode !== undefined ||
+    matchOverrides.gallons !== undefined;
+
   // Auto-match: suggest (and preselect) the most likely trip from date/state/gallons
   useEffect(() => {
-    if (!trips.length || !receiptData.date) {
+    if (!trips.length || !matchInput.date) {
       setTripSuggestion(null);
       setAutoAccepted(false);
       return;
     }
-    const match = findBestTripMatch(
-      { date: receiptData.date, stateCode: receiptData.stateCode, gallons: receiptData.gallons },
-      trips,
-      weights
-    );
+    const match = findBestTripMatch(matchInput, trips, weights);
     setTripSuggestion(match);
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
@@ -122,14 +140,21 @@ export const ReceiptScanner = () => {
   }, [
     trips,
     weights,
-    receiptData.date,
-    receiptData.stateCode,
-    receiptData.gallons,
+    matchInput,
     suggestionDismissed,
     selectedTripId,
     autoAccept.enabled,
     autoAccept.threshold,
   ]);
+
+  /** Runner-up trips, offered when the top suggestion isn't the right one */
+  const alternatives = useMemo(() => {
+    if (!trips.length || !matchInput.date) return [];
+    return rankTripMatches(matchInput, trips, weights, 4).filter(
+      (m) => m.trip.id !== tripSuggestion?.trip.id
+    );
+  }, [trips, matchInput, weights, tripSuggestion?.trip.id]);
+
 
 
 
@@ -461,14 +486,27 @@ export const ReceiptScanner = () => {
         }
         
         // Save receipt data to database with sanitized inputs
-        const { error } = await supabase
+        const { data: inserted, error } = await supabase
           .from('receipts')
           .insert({
             ...receiptDbData,
             receipt_image_url: imageUrl,
-          });
+          })
+          .select('id')
+          .single();
         
         if (error) throw error;
+
+        // Audit trail so the assignment can be reviewed or undone later
+        if (inserted?.id) {
+          await logAssignment(user.id, {
+            receiptId: inserted.id,
+            tripId,
+            source: receiptDbData.trip_auto_assigned ? 'auto' : 'manual',
+            matchScore: receiptDbData.trip_match_score,
+          });
+        }
+
 
         // Roll the fuel purchase into the trip's fuel line
         if (tripId && addToTripFuel) {
@@ -527,6 +565,9 @@ export const ReceiptScanner = () => {
       });
       setCapturedImage(null);
       setOcrText('');
+      setMatchOverrides({});
+      setEditingMatchFields(false);
+      setShowAlternatives(false);
     }
   };
 
@@ -891,7 +932,7 @@ export const ReceiptScanner = () => {
                       </ul>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {selectedTripId !== tripSuggestion.trip.id && (
                       <Button
                         size="sm"
@@ -914,7 +955,121 @@ export const ReceiptScanner = () => {
                     >
                       Not this trip
                     </Button>
+                    {alternatives.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowAlternatives((v) => !v)}
+                      >
+                        <ListOrdered className="h-4 w-4 mr-2" />
+                        {showAlternatives ? 'Hide alternatives' : `Show top alternatives (${alternatives.length})`}
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => setEditingMatchFields((v) => !v)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      {editingMatchFields ? 'Done editing' : 'Edit suggested match fields'}
+                    </Button>
                   </div>
+
+                  {editingMatchFields && (
+                    <div className="rounded-md border border-border bg-background p-3 space-y-3">
+                      <p className="text-xs text-muted-foreground">
+                        Correct what the matcher uses. Changes here re-score the suggestion but don't touch the
+                        receipt fields above.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label htmlFor="match-date" className="text-xs">Fuel date</Label>
+                          <Input
+                            id="match-date"
+                            type="date"
+                            value={matchInput.date}
+                            onChange={(e) => setMatchOverrides((p) => ({ ...p, date: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="match-state" className="text-xs">State</Label>
+                          <Input
+                            id="match-state"
+                            value={matchInput.stateCode}
+                            maxLength={2}
+                            onChange={(e) =>
+                              setMatchOverrides((p) => ({ ...p, stateCode: e.target.value.toUpperCase() }))
+                            }
+                            placeholder="TX"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="match-gallons" className="text-xs">Gallons</Label>
+                          <Input
+                            id="match-gallons"
+                            type="number"
+                            step="0.01"
+                            value={matchInput.gallons}
+                            onChange={(e) => setMatchOverrides((p) => ({ ...p, gallons: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!matchFieldsEdited}
+                          onClick={() => setMatchOverrides({})}
+                        >
+                          Reset to scanned values
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={!matchFieldsEdited}
+                          onClick={() => {
+                            setReceiptData((prev) => ({
+                              ...prev,
+                              date: matchInput.date,
+                              stateCode: matchInput.stateCode,
+                              gallons: matchInput.gallons,
+                            }));
+                            setMatchOverrides({});
+                            toast({ title: 'Receipt fields updated', description: 'Your corrections were copied onto the receipt.' });
+                          }}
+                        >
+                          Apply to receipt fields
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {showAlternatives && alternatives.length > 0 && (
+                    <div className="rounded-md border border-border bg-background p-3 space-y-2">
+                      <p className="text-xs font-medium">Other close trips</p>
+                      {alternatives.map((alt) => (
+                        <div key={alt.trip.id} className="flex flex-wrap items-center gap-2 text-xs">
+                          <Badge variant={alt.confidence === 'high' ? 'default' : 'secondary'}>
+                            {alt.score}%
+                          </Badge>
+                          <span className="text-muted-foreground truncate">{tripLabel(alt.trip)}</span>
+                          <span className="text-muted-foreground">
+                            {alt.signalDetails.map((s) => `${s.label} +${s.points}`).join(' · ')}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="ml-auto h-7"
+                            disabled={selectedTripId === alt.trip.id}
+                            onClick={() => {
+                              setSuggestionDismissed(true);
+                              setSelectedTripId(alt.trip.id);
+                              toast({ title: 'Trip changed', description: tripLabel(alt.trip) });
+                            }}
+                          >
+                            {selectedTripId === alt.trip.id ? 'Selected' : 'Use this trip'}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 pt-1 border-t border-primary/20">
                     <span className="text-xs text-muted-foreground">Was this match right?</span>
                     <Button

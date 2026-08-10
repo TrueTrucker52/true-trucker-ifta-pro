@@ -1,6 +1,7 @@
 import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { BulkReceiptUpload } from '@/components/BulkReceiptUpload';
 import { AutoAssignedReview } from '@/components/receipts/AutoAssignedReview';
+import { AssignmentHistory } from '@/components/receipts/AssignmentHistory';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,9 +48,11 @@ const ReceiptScan = () => {
             <TabsContent value="bulk">
               <BulkReceiptUpload />
             </TabsContent>
-            <TabsContent value="review">
+            <TabsContent value="review" className="space-y-6">
               <AutoAssignedReview />
+              <AssignmentHistory />
             </TabsContent>
+
           </Tabs>
         </div>
       </main>
