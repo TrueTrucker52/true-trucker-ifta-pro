@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import IftaReminderSettingsCard from '@/components/notifications/IftaReminderSettingsCard';
+
 
 const priorityConfig: Record<string, { color: string; label: string; dot: string }> = {
   urgent: { color: 'bg-destructive text-destructive-foreground', label: 'URGENT', dot: '🔴' },
