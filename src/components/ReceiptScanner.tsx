@@ -63,6 +63,8 @@ export const ReceiptScanner = () => {
   const [addToTripFuel, setAddToTripFuel] = useState(true);
   const [tripSuggestion, setTripSuggestion] = useState<TripMatch | null>(null);
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
+  const [feedbackByTrip, setFeedbackByTrip] = useState<Record<string, boolean>>({});
+  const { weights, submitFeedback } = useMatchFeedback();
   const { trips } = useTrips();
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
