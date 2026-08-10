@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getCurrentQuarter } from "@/lib/iftaCalculations";
 
 const steps = [
   { num: "1", emoji: "🚀", title: "Sign Up Free", desc: "Create your account in 60 seconds. No credit card needed to start." },
@@ -7,12 +8,16 @@ const steps = [
   { num: "3", emoji: "📋", title: "Start Tracking", desc: "Hit the road and let TrueTrucker track everything automatically." },
 ];
 
+const QUARTER_NAMES = ["One", "Two", "Three", "Four"];
+const QUARTER_DEADLINES: Record<number, string> = { 1: "April 30", 2: "July 31", 3: "October 31", 4: "January 31" };
+
 const HowItWorks = () => {
   const navigate = useNavigate();
+  const { quarter } = getCurrentQuarter();
   return (
     <section className="bg-[hsl(var(--landing-gray))] py-20 md:py-28">
       <div className="container mx-auto px-4 text-center">
-        <h3 className="text-lg font-semibold text-destructive mb-4">⚠️ Quarter One IFTA Deadline: April 30 — File on time with TrueTrucker</h3>
+        <h3 className="text-lg font-semibold text-destructive mb-4">⚠️ Quarter {QUARTER_NAMES[quarter - 1]} IFTA Deadline: {QUARTER_DEADLINES[quarter]} — File on time with TrueTrucker</h3>
         <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-14">
           Up and running in 5 minutes ⏱️
         </h2>
