@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download, Mail } from 'lucide-react';
+import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download, Mail, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
