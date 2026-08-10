@@ -17,13 +17,38 @@ export interface MatchSignals {
   gallonsMatched: boolean;
 }
 
+/** One scoring signal, surfaced in the UI so the match can be trusted at a glance. */
+export interface MatchSignalDetail {
+  key: 'date' | 'state' | 'gallons';
+  label: string;
+  /** Points this signal contributed (after learned weighting) */
+  points: number;
+  /** Maximum points this signal can contribute */
+  max: number;
+  /** strong = full credit, partial = some credit, none = no credit / missing data */
+  strength: 'strong' | 'partial' | 'none';
+  /** Short human explanation, e.g. "Inside trip dates" */
+  detail: string;
+}
+
+export type MatchConfidence = 'high' | 'medium' | 'low';
+
 export interface TripMatch {
   trip: TripOption;
   /** 0-100 confidence */
   score: number;
+  confidence: MatchConfidence;
   reasons: string[];
   signals: MatchSignals;
+  /** Per-signal breakdown, strongest first */
+  signalDetails: MatchSignalDetail[];
 }
+
+export const confidenceLabel = (c: MatchConfidence) =>
+  c === 'high' ? 'High confidence' : c === 'medium' ? 'Medium confidence' : 'Low confidence';
+
+const toConfidence = (score: number): MatchConfidence =>
+  score >= 80 ? 'high' : score >= 55 ? 'medium' : 'low';
 
 /**
  * Learned multipliers per signal (1 = neutral). Derived from the user's
