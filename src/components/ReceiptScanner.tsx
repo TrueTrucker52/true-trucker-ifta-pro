@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2, CloudOff } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { useOfflineSync } from '@/hooks/useOfflineSync';
 import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
+import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 
 interface ReceiptData {
   date: string;
