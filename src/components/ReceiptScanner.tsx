@@ -107,18 +107,29 @@ export const ReceiptScanner = () => {
     fuelType: 1
   });
 
+  /** Fields the matcher uses — manual overrides win over the OCR values */
+  const matchInput = useMemo(
+    () => ({
+      date: matchOverrides.date ?? receiptData.date,
+      stateCode: matchOverrides.stateCode ?? receiptData.stateCode,
+      gallons: matchOverrides.gallons ?? receiptData.gallons,
+    }),
+    [matchOverrides, receiptData.date, receiptData.stateCode, receiptData.gallons]
+  );
+
+  const matchFieldsEdited =
+    matchOverrides.date !== undefined ||
+    matchOverrides.stateCode !== undefined ||
+    matchOverrides.gallons !== undefined;
+
   // Auto-match: suggest (and preselect) the most likely trip from date/state/gallons
   useEffect(() => {
-    if (!trips.length || !receiptData.date) {
+    if (!trips.length || !matchInput.date) {
       setTripSuggestion(null);
       setAutoAccepted(false);
       return;
     }
-    const match = findBestTripMatch(
-      { date: receiptData.date, stateCode: receiptData.stateCode, gallons: receiptData.gallons },
-      trips,
-      weights
-    );
+    const match = findBestTripMatch(matchInput, trips, weights);
     setTripSuggestion(match);
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
@@ -129,14 +140,21 @@ export const ReceiptScanner = () => {
   }, [
     trips,
     weights,
-    receiptData.date,
-    receiptData.stateCode,
-    receiptData.gallons,
+    matchInput,
     suggestionDismissed,
     selectedTripId,
     autoAccept.enabled,
     autoAccept.threshold,
   ]);
+
+  /** Runner-up trips, offered when the top suggestion isn't the right one */
+  const alternatives = useMemo(() => {
+    if (!trips.length || !matchInput.date) return [];
+    return rankTripMatches(matchInput, trips, weights, 4).filter(
+      (m) => m.trip.id !== tripSuggestion?.trip.id
+    );
+  }, [trips, matchInput, weights, tripSuggestion?.trip.id]);
+
 
 
 
