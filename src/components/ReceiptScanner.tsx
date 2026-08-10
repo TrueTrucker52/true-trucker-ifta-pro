@@ -103,7 +103,6 @@ export const ReceiptScanner = () => {
       weights
     );
     setTripSuggestion(match);
-    setFeedbackGiven(null);
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
     }
