@@ -139,11 +139,6 @@ const PricingSection = () => {
             );
           })}
         </div>
-
-              </article>
-            );
-          })}
-        </div>
         <p className="text-sm text-muted-foreground">
           Need more than 25 trucks?{" "}
           <a href="/contact" className="text-secondary font-semibold hover:underline">
