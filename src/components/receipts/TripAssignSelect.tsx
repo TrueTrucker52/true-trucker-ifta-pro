@@ -12,6 +12,8 @@ export interface TripOption {
   destination_city: string;
   destination_state: string;
   start_date: string;
+  end_date: string | null;
+  total_miles: number | null;
   fuel_gallons: number | null;
   fuel_cost: number | null;
 }
@@ -35,7 +37,7 @@ export const useTrips = () => {
     setLoading(true);
     supabase
       .from('trips')
-      .select('id, trip_number, origin_city, origin_state, destination_city, destination_state, start_date, fuel_gallons, fuel_cost')
+      .select('id, trip_number, origin_city, origin_state, destination_city, destination_state, start_date, end_date, total_miles, fuel_gallons, fuel_cost')
       .order('start_date', { ascending: false })
       .limit(50)
       .then(({ data }) => {
