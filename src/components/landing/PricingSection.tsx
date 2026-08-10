@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney } from "@/lib/annualPlans";
 
 const plans = [
+
   {
     name: "Solo",
     badge: "Most Popular",
