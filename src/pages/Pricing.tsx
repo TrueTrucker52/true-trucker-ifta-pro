@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Switch } from '@/components/ui/switch';
 import { ELD_CHECKOUT_PLANS, ELD_COUPON } from '@/lib/eldUpgrade';
+import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney, startAnnualCheckout } from '@/lib/annualPlans';
+import { useToast } from '@/hooks/use-toast';
 
 const plans = [
   {
@@ -115,7 +117,8 @@ const faqs = [
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
+  const { toast } = useToast();
   const { createCheckout, subscription_tier } = useSubscription();
   const [loading, setLoading] = useState<string | null>(null);
   const [annual, setAnnual] = useState(false);
@@ -123,7 +126,7 @@ const Pricing = () => {
   const [comparisonTab, setComparisonTab] = useState(0);
 
   const getPrice = (plan: typeof plans[number]) => {
-    if (annual) return Math.round(plan.monthlyPrice * 12 * 0.8);
+    if (annual) return ANNUAL_PLANS[plan.id as AnnualPlanKey].annualPrice;
     return plan.monthlyPrice;
   };
 
@@ -134,8 +137,18 @@ const Pricing = () => {
     }
     setLoading(planId);
     try {
-      const suffix = annual ? '_annual' : '';
-      await createCheckout(planId + suffix);
+      if (annual) {
+        if (!session?.access_token) throw new Error('Not signed in');
+        await startAnnualCheckout(planId as AnnualPlanKey, session.access_token);
+      } else {
+        await createCheckout(planId);
+      }
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to create checkout session. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(null);
     }
@@ -172,7 +185,7 @@ const Pricing = () => {
             <span className={`text-sm font-medium ${!annual ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
             <Switch checked={annual} onCheckedChange={setAnnual} />
             <span className={`text-sm font-medium ${annual ? 'text-foreground' : 'text-muted-foreground'}`}>Annual</span>
-            {annual && <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/30">Save 20%</Badge>}
+            {annual && <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/30">{ANNUAL_LABEL}</Badge>}
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
@@ -224,13 +237,18 @@ const Pricing = () => {
                   <p className="text-xs font-semibold tracking-wide uppercase text-primary/80">{plan.trucks}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
                   <p className="mt-4">
-                    <span className="text-4xl font-bold">${price}</span>
+                    <span className="text-4xl font-bold">${formatMoney(price)}</span>
                     <span className="text-muted-foreground">/{annual ? 'year' : 'mo'}</span>
                   </p>
                   {annual && (
-                    <p className="mt-1 text-xs font-semibold text-green-600">
-                      ${Math.round(price / 12)}/mo billed annually
-                    </p>
+                    <>
+                      <p className="mt-1 text-xs font-semibold text-green-600">
+                        {ANNUAL_LABEL} — saves ${formatMoney(ANNUAL_PLANS[plan.id as AnnualPlanKey].savings)} vs monthly
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {financingCopy(ANNUAL_PLANS[plan.id as AnnualPlanKey])}
+                      </p>
+                    </>
                   )}
                   {plan.extraTrucks && <p className="mt-1 text-xs text-muted-foreground">Extra trucks: $12/truck/mo</p>}
                   <p className="mt-1 text-xs font-semibold text-green-600">7-day free trial</p>
@@ -252,7 +270,7 @@ const Pricing = () => {
                   disabled={loading === plan.id || isCurrent}
                   size="lg"
                 >
-                  {loading === plan.id ? 'Setting up...' : isCurrent ? 'Current Plan' : 'Start Free Trial'}
+                  {loading === plan.id ? 'Setting up...' : isCurrent ? 'Current Plan' : annual ? 'Get Annual Plan' : 'Start Free Trial'}
                 </Button>
                 <p className="mt-2 text-xs text-center text-muted-foreground">Cancel anytime • No setup fees</p>
               </article>
@@ -286,7 +304,7 @@ const Pricing = () => {
               })()}
               <div>
                 <h3 className="text-lg font-bold">{plans[comparisonTab].name}</h3>
-                <p className="text-sm text-muted-foreground">{plans[comparisonTab].trucks} • ${getPrice(plans[comparisonTab])}/{annual ? 'year' : 'mo'}</p>
+                <p className="text-sm text-muted-foreground">{plans[comparisonTab].trucks} • ${formatMoney(getPrice(plans[comparisonTab]))}/{annual ? 'year' : 'mo'}</p>
               </div>
             </header>
             <ul className="space-y-3">
