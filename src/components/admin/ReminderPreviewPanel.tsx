@@ -29,6 +29,28 @@ type PreviewResult = {
 
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
 
+const CSV_HEADERS = ['Email', 'Trial ends', 'Days left', 'Would send', 'Reason', 'Tier', 'User ID'];
+
+// Guard against spreadsheet formula injection and quote embedded delimiters
+const csvCell = (value: unknown) => {
+  const raw = value === null || value === undefined ? '' : String(value);
+  const safe = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+  return `"${safe.replace(/"/g, '""')}"`;
+};
+
+const buildCsv = (result: PreviewResult) => {
+  const rows = result.recipients.map((r) => [
+    r.email,
+    r.trial_end_date,
+    r.days_left,
+    r.would_send ? 'Yes' : 'No',
+    r.reason,
+    r.subscription_tier ?? '',
+    r.user_id,
+  ]);
+  return [CSV_HEADERS, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+};
+
 const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
   const { toast } = useToast();
   const [startDate, setStartDate] = useState(iso(new Date()));
