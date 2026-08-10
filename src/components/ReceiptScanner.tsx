@@ -58,6 +58,9 @@ export const ReceiptScanner = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedTripId, setSelectedTripId] = useState<string>(UNASSIGNED);
+  const [addToTripFuel, setAddToTripFuel] = useState(true);
+  const { trips } = useTrips();
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
     date: '',
