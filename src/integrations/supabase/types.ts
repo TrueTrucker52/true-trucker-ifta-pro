@@ -1339,6 +1339,60 @@ export type Database = {
         }
         Relationships: []
       }
+      receipt_match_feedback: {
+        Row: {
+          chosen_trip_id: string | null
+          created_at: string
+          day_offset: number | null
+          gallons_matched: boolean
+          helpful: boolean
+          id: string
+          match_score: number | null
+          state_matched: boolean
+          suggested_trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          chosen_trip_id?: string | null
+          created_at?: string
+          day_offset?: number | null
+          gallons_matched?: boolean
+          helpful: boolean
+          id?: string
+          match_score?: number | null
+          state_matched?: boolean
+          suggested_trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          chosen_trip_id?: string | null
+          created_at?: string
+          day_offset?: number | null
+          gallons_matched?: boolean
+          helpful?: boolean
+          id?: string
+          match_score?: number | null
+          state_matched?: boolean
+          suggested_trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_match_feedback_chosen_trip_id_fkey"
+            columns: ["chosen_trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_match_feedback_suggested_trip_id_fkey"
+            columns: ["suggested_trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipts: {
         Row: {
           created_at: string
