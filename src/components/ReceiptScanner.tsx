@@ -773,29 +773,61 @@ export const ReceiptScanner = () => {
                 <span>You're offline. Receipt will be saved locally and synced when connection is restored.</span>
               </div>
             )}
-            
-            <Button 
-              onClick={saveReceipt} 
-              disabled={isSaving}
-              className="w-full"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : !isOnline ? (
-                <>
-                  <CloudOff className="h-4 w-4 mr-2" />
-                  Save Offline
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Receipt
-                </>
+            <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+              <TripAssignSelect
+                trips={trips}
+                value={selectedTripId}
+                onChange={setSelectedTripId}
+              />
+              {selectedTripId !== UNASSIGNED && (
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={addToTripFuel}
+                    onChange={(e) => setAddToTripFuel(e.target.checked)}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  Add gallons and cost to this trip's fuel line
+                </label>
               )}
-            </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={() => saveReceipt()}
+                disabled={isSaving}
+                variant={selectedTripId === UNASSIGNED ? 'default' : 'outline'}
+                className="w-full"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : !isOnline ? (
+                  <>
+                    <CloudOff className="h-4 w-4 mr-2" />
+                    Save Offline
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Receipt
+                  </>
+                )}
+              </Button>
+
+              {selectedTripId !== UNASSIGNED && (
+                <Button
+                  onClick={() => saveReceipt({ quick: true })}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Quick Save to Trip
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
