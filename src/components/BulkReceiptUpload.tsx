@@ -466,6 +466,31 @@ export const BulkReceiptUpload = () => {
                   <p className="text-sm font-medium truncate">{row.fileName}</p>
                   {statusBadge(row)}
                 </div>
+
+                {(row.status === 'scanning' || row.status === 'queued') && (
+                  <div className="space-y-1" aria-live="polite">
+                    <Progress value={row.progress} className="h-2" />
+                    <p className="text-xs text-muted-foreground">
+                      {PHASE_LABEL[row.phase]}
+                      {row.status === 'scanning' ? ` · ${row.progress}%` : ''}
+                    </p>
+                  </div>
+                )}
+
+                {row.status === 'error' && row.error && (
+                  <div className="flex items-start gap-2 p-2 rounded-md border border-destructive/40 bg-destructive/10 text-sm text-destructive">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>{row.error}</span>
+                  </div>
+                )}
+
+                {row.warning && row.status !== 'error' && (
+                  <div className="flex items-start gap-2 p-2 rounded-md border border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-600 text-sm text-yellow-800 dark:text-yellow-300">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>{row.warning}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <Input
                     type="date"
