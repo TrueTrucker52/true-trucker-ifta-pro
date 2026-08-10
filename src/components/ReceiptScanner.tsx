@@ -804,19 +804,53 @@ export const ReceiptScanner = () => {
                 <div className="rounded-md border border-primary/40 bg-primary/5 p-3 space-y-2">
                   <div className="flex items-start gap-2">
                     <Zap className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-medium">
-                        Suggested trip ({tripSuggestion.score}% match)
-                        {selectedTripId === tripSuggestion.trip.id && ' — preselected'}
-                      </p>
+                    <div className="text-sm flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium">Suggested trip</p>
+                        <Badge
+                          variant={
+                            tripSuggestion.confidence === 'high'
+                              ? 'default'
+                              : tripSuggestion.confidence === 'medium'
+                                ? 'secondary'
+                                : 'outline'
+                          }
+                        >
+                          {tripSuggestion.score}% · {confidenceLabel(tripSuggestion.confidence)}
+                        </Badge>
+                        {selectedTripId === tripSuggestion.trip.id && (
+                          <span className="text-xs text-muted-foreground">preselected</span>
+                        )}
+                      </div>
                       <p className="text-muted-foreground">{tripLabel(tripSuggestion.trip)}</p>
-                      {tripSuggestion.reasons.length > 0 && (
-                        <ul className="mt-1 list-disc list-inside text-xs text-muted-foreground">
-                          {tripSuggestion.reasons.map((r) => (
-                            <li key={r}>{r}</li>
-                          ))}
-                        </ul>
-                      )}
+                      <Progress value={tripSuggestion.score} className="h-1.5 mt-2" />
+                      <ul className="mt-2 space-y-1">
+                        {tripSuggestion.signalDetails.map((s) => {
+                          const SignalIcon =
+                            s.key === 'date' ? CalendarDays : s.key === 'state' ? MapPin : Fuel;
+                          const StatusIcon =
+                            s.strength === 'strong' ? Check : s.strength === 'partial' ? Minus : X;
+                          return (
+                            <li key={s.key} className="flex items-center gap-2 text-xs">
+                              <SignalIcon className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                              <span className="font-medium w-16 flex-shrink-0">{s.label}</span>
+                              <StatusIcon
+                                className={`h-3.5 w-3.5 flex-shrink-0 ${
+                                  s.strength === 'strong'
+                                    ? 'text-primary'
+                                    : s.strength === 'partial'
+                                      ? 'text-muted-foreground'
+                                      : 'text-destructive'
+                                }`}
+                              />
+                              <span className="text-muted-foreground truncate">{s.detail}</span>
+                              <span className="ml-auto text-muted-foreground tabular-nums flex-shrink-0">
+                                +{s.points}/{s.max}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
                     </div>
                   </div>
                   <div className="flex gap-2">
