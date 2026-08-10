@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTrialConversion } from '@/hooks/useTrialConversion';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Clock, Shield, Gift, MessageSquare, Check } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney, startAnnualCheckout } from '@/lib/annualPlans';
@@ -64,14 +64,30 @@ const TrialExpiryWall: React.FC = () => {
             <span className="text-green-700">Your data is safe and waiting — upgrade now to regain full access instantly.</span>
           </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <span className={`text-sm font-medium ${!annual ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
-            <Switch checked={annual} onCheckedChange={setAnnual} />
-            <span className={`text-sm font-medium ${annual ? 'text-foreground' : 'text-muted-foreground'}`}>Annual</span>
+          <div className="flex items-center justify-center gap-2">
+            <div className="inline-flex items-center bg-muted rounded-full p-1">
+              <button
+                type="button"
+                aria-pressed={!annual}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!annual ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                onClick={() => setAnnual(false)}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                aria-pressed={annual}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${annual ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                onClick={() => setAnnual(true)}
+              >
+                Annual
+              </button>
+            </div>
             {annual && (
               <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/30">{ANNUAL_LABEL}</Badge>
             )}
           </div>
+
 
           <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
             <Gift className="h-5 w-5 text-primary shrink-0" />
