@@ -353,12 +353,19 @@ export const BulkReceiptUpload = () => {
   const readyCount = rows.filter((r) => r.status === 'ready').length;
   const savedCount = rows.filter((r) => r.status === 'saved').length;
 
+  const failedCount = rows.filter((r) => r.status === 'error').length;
+
   const statusBadge = (row: BulkRow) => {
     switch (row.status) {
       case 'queued':
         return <Badge variant="secondary">Queued</Badge>;
       case 'scanning':
-        return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Scanning</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+            {PHASE_LABEL[row.phase]} {row.progress}%
+          </Badge>
+        );
       case 'ready':
         return <Badge variant="outline">Needs review</Badge>;
       case 'saving':
@@ -366,7 +373,7 @@ export const BulkReceiptUpload = () => {
       case 'saved':
         return <Badge className="bg-green-600 hover:bg-green-600"><CheckCircle2 className="h-3 w-3 mr-1" />Saved</Badge>;
       case 'error':
-        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />{row.error || 'Error'}</Badge>;
+        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />Failed</Badge>;
     }
   };
 
