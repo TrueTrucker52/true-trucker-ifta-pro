@@ -17,13 +17,38 @@ export interface MatchSignals {
   gallonsMatched: boolean;
 }
 
+/** One scoring signal, surfaced in the UI so the match can be trusted at a glance. */
+export interface MatchSignalDetail {
+  key: 'date' | 'state' | 'gallons';
+  label: string;
+  /** Points this signal contributed (after learned weighting) */
+  points: number;
+  /** Maximum points this signal can contribute */
+  max: number;
+  /** strong = full credit, partial = some credit, none = no credit / missing data */
+  strength: 'strong' | 'partial' | 'none';
+  /** Short human explanation, e.g. "Inside trip dates" */
+  detail: string;
+}
+
+export type MatchConfidence = 'high' | 'medium' | 'low';
+
 export interface TripMatch {
   trip: TripOption;
   /** 0-100 confidence */
   score: number;
+  confidence: MatchConfidence;
   reasons: string[];
   signals: MatchSignals;
+  /** Per-signal breakdown, strongest first */
+  signalDetails: MatchSignalDetail[];
 }
+
+export const confidenceLabel = (c: MatchConfidence) =>
+  c === 'high' ? 'High confidence' : c === 'medium' ? 'Medium confidence' : 'Low confidence';
+
+const toConfidence = (score: number): MatchConfidence =>
+  score >= 80 ? 'high' : score >= 55 ? 'medium' : 'low';
 
 /**
  * Learned multipliers per signal (1 = neutral). Derived from the user's
@@ -127,8 +152,60 @@ export const scoreTripMatch = (
   const weighted =
     dateScore * weights.date + stateScore * weights.state + gallonsScore * weights.gallons;
   const bias = weights.tripBias?.[trip.id] ?? 1;
+  const score = Math.round(Math.max(0, Math.min(100, weighted * bias)));
 
-  return { trip, score: Math.round(Math.max(0, Math.min(100, weighted * bias))), reasons, signals };
+  const dateDetail = !receipt.date
+    ? 'No date read from the receipt'
+    : signals.dayOffset === 0
+      ? 'Inside the trip dates'
+      : signals.dayOffset === null
+        ? 'Trip dates unavailable'
+        : `${signals.dayOffset} day${signals.dayOffset === 1 ? '' : 's'} outside the trip`;
+
+  const stateDetail = !st
+    ? 'No state read from the receipt'
+    : signals.stateMatched
+      ? `${st} matches this trip`
+      : `${st} is not on this trip`;
+
+  const gallonsDetail = !Number.isFinite(gallons) || gallons <= 0
+    ? 'No gallons read from the receipt'
+    : gallonsScore >= 15
+      ? `${gallons} gal fits the trip mileage`
+      : gallonsScore > 0
+        ? `${gallons} gal is high for this trip`
+        : `${gallons} gal looks off for this trip`;
+
+  const mk = (
+    key: MatchSignalDetail['key'],
+    label: string,
+    raw: number,
+    max: number,
+    mult: number,
+    detail: string
+  ): MatchSignalDetail => ({
+    key,
+    label,
+    points: Math.round(raw * mult * bias),
+    max,
+    strength: raw >= max ? 'strong' : raw > 0 ? 'partial' : 'none',
+    detail,
+  });
+
+  const signalDetails: MatchSignalDetail[] = [
+    mk('date', 'Date', dateScore, 55, weights.date, dateDetail),
+    mk('state', 'State', stateScore, 30, weights.state, stateDetail),
+    mk('gallons', 'Gallons', gallonsScore, 15, weights.gallons, gallonsDetail),
+  ].sort((a, b) => b.points - a.points);
+
+  return {
+    trip,
+    score,
+    confidence: toConfidence(score),
+    reasons,
+    signals,
+    signalDetails,
+  };
 };
 
 /** Minimum score before we preselect a trip for the user. */
