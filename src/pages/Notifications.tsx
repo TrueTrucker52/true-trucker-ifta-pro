@@ -72,9 +72,15 @@ const Notifications = () => {
         </div>
       </div>
 
+      {/* IFTA deadline reminder emails */}
+      <div className="px-4 pt-3">
+        <IftaReminderSettingsCard />
+      </div>
+
       {/* Tabs */}
       <div className="px-4 pt-3">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
+
           <TabsList className="w-full">
             <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
             <TabsTrigger value="unread" className="flex-1">
