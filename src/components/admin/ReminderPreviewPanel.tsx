@@ -78,6 +78,25 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
     }
   };
 
+  const downloadCsv = () => {
+    if (!result || result.recipients.length === 0) return;
+    const blob = new Blob([`\uFEFF${buildCsv(result)}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reminder-recipients-${result.window.start_date}-to-${result.window.end_date}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({
+      title: 'CSV exported',
+      description: `${result.recipients.length} recipient${result.recipients.length === 1 ? '' : 's'} downloaded.`,
+    });
+  };
+
+
+
   if (!enabled) return null;
 
   return (
