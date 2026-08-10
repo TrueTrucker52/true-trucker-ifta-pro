@@ -888,7 +888,6 @@ export const ReceiptScanner = () => {
                     )}
                   </div>
                 </div>
-                </div>
               )}
               <TripAssignSelect
                 trips={trips}
