@@ -20,6 +20,17 @@ export const ANNUAL_PLANS: Record<AnnualPlanKey, AnnualPlan> = {
 
 export const ANNUAL_LABEL = '2 months free';
 
+export const ANNUAL_PLAN_NAMES: Record<AnnualPlanKey, string> = {
+  solo: 'Solo',
+  small_fleet: 'Small Fleet',
+  fleet_pro: 'Fleet Pro',
+  enterprise: 'Enterprise',
+};
+
+export const isAnnualPlanKey = (value: string | null): value is AnnualPlanKey =>
+  !!value && value in ANNUAL_PLANS;
+
+
 export const formatMoney = (value: number) =>
   value.toLocaleString('en-US', { minimumFractionDigits: value % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 });
 
