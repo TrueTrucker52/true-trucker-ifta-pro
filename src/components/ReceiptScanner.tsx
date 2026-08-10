@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2, CloudOff } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { useOfflineSync } from '@/hooks/useOfflineSync';
 import Tesseract from 'tesseract.js';
 import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation';
 import { validateFileUpload } from '@/lib/securityMonitoring';
+import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 
 interface ReceiptData {
   date: string;
@@ -57,6 +58,9 @@ export const ReceiptScanner = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedTripId, setSelectedTripId] = useState<string>(UNASSIGNED);
+  const [addToTripFuel, setAddToTripFuel] = useState(true);
+  const { trips } = useTrips();
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
     date: '',
@@ -315,11 +319,22 @@ export const ReceiptScanner = () => {
     }
   };
 
-  const saveReceipt = async () => {
+  const saveReceipt = async (options?: { quick?: boolean }) => {
+    const quick = options?.quick === true;
+
     if (!user) {
       toast({
         title: "Authentication Required",
         description: "Please log in to save receipts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (quick && selectedTripId === UNASSIGNED) {
+      toast({
+        title: "Pick a trip first",
+        description: "Choose the trip this receipt belongs to, then quick save.",
         variant: "destructive",
       });
       return;
@@ -346,17 +361,31 @@ export const ReceiptScanner = () => {
       return;
     }
 
+    if (quick && (!receiptData.gallons || !receiptData.totalAmount)) {
+      toast({
+        title: "Missing fuel amounts",
+        description: "Quick save needs gallons and total amount from the receipt.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
-    
+
+    const tripId = selectedTripId === UNASSIGNED ? null : selectedTripId;
+    const gallonsValue = receiptData.gallons ? parseFloat(receiptData.gallons) : null;
+    const totalValue = receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : null;
+
     const receiptDbData = {
       user_id: user.id,
+      trip_id: tripId,
       receipt_date: receiptData.date || new Date().toISOString().split('T')[0],
       receipt_time: receiptData.time || null,
       location: receiptData.location ? sanitizeInput(receiptData.location) : null,
       vendor: receiptData.vendor ? sanitizeInput(receiptData.vendor) : null,
-      gallons: receiptData.gallons ? parseFloat(receiptData.gallons) : null,
+      gallons: gallonsValue,
       price_per_gallon: receiptData.pricePerGallon ? parseFloat(receiptData.pricePerGallon) : null,
-      total_amount: receiptData.totalAmount ? parseFloat(receiptData.totalAmount) : null,
+      total_amount: totalValue,
       fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
       state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
       raw_ocr_text: sanitizeOcrText(ocrText)
@@ -391,6 +420,20 @@ export const ReceiptScanner = () => {
           });
         
         if (error) throw error;
+
+        // Roll the fuel purchase into the trip's fuel line
+        if (tripId && addToTripFuel) {
+          const trip = trips.find(t => t.id === tripId);
+          const { error: tripError } = await supabase
+            .from('trips')
+            .update({
+              fuel_gallons: Number(((trip?.fuel_gallons || 0) + (gallonsValue || 0)).toFixed(3)),
+              fuel_cost: Number(((trip?.fuel_cost || 0) + (totalValue || 0)).toFixed(2)),
+            })
+            .eq('id', tripId);
+          if (tripError) throw tripError;
+        }
+
         return { success: true };
       }
     );
@@ -398,11 +441,14 @@ export const ReceiptScanner = () => {
     setIsSaving(false);
 
     if (result.success) {
+      const trip = trips.find(t => t.id === tripId);
       toast({
-        title: result.offline ? "Saved Offline" : "Receipt Saved",
+        title: result.offline ? "Saved Offline" : trip ? "Receipt Assigned to Trip" : "Receipt Saved",
         description: result.offline 
           ? "Your receipt has been saved locally and will sync when online."
-          : "Your fuel receipt has been saved successfully.",
+          : trip
+            ? `Filed to ${tripLabel(trip)}${addToTripFuel ? ' and added to its fuel line.' : '.'}`
+            : "Your fuel receipt has been saved successfully.",
       });
       
       // Reset form
@@ -727,29 +773,61 @@ export const ReceiptScanner = () => {
                 <span>You're offline. Receipt will be saved locally and synced when connection is restored.</span>
               </div>
             )}
-            
-            <Button 
-              onClick={saveReceipt} 
-              disabled={isSaving}
-              className="w-full"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : !isOnline ? (
-                <>
-                  <CloudOff className="h-4 w-4 mr-2" />
-                  Save Offline
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Receipt
-                </>
+            <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+              <TripAssignSelect
+                trips={trips}
+                value={selectedTripId}
+                onChange={setSelectedTripId}
+              />
+              {selectedTripId !== UNASSIGNED && (
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={addToTripFuel}
+                    onChange={(e) => setAddToTripFuel(e.target.checked)}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  Add gallons and cost to this trip's fuel line
+                </label>
               )}
-            </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={() => saveReceipt()}
+                disabled={isSaving}
+                variant={selectedTripId === UNASSIGNED ? 'default' : 'outline'}
+                className="w-full"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : !isOnline ? (
+                  <>
+                    <CloudOff className="h-4 w-4 mr-2" />
+                    Save Offline
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Receipt
+                  </>
+                )}
+              </Button>
+
+              {selectedTripId !== UNASSIGNED && (
+                <Button
+                  onClick={() => saveReceipt({ quick: true })}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Quick Save to Trip
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
