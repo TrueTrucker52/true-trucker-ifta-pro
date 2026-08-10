@@ -19,6 +19,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import { cn } from '@/lib/utils';
 import { useSubscription } from '@/hooks/useSubscription';
 import ELDUpgradeBanner from '@/components/eld/ELDUpgradeBanner';
+import { getCurrentQuarter } from '@/lib/iftaCalculations';
 
 function getQuarterLabel(dateStr: string) {
   const d = new Date(dateStr);
@@ -40,6 +41,7 @@ const FleetDashboard = () => {
   const [truckInput, setTruckInput] = useState('');
   const [bolSearch, setBolSearch] = useState('');
   const [bolFilter, setBolFilter] = useState('all');
+  const { quarter: currentQuarter, year: currentQuarterYear } = getCurrentQuarter();
 
   // ─── Data fetching ───
   const { data: fleet, isLoading: fleetLoading } = useQuery({
@@ -435,7 +437,7 @@ const FleetDashboard = () => {
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Fleet IFTA Reports</h2>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline"><FileText className="h-4 w-4 mr-2" /> Generate Combined Fleet Report</Button>
-            <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download All Q1 Reports</Button>
+            <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download All Q{currentQuarter} Reports</Button>
           </div>
           {activeDriverIds.length > 0 && (
             <div className="flex flex-wrap gap-3">
@@ -444,7 +446,7 @@ const FleetDashboard = () => {
                 const status = (stats?.submitted ?? 0) > 0 ? '✅' : (stats?.pending ?? 0) > 0 ? '⏳' : '📝';
                 return (
                   <Badge key={id} variant="secondary" className="text-sm py-1 px-3">
-                    {driverName(id)} — Q1 2026 {status}
+                    {driverName(id)} — Q{currentQuarter} {currentQuarterYear} {status}
                   </Badge>
                 );
               })}

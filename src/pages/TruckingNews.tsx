@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '@/components/BottomNavigation';
+import { getCurrentQuarter } from '@/lib/iftaCalculations';
 
 interface NewsArticle {
   id: string;
@@ -26,15 +27,28 @@ interface FeaturedAlert {
 }
 
 // Featured IFTA alerts - can be managed by admin
-const featuredAlerts: FeaturedAlert[] = [
-  {
+const QUARTER_DEADLINE_DATES: Record<number, { month: number; day: number }> = {
+  1: { month: 3, day: 30 }, 2: { month: 6, day: 31 }, 3: { month: 9, day: 31 }, 4: { month: 0, day: 31 },
+};
+
+function getUpcomingDeadlineAlert(): FeaturedAlert {
+  const { quarter, year } = getCurrentQuarter();
+  const dl = QUARTER_DEADLINE_DATES[quarter];
+  const deadlineYear = quarter === 4 ? year + 1 : year;
+  const deadlineDate = new Date(deadlineYear, dl.month, dl.day);
+  const deadlineLabel = deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return {
     id: '1',
-    title: 'Q4 2025 IFTA Filing Deadline',
-    description: 'File your Q4 IFTA return by January 31, 2026. Late filings may result in penalties and interest charges.',
+    title: `Q${quarter} ${year} IFTA Filing Deadline`,
+    description: `File your Q${quarter} IFTA return by ${deadlineLabel}. Late filings may result in penalties and interest charges.`,
     type: 'deadline',
-    date: '2026-01-31',
+    date: deadlineDate.toISOString().slice(0, 10),
     priority: 'high',
-  },
+  };
+}
+
+const featuredAlerts: FeaturedAlert[] = [
+  getUpcomingDeadlineAlert(),
   {
     id: '2',
     title: 'Oregon Fuel Tax Rate Change',

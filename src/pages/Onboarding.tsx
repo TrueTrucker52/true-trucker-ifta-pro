@@ -11,12 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { OptimizedLoadingState } from '@/components/OptimizedLoadingState';
 import { US_STATES } from '@/lib/usStates';
+import { getCurrentQuarter } from '@/lib/iftaCalculations';
 import {
   Truck, User, Users, MapPin, Camera, Bell, Map,
   ChevronRight, Check, Sparkles, HelpCircle, Phone
 } from 'lucide-react';
 
 const TOTAL_STEPS = 7;
+const QUARTER_DEADLINES: Record<number, string> = { 1: 'April 30', 2: 'July 31', 3: 'October 31', 4: 'January 31' };
 
 const Onboarding: React.FC = () => {
   const { user, profile } = useAuth();
@@ -720,6 +722,8 @@ const Onboarding: React.FC = () => {
 
   // Completion screen after step 7
   if (currentStep > TOTAL_STEPS || onboarding.isComplete) {
+    const { quarter: dueQuarter, year: dueYear } = getCurrentQuarter();
+    const deadlineYear = dueQuarter === 4 ? dueYear + 1 : dueYear;
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full text-center space-y-6">
@@ -740,7 +744,7 @@ const Onboarding: React.FC = () => {
           </Card>
           <div className="bg-muted/50 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Your next IFTA deadline:</p>
-            <p className="font-semibold text-foreground">📅 Q1 2026 — Due April 30, 2026</p>
+            <p className="font-semibold text-foreground">📅 Q{dueQuarter} {dueYear} — Due {QUARTER_DEADLINES[dueQuarter]}, {deadlineYear}</p>
           </div>
           <Button size="lg" className="w-full" onClick={handleFinish}>
             🚛 Go to My Dashboard

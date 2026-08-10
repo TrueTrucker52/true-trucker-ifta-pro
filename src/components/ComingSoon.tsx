@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Clock, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentQuarter } from "@/lib/iftaCalculations";
 
 interface ComingSoonProps {
   title: string;
@@ -10,11 +11,16 @@ interface ComingSoonProps {
   expectedDate?: string;
 }
 
-export const ComingSoon = ({ 
-  title, 
-  description, 
+function getNextQuarterLabel() {
+  const { quarter, year } = getCurrentQuarter();
+  return quarter === 4 ? `Q1 ${year + 1}` : `Q${quarter + 1} ${year}`;
+}
+
+export const ComingSoon = ({
+  title,
+  description,
   icon: Icon = Clock,
-  expectedDate = "Q1 2026"
+  expectedDate = getNextQuarterLabel()
 }: ComingSoonProps) => {
   const navigate = useNavigate();
 
