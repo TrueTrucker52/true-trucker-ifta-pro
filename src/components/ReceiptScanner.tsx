@@ -794,11 +794,60 @@ export const ReceiptScanner = () => {
               </div>
             )}
             <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+              {tripSuggestion && (
+                <div className="rounded-md border border-primary/40 bg-primary/5 p-3 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <Zap className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium">
+                        Suggested trip ({tripSuggestion.score}% match)
+                        {selectedTripId === tripSuggestion.trip.id && ' — preselected'}
+                      </p>
+                      <p className="text-muted-foreground">{tripLabel(tripSuggestion.trip)}</p>
+                      {tripSuggestion.reasons.length > 0 && (
+                        <ul className="mt-1 list-disc list-inside text-xs text-muted-foreground">
+                          {tripSuggestion.reasons.map((r) => (
+                            <li key={r}>{r}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {selectedTripId !== tripSuggestion.trip.id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSuggestionDismissed(false);
+                          setSelectedTripId(tripSuggestion.trip.id);
+                        }}
+                      >
+                        Use suggestion
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setSuggestionDismissed(true);
+                        if (selectedTripId === tripSuggestion.trip.id) setSelectedTripId(UNASSIGNED);
+                      }}
+                    >
+                      Not this trip
+                    </Button>
+                  </div>
+                </div>
+              )}
               <TripAssignSelect
                 trips={trips}
                 value={selectedTripId}
-                onChange={setSelectedTripId}
+                onChange={(v) => {
+                  setSuggestionDismissed(true);
+                  setSelectedTripId(v);
+                }}
               />
+
               {selectedTripId !== UNASSIGNED && (
                 <label className="flex items-center gap-2 text-sm text-muted-foreground">
                   <input
