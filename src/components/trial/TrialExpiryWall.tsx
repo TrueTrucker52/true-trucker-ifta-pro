@@ -134,8 +134,9 @@ const TrialExpiryWall: React.FC = () => {
                   </Button>
                   {annual && (
                     <p className="text-xs text-center text-muted-foreground">
-                      Saves ${formatMoney(annualPlan.savings)} vs monthly · {financingCopy(annualPlan)}
+                      {ANNUAL_LABEL} — saves ${formatMoney(annualPlan.savings)} vs monthly · {financingCopy(annualPlan)}
                     </p>
+
                   )}
                 </div>
               );
