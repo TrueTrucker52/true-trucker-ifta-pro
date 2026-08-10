@@ -7,6 +7,7 @@ const plans = [
 
   {
     name: "Solo",
+    key: "solo" as AnnualPlanKey,
     badge: "Most Popular",
     monthly: 39,
     trucks: "1 truck included",
@@ -15,6 +16,7 @@ const plans = [
   },
   {
     name: "Small Fleet",
+    key: "small_fleet" as AnnualPlanKey,
     badge: "Best Value",
     monthly: 79,
     trucks: "2–5 trucks included",
@@ -24,6 +26,7 @@ const plans = [
   },
   {
     name: "Fleet Pro",
+    key: "fleet_pro" as AnnualPlanKey,
     badge: null,
     monthly: 129,
     trucks: "6–10 trucks included",
@@ -32,6 +35,7 @@ const plans = [
   },
   {
     name: "Enterprise",
+    key: "enterprise" as AnnualPlanKey,
     badge: null,
     monthly: 199,
     trucks: "11–25 trucks included",
