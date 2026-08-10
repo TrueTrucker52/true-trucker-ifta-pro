@@ -104,6 +104,7 @@ export const ReceiptScanner = () => {
   useEffect(() => {
     if (!trips.length || !receiptData.date) {
       setTripSuggestion(null);
+      setAutoAccepted(false);
       return;
     }
     const match = findBestTripMatch(
@@ -115,7 +116,21 @@ export const ReceiptScanner = () => {
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
     }
-  }, [trips, weights, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
+    const accepted =
+      !!match && !suggestionDismissed && autoAccept.enabled && match.score >= autoAccept.threshold;
+    setAutoAccepted(accepted);
+  }, [
+    trips,
+    weights,
+    receiptData.date,
+    receiptData.stateCode,
+    receiptData.gallons,
+    suggestionDismissed,
+    selectedTripId,
+    autoAccept.enabled,
+    autoAccept.threshold,
+  ]);
+
 
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
