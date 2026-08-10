@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { ANNUAL_PLANS, ANNUAL_LABEL, AnnualPlanKey, financingCopy, formatMoney } from "@/lib/annualPlans";
 
 const plans = [
+
   {
     name: "Solo",
+    key: "solo" as AnnualPlanKey,
     badge: "Most Popular",
     monthly: 39,
     trucks: "1 truck included",
@@ -13,6 +16,7 @@ const plans = [
   },
   {
     name: "Small Fleet",
+    key: "small_fleet" as AnnualPlanKey,
     badge: "Best Value",
     monthly: 79,
     trucks: "2–5 trucks included",
@@ -22,6 +26,7 @@ const plans = [
   },
   {
     name: "Fleet Pro",
+    key: "fleet_pro" as AnnualPlanKey,
     badge: null,
     monthly: 129,
     trucks: "6–10 trucks included",
@@ -30,6 +35,7 @@ const plans = [
   },
   {
     name: "Enterprise",
+    key: "enterprise" as AnnualPlanKey,
     badge: null,
     monthly: 199,
     trucks: "11–25 trucks included",
@@ -63,13 +69,13 @@ const PricingSection = () => {
             className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${annual ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             onClick={() => setAnnual(true)}
           >
-            Annual — Save 20%
+            Annual — {ANNUAL_LABEL}
           </button>
         </div>
 
         <div className="grid max-w-6xl gap-6 mx-auto mb-10 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((p) => {
-            const price = annual ? Math.round(p.monthly * 0.8) : p.monthly;
+            const annualPlan = ANNUAL_PLANS[p.key];
             return (
               <article
                 key={p.name}
@@ -88,9 +94,23 @@ const PricingSection = () => {
                   <h3 className="mb-1 text-lg font-bold text-card-foreground">{p.name}</h3>
                   <p className="text-sm text-muted-foreground">{p.trucks}</p>
                   <div className="mt-4">
-                  <span className="text-4xl font-extrabold text-foreground">${price}</span>
-                  <span className="text-muted-foreground">/mo</span>
+                    <span className="text-4xl font-extrabold text-foreground">
+                      ${annual ? formatMoney(annualPlan.annualPrice) : p.monthly}
+                    </span>
+                    <span className="text-muted-foreground">{annual ? "/yr" : "/mo"}</span>
                   </div>
+                  {annual ? (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs font-semibold text-accent">
+                        {ANNUAL_LABEL} — saves ${formatMoney(annualPlan.savings)} vs monthly
+                      </p>
+                      <p className="text-xs text-muted-foreground">{financingCopy(annualPlan)}</p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Billed monthly · cancel anytime
+                    </p>
+                  )}
                 </header>
                 <ul className="flex-1 mb-6 space-y-2">
                   {p.features.map((f) => (
@@ -107,9 +127,13 @@ const PricingSection = () => {
                   className={p.highlight ? "bg-secondary hover:bg-secondary/90 w-full" : "w-full"}
                   asChild
                 >
-                  <a href={p.link} target="_blank" rel="noopener noreferrer">
-                    Start Free Trial →
-                  </a>
+                  {annual ? (
+                    <a href="/pricing">Get Annual Plan →</a>
+                  ) : (
+                    <a href={p.link} target="_blank" rel="noopener noreferrer">
+                      Start 7‑Day Free Trial →
+                    </a>
+                  )}
                 </Button>
               </article>
             );
