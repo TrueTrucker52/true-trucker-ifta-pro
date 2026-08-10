@@ -433,7 +433,11 @@ export const ReceiptScanner = () => {
       total_amount: totalValue,
       fuel_tax: receiptData.fuelTax ? parseFloat(receiptData.fuelTax) : null,
       state_code: receiptData.stateCode ? receiptData.stateCode.toUpperCase().substring(0, 2) : null,
-      raw_ocr_text: sanitizeOcrText(ocrText)
+      raw_ocr_text: sanitizeOcrText(ocrText),
+      // Flag auto-accepted matches so they show up in the review list later
+      trip_auto_assigned: !!tripId && autoAccepted && tripSuggestion?.trip.id === tripId,
+      trip_match_score:
+        tripSuggestion && tripSuggestion.trip.id === tripId ? tripSuggestion.score : null,
     };
 
     const result = await saveWithOfflineSupport(
