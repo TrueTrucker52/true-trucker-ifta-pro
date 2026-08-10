@@ -253,12 +253,28 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
                   {result.templates.map((t) => (
                     <TabsContent key={t.lead_days} value={String(t.lead_days)} className="space-y-2">
                       <div className="border rounded-md p-3 space-y-1">
-                        <p className="text-xs text-muted-foreground">Subject</p>
-                        <p className="text-sm font-medium break-words">{t.subject}</p>
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Subject</p>
+                            <p className="text-sm font-medium break-words">{t.subject}</p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => sendTest(t.lead_days)}
+                            disabled={sendingTest !== null}
+                          >
+                            <Send className="h-4 w-4 mr-2" />
+                            {sendingTest === t.lead_days ? 'Sending…' : 'Send test email'}
+                          </Button>
+                        </div>
                         <p className="text-xs text-muted-foreground pt-1">
                           {t.recipient_count === 0
                             ? 'No recipients in this window for this tier.'
                             : `Goes to: ${t.recipients.join(', ')}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Test sends go only to your own admin email — no trial users are contacted.
                         </p>
                       </div>
                       <div className="border rounded-md overflow-hidden bg-background">
