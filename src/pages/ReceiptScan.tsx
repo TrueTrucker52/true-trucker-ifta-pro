@@ -34,9 +34,21 @@ const ReceiptScan = () => {
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <ReceiptScanner />
+          <Tabs defaultValue="single">
+            <TabsList className="mb-6">
+              <TabsTrigger value="single">Single Receipt</TabsTrigger>
+              <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+            </TabsList>
+            <TabsContent value="single">
+              <ReceiptScanner />
+            </TabsContent>
+            <TabsContent value="bulk">
+              <BulkReceiptUpload />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
+
     </div>
   );
 };
