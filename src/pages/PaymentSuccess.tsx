@@ -29,9 +29,13 @@ const PaymentSuccess = () => {
       return;
     }
 
+    // Annual one-time purchases are confirmed by AnnualPurchaseConfirmation instead
+    if (isAnnual) return;
+
     const verifyPayment = async () => {
       try {
         const sessionId = searchParams.get('session_id');
+
 
         if (sessionId && session?.access_token) {
           await supabase.functions.invoke('sync-eld-checkout', {
