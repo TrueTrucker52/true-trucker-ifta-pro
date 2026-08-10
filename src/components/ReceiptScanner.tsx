@@ -18,6 +18,8 @@ import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMa
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Fuel, Check, Minus, X } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
+import { useAutoAcceptMatch } from '@/hooks/useAutoAcceptMatch';
+import { AutoAcceptSettings } from '@/components/receipts/AutoAcceptSettings';
 
 interface ReceiptData {
   date: string;
