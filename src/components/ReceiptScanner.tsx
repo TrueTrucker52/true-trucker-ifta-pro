@@ -16,7 +16,7 @@ import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 import { findBestTripMatch, confidenceLabel, type TripMatch } from '@/lib/tripMatch';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Fuel, Check, Minus, X } from 'lucide-react';
+import { CalendarDays, MapPin, Fuel, Check, Minus, X, Wand2 } from 'lucide-react';
 import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 import { useAutoAcceptMatch } from '@/hooks/useAutoAcceptMatch';
 import { AutoAcceptSettings } from '@/components/receipts/AutoAcceptSettings';
