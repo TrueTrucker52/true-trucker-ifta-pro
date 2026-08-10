@@ -823,6 +823,21 @@ export const ReceiptScanner = () => {
               </div>
             )}
             <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+              <AutoAcceptSettings />
+              {autoAccepted && tripSuggestion && (
+                <div className="rounded-md border border-primary/40 bg-primary/10 p-3 text-sm flex items-start gap-2">
+                  <Wand2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">
+                      Auto-accepted at {tripSuggestion.score}% — above your {autoAccept.threshold}% threshold
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      Saved to {tripLabel(tripSuggestion.trip)}. It's flagged under "Review auto-matched" so you
+                      can change it later.
+                    </p>
+                  </div>
+                </div>
+              )}
               {tripSuggestion && (
                 <div className="rounded-md border border-primary/40 bg-primary/5 p-3 space-y-2">
                   <div className="flex items-start gap-2">
