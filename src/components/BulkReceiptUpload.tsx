@@ -562,6 +562,17 @@ export const BulkReceiptUpload = () => {
                       Save this one
                     </Button>
                   )}
+                  {row.status !== 'saved' && row.status !== 'scanning' && row.status !== 'saving' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => retryRow(row)}
+                      disabled={isProcessing || isSaving}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Retry scan
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="ghost"
