@@ -105,3 +105,6 @@ verify_jwt = false
 
 [functions.process-referral]
 verify_jwt = false
+
+[functions.create-annual-checkout]
+verify_jwt = true
