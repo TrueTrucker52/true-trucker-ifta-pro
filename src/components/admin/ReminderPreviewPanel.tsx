@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Eye, CheckCircle2, MinusCircle, AlertCircle } from 'lucide-react';
+import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +28,28 @@ type PreviewResult = {
 };
 
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
+
+const CSV_HEADERS = ['Email', 'Trial ends', 'Days left', 'Would send', 'Reason', 'Tier', 'User ID'];
+
+// Guard against spreadsheet formula injection and quote embedded delimiters
+const csvCell = (value: unknown) => {
+  const raw = value === null || value === undefined ? '' : String(value);
+  const safe = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+  return `"${safe.replace(/"/g, '""')}"`;
+};
+
+const buildCsv = (result: PreviewResult) => {
+  const rows = result.recipients.map((r) => [
+    r.email,
+    r.trial_end_date,
+    r.days_left,
+    r.would_send ? 'Yes' : 'No',
+    r.reason,
+    r.subscription_tier ?? '',
+    r.user_id,
+  ]);
+  return [CSV_HEADERS, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+};
 
 const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
   const { toast } = useToast();
@@ -55,6 +77,25 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
       setLoading(false);
     }
   };
+
+  const downloadCsv = () => {
+    if (!result || result.recipients.length === 0) return;
+    const blob = new Blob([`\uFEFF${buildCsv(result)}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reminder-recipients-${result.window.start_date}-to-${result.window.end_date}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({
+      title: 'CSV exported',
+      description: `${result.recipients.length} recipient${result.recipients.length === 1 ? '' : 's'} downloaded.`,
+    });
+  };
+
+
 
   if (!enabled) return null;
 
@@ -92,6 +133,13 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
           </div>
           <Button onClick={runPreview} disabled={loading}>
             {loading ? 'Checking…' : 'Preview recipients'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={downloadCsv}
+            disabled={loading || !result || result.recipients.length === 0}
+          >
+            <Download className="h-4 w-4 mr-2" /> Export CSV
           </Button>
         </div>
 
