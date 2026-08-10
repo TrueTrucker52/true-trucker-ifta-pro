@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Resend } from "npm:resend@4.0.0";
+import { getTrialReminderEmail } from "../_shared/trialReminderEmail.ts";
 
 // Note: This function is called by cron jobs, so we keep permissive CORS for internal calls
 // but still validate origin when available
