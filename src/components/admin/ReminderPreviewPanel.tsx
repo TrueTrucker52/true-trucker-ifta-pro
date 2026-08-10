@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download, Mail } from 'lucide-react';
+import { Eye, CheckCircle2, MinusCircle, AlertCircle, Download, Mail, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -67,6 +67,7 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
   const [endDate, setEndDate] = useState(iso(addDays(new Date(), 6)));
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PreviewResult | null>(null);
+  const [sendingTest, setSendingTest] = useState<number | null>(null);
 
   const runPreview = async () => {
     setLoading(true);
@@ -103,6 +104,28 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
       title: 'CSV exported',
       description: `${result.recipients.length} recipient${result.recipients.length === 1 ? '' : 's'} downloaded.`,
     });
+  };
+  const sendTest = async (leadDays: number) => {
+    setSendingTest(leadDays);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-test-reminder-email', {
+        body: { lead_days: leadDays, start_date: startDate, end_date: endDate },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: 'Test email sent',
+        description: `The ${leadDays}-day reminder was sent to ${data.sent_to}.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Test email failed',
+        description: err instanceof Error ? err.message : 'Could not send the test email.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingTest(null);
+    }
   };
 
 
@@ -230,12 +253,28 @@ const ReminderPreviewPanel = ({ enabled }: { enabled: boolean }) => {
                   {result.templates.map((t) => (
                     <TabsContent key={t.lead_days} value={String(t.lead_days)} className="space-y-2">
                       <div className="border rounded-md p-3 space-y-1">
-                        <p className="text-xs text-muted-foreground">Subject</p>
-                        <p className="text-sm font-medium break-words">{t.subject}</p>
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Subject</p>
+                            <p className="text-sm font-medium break-words">{t.subject}</p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => sendTest(t.lead_days)}
+                            disabled={sendingTest !== null}
+                          >
+                            <Send className="h-4 w-4 mr-2" />
+                            {sendingTest === t.lead_days ? 'Sending…' : 'Send test email'}
+                          </Button>
+                        </div>
                         <p className="text-xs text-muted-foreground pt-1">
                           {t.recipient_count === 0
                             ? 'No recipients in this window for this tier.'
                             : `Goes to: ${t.recipients.join(', ')}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Test sends go only to your own admin email — no trial users are contacted.
                         </p>
                       </div>
                       <div className="border rounded-md overflow-hidden bg-background">

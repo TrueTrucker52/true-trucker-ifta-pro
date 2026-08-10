@@ -117,3 +117,6 @@ verify_jwt = false
 
 [functions.preview-reminder-recipients]
 verify_jwt = true
+
+[functions.send-test-reminder-email]
+verify_jwt = true
