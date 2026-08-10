@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Layers, Save, Loader2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Upload, Layers, Save, Loader2, Trash2, CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +28,7 @@ interface BulkFields {
 }
 
 type RowStatus = 'queued' | 'scanning' | 'ready' | 'saving' | 'saved' | 'error';
+type RowPhase = 'waiting' | 'ocr' | 'enhancing' | 'done';
 
 interface BulkRow {
   id: string;
@@ -38,7 +39,19 @@ interface BulkRow {
   confidence: Partial<Record<keyof BulkFields, number>>;
   status: RowStatus;
   error?: string;
+  /** Non-blocking notice, e.g. AI enhancement unavailable */
+  warning?: string;
+  /** 0-100 progress for the current row */
+  progress: number;
+  phase: RowPhase;
 }
+
+const PHASE_LABEL: Record<RowPhase, string> = {
+  waiting: 'Waiting in queue',
+  ocr: 'Reading text (OCR)',
+  enhancing: 'Enhancing with AI',
+  done: 'Finished',
+};
 
 const emptyFields = (): BulkFields => ({
   date: '',
@@ -93,39 +106,109 @@ export const BulkReceiptUpload = () => {
 
   const [rows, setRows] = useState<BulkRow[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [queueTotal, setQueueTotal] = useState(0);
+  const [queueDone, setQueueDone] = useState(0);
+  const [currentFile, setCurrentFile] = useState<string>('');
+  const [currentRowProgress, setCurrentRowProgress] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+
+  const overallProgress =
+    queueTotal === 0 ? 0 : Math.min(100, Math.round(((queueDone + currentRowProgress / 100) / queueTotal) * 100));
 
   const updateRow = (id: string, patch: Partial<BulkRow>) =>
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
   const scanRow = async (row: BulkRow) => {
-    updateRow(row.id, { status: 'scanning' });
+    setCurrentFile(row.fileName);
+    setCurrentRowProgress(0);
+    updateRow(row.id, { status: 'scanning', phase: 'ocr', progress: 0, error: undefined, warning: undefined });
+
+    let ocrText = '';
     try {
-      const { data: { text } } = await Tesseract.recognize(row.imageData, 'eng');
-      const ocrText = sanitizeOcrText(text);
-      const basic = basicExtract(ocrText);
-      let fields: BulkFields = { ...emptyFields(), ...basic };
-      let confidence: Partial<Record<keyof BulkFields, number>> = {};
-
-      try {
-        const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
-          body: { ocrText: stripPotentialPII(ocrText), extractedData: basic },
-        });
-        if (error) throw error;
-        if (data?.enhancedData) {
-          const { confidence: conf, ...enhanced } = data.enhancedData;
-          fields = { ...fields, ...enhanced };
-          if (conf) confidence = conf;
-        }
-      } catch (e) {
-        console.error('AI enhancement failed for bulk row, using basic extraction:', e);
-      }
-
-      updateRow(row.id, { ocrText, fields, confidence, status: 'ready' });
+      const { data: { text } } = await Tesseract.recognize(row.imageData, 'eng', {
+        logger: (m: { status?: string; progress?: number }) => {
+          if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+            // OCR occupies the first 80% of a row's progress
+            const pct = Math.round(m.progress * 80);
+            setCurrentRowProgress(pct);
+            updateRow(row.id, { progress: pct, phase: 'ocr' });
+          }
+        },
+      });
+      ocrText = sanitizeOcrText(text);
     } catch (e) {
-      updateRow(row.id, { status: 'error', error: 'Could not read this image' });
+      console.error('OCR failed for bulk row:', e);
+      updateRow(row.id, {
+        status: 'error',
+        phase: 'done',
+        progress: 100,
+        error: `Couldn't read text from ${row.fileName}. Try a sharper, well-lit photo, then retry.`,
+      });
+      setCurrentRowProgress(100);
+      return;
     }
+
+    if (!ocrText.trim()) {
+      updateRow(row.id, {
+        status: 'error',
+        phase: 'done',
+        progress: 100,
+        error: 'No text found on this image. Retake the photo so the whole receipt is in frame, then retry.',
+      });
+      setCurrentRowProgress(100);
+      return;
+    }
+
+    const basic = basicExtract(ocrText);
+    let fields: BulkFields = { ...emptyFields(), ...basic };
+    let confidence: Partial<Record<keyof BulkFields, number>> = {};
+    let warning: string | undefined;
+
+    setCurrentRowProgress(85);
+    updateRow(row.id, { phase: 'enhancing', progress: 85 });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('enhance-receipt-data', {
+        body: { ocrText: stripPotentialPII(ocrText), extractedData: basic },
+      });
+      if (error) throw error;
+      if (data?.enhancedData) {
+        const { confidence: conf, ...enhanced } = data.enhancedData;
+        fields = { ...fields, ...enhanced };
+        if (conf) confidence = conf;
+      }
+    } catch (e) {
+      console.error('AI enhancement failed for bulk row, using basic extraction:', e);
+      warning = 'AI enhancement unavailable — basic text extraction used. Double-check every field.';
+    }
+
+    setCurrentRowProgress(100);
+    updateRow(row.id, { ocrText, fields, confidence, status: 'ready', phase: 'done', progress: 100, warning });
+  };
+
+  const processQueue = async (queue: BulkRow[]) => {
+    setIsProcessing(true);
+    setQueueTotal(queue.length);
+    setQueueDone(0);
+    for (let i = 0; i < queue.length; i++) {
+      await scanRow(queue[i]);
+      setQueueDone(i + 1);
+      setCurrentRowProgress(0);
+    }
+    setIsProcessing(false);
+    setCurrentFile('');
+    setCurrentRowProgress(0);
+  };
+
+  const retryRow = async (row: BulkRow) => {
+    if (isProcessing || isSaving) return;
+    await processQueue([{ ...row, status: 'queued', phase: 'waiting', progress: 0 }]);
+  };
+
+  const retryAllFailed = async () => {
+    const failed = rows.filter((r) => r.status === 'error');
+    if (failed.length === 0) return;
+    await processQueue(failed.map((r) => ({ ...r, status: 'queued', phase: 'waiting', progress: 0 })));
   };
 
   const handleFiles = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,22 +240,19 @@ export const BulkReceiptUpload = () => {
         fields: emptyFields(),
         confidence: {},
         status: 'queued',
+        phase: 'waiting',
+        progress: 0,
       });
     }
 
     if (newRows.length === 0) return;
     setRows((prev) => [...prev, ...newRows]);
 
-    setIsProcessing(true);
-    setProgress(0);
-    for (let i = 0; i < newRows.length; i++) {
-      await scanRow(newRows[i]);
-      setProgress(Math.round(((i + 1) / newRows.length) * 100));
-    }
-    setIsProcessing(false);
+    await processQueue(newRows);
+
     toast({
       title: 'Receipts scanned',
-      description: `${newRows.length} receipt${newRows.length > 1 ? 's' : ''} ready for review. Check highlighted fields before saving.`,
+      description: `${newRows.length} receipt${newRows.length > 1 ? 's' : ''} processed. Check highlighted fields before saving.`,
     });
   };
 
@@ -273,12 +353,19 @@ export const BulkReceiptUpload = () => {
   const readyCount = rows.filter((r) => r.status === 'ready').length;
   const savedCount = rows.filter((r) => r.status === 'saved').length;
 
+  const failedCount = rows.filter((r) => r.status === 'error').length;
+
   const statusBadge = (row: BulkRow) => {
     switch (row.status) {
       case 'queued':
         return <Badge variant="secondary">Queued</Badge>;
       case 'scanning':
-        return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Scanning</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+            {PHASE_LABEL[row.phase]} {row.progress}%
+          </Badge>
+        );
       case 'ready':
         return <Badge variant="outline">Needs review</Badge>;
       case 'saving':
@@ -286,7 +373,7 @@ export const BulkReceiptUpload = () => {
       case 'saved':
         return <Badge className="bg-green-600 hover:bg-green-600"><CheckCircle2 className="h-3 w-3 mr-1" />Saved</Badge>;
       case 'error':
-        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />{row.error || 'Error'}</Badge>;
+        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />Failed</Badge>;
     }
   };
 
@@ -330,17 +417,30 @@ export const BulkReceiptUpload = () => {
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
+                {failedCount > 0 && (
+                  <Button variant="outline" onClick={retryAllFailed} disabled={isProcessing || isSaving}>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Retry Failed ({failedCount})
+                  </Button>
+                )}
                 <span className="text-sm text-muted-foreground">
-                  {rows.length} uploaded · {savedCount} saved
+                  {rows.length} uploaded · {savedCount} saved{failedCount > 0 ? ` · ${failedCount} failed` : ''}
                 </span>
               </>
             )}
           </div>
 
           {isProcessing && (
-            <div className="space-y-2">
-              <Progress value={progress} />
-              <p className="text-sm text-muted-foreground">Scanning receipts… {progress}%</p>
+            <div className="space-y-2" aria-live="polite">
+              <Progress value={overallProgress} />
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Processing {Math.min(queueDone + 1, queueTotal)} of {queueTotal}
+                  {currentFile ? ` — ${currentFile}` : ''}
+                </span>
+                <span>{overallProgress}%</span>
+              </div>
             </div>
           )}
 
@@ -366,6 +466,31 @@ export const BulkReceiptUpload = () => {
                   <p className="text-sm font-medium truncate">{row.fileName}</p>
                   {statusBadge(row)}
                 </div>
+
+                {(row.status === 'scanning' || row.status === 'queued') && (
+                  <div className="space-y-1" aria-live="polite">
+                    <Progress value={row.progress} className="h-2" />
+                    <p className="text-xs text-muted-foreground">
+                      {PHASE_LABEL[row.phase]}
+                      {row.status === 'scanning' ? ` · ${row.progress}%` : ''}
+                    </p>
+                  </div>
+                )}
+
+                {row.status === 'error' && row.error && (
+                  <div className="flex items-start gap-2 p-2 rounded-md border border-destructive/40 bg-destructive/10 text-sm text-destructive">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>{row.error}</span>
+                  </div>
+                )}
+
+                {row.warning && row.status !== 'error' && (
+                  <div className="flex items-start gap-2 p-2 rounded-md border border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-600 text-sm text-yellow-800 dark:text-yellow-300">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>{row.warning}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <Input
                     type="date"
@@ -435,6 +560,17 @@ export const BulkReceiptUpload = () => {
                     >
                       <Save className="h-4 w-4 mr-2" />
                       Save this one
+                    </Button>
+                  )}
+                  {row.status !== 'saved' && row.status !== 'scanning' && row.status !== 'saving' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => retryRow(row)}
+                      disabled={isProcessing || isSaving}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Retry scan
                     </Button>
                   )}
                   <Button
