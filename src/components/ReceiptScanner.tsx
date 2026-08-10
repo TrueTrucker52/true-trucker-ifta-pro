@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap } from 'lucide-react';
+import { Camera, Upload, FileText, Save, Loader2, CloudOff, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,7 @@ import { receiptSchema, sanitizeInput, sanitizeOcrText } from '@/lib/validation'
 import { validateFileUpload } from '@/lib/securityMonitoring';
 import { TripAssignSelect, UNASSIGNED, useTrips, tripLabel } from '@/components/receipts/TripAssignSelect';
 import { findBestTripMatch, type TripMatch } from '@/lib/tripMatch';
+import { useMatchFeedback } from '@/hooks/useMatchFeedback';
 
 interface ReceiptData {
   date: string;
@@ -63,6 +64,8 @@ export const ReceiptScanner = () => {
   const [addToTripFuel, setAddToTripFuel] = useState(true);
   const [tripSuggestion, setTripSuggestion] = useState<TripMatch | null>(null);
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
+  const [feedbackByTrip, setFeedbackByTrip] = useState<Record<string, boolean>>({});
+  const { weights, submitFeedback } = useMatchFeedback();
   const { trips } = useTrips();
   
   const [receiptData, setReceiptData] = useState<ReceiptData>({
@@ -99,13 +102,14 @@ export const ReceiptScanner = () => {
     }
     const match = findBestTripMatch(
       { date: receiptData.date, stateCode: receiptData.stateCode, gallons: receiptData.gallons },
-      trips
+      trips,
+      weights
     );
     setTripSuggestion(match);
     if (match && !suggestionDismissed && selectedTripId === UNASSIGNED) {
       setSelectedTripId(match.trip.id);
     }
-  }, [trips, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
+  }, [trips, weights, receiptData.date, receiptData.stateCode, receiptData.gallons, suggestionDismissed, selectedTripId]);
 
 
   const isLowConfidence = (field: keyof ConfidenceScores): boolean => {
@@ -836,6 +840,52 @@ export const ReceiptScanner = () => {
                     >
                       Not this trip
                     </Button>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1 border-t border-primary/20">
+                    <span className="text-xs text-muted-foreground">Was this match right?</span>
+                    <Button
+                      size="sm"
+                      variant={feedbackByTrip[tripSuggestion.trip.id] === true ? 'default' : 'ghost'}
+                      className="h-7 px-2"
+                      aria-label="Good match"
+                      disabled={tripSuggestion.trip.id in feedbackByTrip}
+                      onClick={async () => {
+                        setFeedbackByTrip((p) => ({ ...p, [tripSuggestion.trip.id]: true }));
+                        await submitFeedback({
+                          helpful: true,
+                          suggestedTripId: tripSuggestion.trip.id,
+                          chosenTripId: selectedTripId === UNASSIGNED ? null : selectedTripId,
+                          matchScore: tripSuggestion.score,
+                          signals: tripSuggestion.signals,
+                        });
+                        toast({ title: 'Thanks — noted', description: 'Future suggestions will lean on these signals more.' });
+                      }}
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={feedbackByTrip[tripSuggestion.trip.id] === false ? 'default' : 'ghost'}
+                      className="h-7 px-2"
+                      aria-label="Bad match"
+                      disabled={tripSuggestion.trip.id in feedbackByTrip}
+                      onClick={async () => {
+                        setFeedbackByTrip((p) => ({ ...p, [tripSuggestion.trip.id]: false }));
+                        await submitFeedback({
+                          helpful: false,
+                          suggestedTripId: tripSuggestion.trip.id,
+                          chosenTripId: selectedTripId === UNASSIGNED ? null : selectedTripId,
+                          matchScore: tripSuggestion.score,
+                          signals: tripSuggestion.signals,
+                        });
+                        toast({ title: 'Got it', description: 'This kind of match will be suggested less often.' });
+                      }}
+                    >
+                      <ThumbsDown className="h-4 w-4" />
+                    </Button>
+                    {tripSuggestion.trip.id in feedbackByTrip && (
+                      <span className="text-xs text-muted-foreground">Feedback saved</span>
+                    )}
                   </div>
                 </div>
               )}
