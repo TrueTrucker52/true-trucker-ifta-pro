@@ -9,12 +9,35 @@ export interface ReceiptMatchInput {
   gallons?: string | number;
 }
 
+/** Signals that produced a match — logged with thumbs feedback so weights can adapt. */
+export interface MatchSignals {
+  /** Days between the receipt date and the nearest trip date (0 = inside window) */
+  dayOffset: number | null;
+  stateMatched: boolean;
+  gallonsMatched: boolean;
+}
+
 export interface TripMatch {
   trip: TripOption;
   /** 0-100 confidence */
   score: number;
   reasons: string[];
+  signals: MatchSignals;
 }
+
+/**
+ * Learned multipliers per signal (1 = neutral). Derived from the user's
+ * thumbs-up/thumbs-down history on past suggestions.
+ */
+export interface MatchWeights {
+  date: number;
+  state: number;
+  gallons: number;
+  /** Per-trip multiplier, e.g. trips the user repeatedly rejected */
+  tripBias?: Record<string, number>;
+}
+
+export const DEFAULT_WEIGHTS: MatchWeights = { date: 1, state: 1, gallons: 1 };
 
 const dayDiff = (a: string, b: string) => {
   const t1 = new Date(a + 'T00:00:00').getTime();
@@ -27,10 +50,18 @@ const dayDiff = (a: string, b: string) => {
  * Scores a receipt against a trip using fuel date, purchase state and gallons.
  * Date is weighted heaviest (a receipt inside the trip window is the strongest
  * signal), then state overlap, then whether gallons look plausible for the trip.
+ * Learned weights nudge each signal based on past user corrections.
  */
-export const scoreTripMatch = (receipt: ReceiptMatchInput, trip: TripOption): TripMatch => {
+export const scoreTripMatch = (
+  receipt: ReceiptMatchInput,
+  trip: TripOption,
+  weights: MatchWeights = DEFAULT_WEIGHTS
+): TripMatch => {
   const reasons: string[] = [];
-  let score = 0;
+  let dateScore = 0;
+  let stateScore = 0;
+  let gallonsScore = 0;
+  const signals: MatchSignals = { dayOffset: null, stateMatched: false, gallonsMatched: false };
 
   // --- Date (max 55) ---
   if (receipt.date) {
@@ -39,15 +70,17 @@ export const scoreTripMatch = (receipt: ReceiptMatchInput, trip: TripOption): Tr
     const fromEnd = dayDiff(receipt.date, end);
     if (fromStart !== null && fromEnd !== null) {
       if (fromStart >= 0 && fromEnd <= 0) {
-        score += 55;
+        dateScore = 55;
+        signals.dayOffset = 0;
         reasons.push('Fuel date falls inside the trip dates');
       } else {
         const off = fromStart < 0 ? Math.abs(fromStart) : fromEnd;
+        signals.dayOffset = off;
         if (off <= 1) {
-          score += 40;
+          dateScore = 40;
           reasons.push('Fuel date is within a day of the trip');
         } else if (off <= 3) {
-          score += 22;
+          dateScore = 22;
           reasons.push(`Fuel date is ${off} days from the trip`);
         }
       }
@@ -58,15 +91,16 @@ export const scoreTripMatch = (receipt: ReceiptMatchInput, trip: TripOption): Tr
   const st = receipt.stateCode?.trim().toUpperCase();
   if (st) {
     if (st === trip.origin_state?.toUpperCase() && st === trip.destination_state?.toUpperCase()) {
-      score += 30;
+      stateScore = 30;
       reasons.push(`Purchased in ${st}, the trip's only state`);
     } else if (st === trip.origin_state?.toUpperCase()) {
-      score += 25;
+      stateScore = 25;
       reasons.push(`Purchased in ${st}, the trip's origin state`);
     } else if (st === trip.destination_state?.toUpperCase()) {
-      score += 25;
+      stateScore = 25;
       reasons.push(`Purchased in ${st}, the trip's destination state`);
     }
+    signals.stateMatched = stateScore > 0;
   }
 
   // --- Gallons (max 15) ---
@@ -77,19 +111,24 @@ export const scoreTripMatch = (receipt: ReceiptMatchInput, trip: TripOption): Tr
       // Plausible if the fill-up is no more than the trip could burn at ~5 mpg
       const maxPlausible = tripMiles / 5;
       if (gallons <= maxPlausible) {
-        score += 15;
+        gallonsScore = 15;
         reasons.push(`${gallons} gal fits this trip's mileage`);
       } else if (gallons <= maxPlausible * 1.5) {
-        score += 7;
+        gallonsScore = 7;
         reasons.push(`${gallons} gal is slightly high for this trip`);
       }
     } else {
-      score += 7;
+      gallonsScore = 7;
       reasons.push(`${gallons} gal recorded`);
     }
+    signals.gallonsMatched = gallonsScore >= 15;
   }
 
-  return { trip, score: Math.min(100, score), reasons };
+  const weighted =
+    dateScore * weights.date + stateScore * weights.state + gallonsScore * weights.gallons;
+  const bias = weights.tripBias?.[trip.id] ?? 1;
+
+  return { trip, score: Math.round(Math.max(0, Math.min(100, weighted * bias))), reasons, signals };
 };
 
 /** Minimum score before we preselect a trip for the user. */
@@ -98,11 +137,12 @@ export const AUTO_MATCH_THRESHOLD = 55;
 /** Returns the best-scoring trip, or null when nothing is convincing enough. */
 export const findBestTripMatch = (
   receipt: ReceiptMatchInput,
-  trips: TripOption[]
+  trips: TripOption[],
+  weights: MatchWeights = DEFAULT_WEIGHTS
 ): TripMatch | null => {
   if (!trips.length) return null;
   const scored = trips
-    .map((t) => scoreTripMatch(receipt, t))
+    .map((t) => scoreTripMatch(receipt, t, weights))
     .sort((a, b) => b.score - a.score);
   const best = scored[0];
   if (!best || best.score < AUTO_MATCH_THRESHOLD) return null;
