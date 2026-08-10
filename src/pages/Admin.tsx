@@ -559,6 +559,9 @@ const Admin = () => {
         </Card>
 
         {/* ─── Email Reminder Log ─── */}
+        <ReminderPreviewPanel enabled={isAdmin} />
+
+        {/* ─── Email Reminder Log ─── */}
         <EmailLogPanel enabled={isAdmin} />
 
         {/* ─── System Health ─── */}
