@@ -1,7 +1,10 @@
 import { ReceiptScanner } from '@/components/ReceiptScanner';
+import { BulkReceiptUpload } from '@/components/BulkReceiptUpload';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Camera } from 'lucide-react';
+
 
 const ReceiptScan = () => {
   const navigate = useNavigate();
